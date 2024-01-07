@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2024-01-02T03:59:05.501Z</updated>
+  <updated>2024-01-07T06:53:30.825Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -17,11 +17,95 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>APP读取按键的几种方式</title>
+    <link href="http://example.com/2024/01/07/APP%E8%AF%BB%E5%8F%96%E6%8C%89%E9%94%AE%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F/"/>
+    <id>http://example.com/2024/01/07/APP%E8%AF%BB%E5%8F%96%E6%8C%89%E9%94%AE%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F/</id>
+    <published>2024-01-07T11:43:44.000Z</published>
+    <updated>2024-01-07T06:53:30.825Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;1-APP读取按键值&quot;&gt;&lt;a href=&quot;#1-APP读取按键值&quot; class=&quot;headerlink&quot; title=&quot;1.APP读取按键值&quot;&gt;&lt;/a&gt;1.APP读取按键值&lt;/h2&gt;&lt;h3 id=&quot;1-1-APP读取按键的-4-种方法&quot;&gt;&lt;a href=&quot;#1-1-APP读取按键的-4-种方法&quot; class=&quot;headerlink&quot; title=&quot;1.1 APP读取按键的 4 种方法&quot;&gt;&lt;/a&gt;1.1 APP读取按键的 4 种方法&lt;/h3&gt;&lt;h4 id=&quot;1-1-1-查询方式&quot;&gt;&lt;a href=&quot;#1-1-1-查询方式&quot; class=&quot;headerlink&quot; title=&quot;1.1.1 查询方式&quot;&gt;&lt;/a&gt;1.1.1 查询方式&lt;/h4&gt;&lt;p&gt;&lt;img src=&quot;/../images/APP%E8%AF%BB%E5%8F%96%E6%8C%89%E9%94%AE%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F/image-20240102195020502.png&quot; alt=&quot;image-20240102195020502&quot;&gt;&lt;/p&gt;
+&lt;p&gt;驱动程序中构造、注册一个 file_operations 结构体，里面提供有对应的 open,read 函数。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="Linux应用开发" scheme="http://example.com/categories/Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/"/>
+    
+    
+    <category term="嵌入式" scheme="http://example.com/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/"/>
+    
+    <category term="Linux" scheme="http://example.com/tags/Linux/"/>
+    
+    <category term="C/C++" scheme="http://example.com/tags/C-C/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>异常和中断</title>
+    <link href="http://example.com/2024/01/05/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/"/>
+    <id>http://example.com/2024/01/05/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/</id>
+    <published>2024-01-05T02:36:47.000Z</published>
+    <updated>2024-01-07T07:25:10.537Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;1-异常和中断&quot;&gt;&lt;a href=&quot;#1-异常和中断&quot; class=&quot;headerlink&quot; title=&quot;1.异常和中断&quot;&gt;&lt;/a&gt;1.异常和中断&lt;/h2&gt;&lt;h3 id=&quot;1-1-异常和中断的概念&quot;&gt;&lt;a href=&quot;#1-1-异常和中断的概念&quot; class=&quot;headerlink&quot; title=&quot;1.1 异常和中断的概念&quot;&gt;&lt;/a&gt;1.1 异常和中断的概念&lt;/h3&gt;&lt;p&gt;异常不可屏蔽，中断可以屏蔽，中断一种特殊的异常。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/../images/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/image-20240105105633741.png&quot; alt=&quot;image-20240105105633741&quot;&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;初始化，设置中断源（设置中断源、设置中断控制器、使能CPU总开关）&lt;/li&gt;
+&lt;li&gt;执行程序&lt;/li&gt;
+&lt;li&gt;产生中断：中断源 -&amp;gt; 中断控制器 -&amp;gt; CPU&lt;/li&gt;
+&lt;li&gt;CPU每执行完一条指令，都会检查有无中断&amp;#x2F;异常产生&lt;/li&gt;
+&lt;li&gt;CPU发现有中断&amp;#x2F;异常产生，开始处理&lt;/li&gt;
+&lt;li&gt;对于不同的异常，跳去不同的地址执行指令（中断向量表），这些指令只是一条跳转指令，跳去执行某个函数&lt;/li&gt;
+&lt;li&gt;处理函数：保存现场，&lt;strong&gt;分辨中断源并调用相应的处理函数&lt;/strong&gt;，恢复现场&lt;/li&gt;
+&lt;/ol&gt;</summary>
+    
+    
+    
+    <category term="Linux应用开发" scheme="http://example.com/categories/Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/"/>
+    
+    
+    <category term="嵌入式" scheme="http://example.com/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/"/>
+    
+    <category term="Linux" scheme="http://example.com/tags/Linux/"/>
+    
+    <category term="C/C++" scheme="http://example.com/tags/C-C/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Pinctrl和GPIO子系统</title>
+    <link href="http://example.com/2024/01/02/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/"/>
+    <id>http://example.com/2024/01/02/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/</id>
+    <published>2024-01-02T11:43:44.000Z</published>
+    <updated>2024-01-07T06:53:35.028Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;1-GPIO-和-Pinctrl-子系统的使用&quot;&gt;&lt;a href=&quot;#1-GPIO-和-Pinctrl-子系统的使用&quot; class=&quot;headerlink&quot; title=&quot;1.  GPIO 和 Pinctrl 子系统的使用&quot;&gt;&lt;/a&gt;1.  GPIO 和 Pinctrl 子系统的使用&lt;/h2&gt;&lt;p&gt;在 LED 驱动程序中，我们使用寄存器操作的方式来配置硬件，这种方式是非常低效的，对于具有大量寄存器的芯片肯定需要将寄存器操作，可以由芯片厂的BSP工程师来封装成库，然后来让驱动开发人员进行调用，这就是今天引入的 GPIO 和 Pinctrl 子系统。&lt;/p&gt;
+&lt;h3 id=&quot;1-1-Pinctrl-子系统&quot;&gt;&lt;a href=&quot;#1-1-Pinctrl-子系统&quot; class=&quot;headerlink&quot; title=&quot;1.1 Pinctrl 子系统&quot;&gt;&lt;/a&gt;1.1 Pinctrl 子系统&lt;/h3&gt;&lt;blockquote&gt;
+&lt;p&gt;参考文档：内核目录&#92;Documentation&#92;devicetree&#92;bindings&#92;pinctrl&#92;pinctrl-bindings.txt&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Pinctrl 子系统涉及 2 个对象：pin controller、client device。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="Linux应用开发" scheme="http://example.com/categories/Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/"/>
+    
+    
+    <category term="嵌入式" scheme="http://example.com/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/"/>
+    
+    <category term="Linux" scheme="http://example.com/tags/Linux/"/>
+    
+    <category term="C/C++" scheme="http://example.com/tags/C-C/"/>
+    
+  </entry>
+  
+  <entry>
     <title>使用设备树的LED驱动框架</title>
     <link href="http://example.com/2024/01/02/%E4%BD%BF%E7%94%A8%E8%AE%BE%E5%A4%87%E6%A0%91%E7%9A%84LED%E9%A9%B1%E5%8A%A8%E6%A1%86%E6%9E%B6/"/>
     <id>http://example.com/2024/01/02/%E4%BD%BF%E7%94%A8%E8%AE%BE%E5%A4%87%E6%A0%91%E7%9A%84LED%E9%A9%B1%E5%8A%A8%E6%A1%86%E6%9E%B6/</id>
     <published>2024-01-02T03:02:49.000Z</published>
-    <updated>2024-01-02T03:59:05.501Z</updated>
+    <updated>2024-01-06T04:29:11.167Z</updated>
     
     
     <summary type="html">&lt;h2 id=&quot;1-设备树&quot;&gt;&lt;a href=&quot;#1-设备树&quot; class=&quot;headerlink&quot; title=&quot;1. 设备树&quot;&gt;&lt;/a&gt;1. 设备树&lt;/h2&gt;&lt;h3 id=&quot;1-1-设备树的引入&quot;&gt;&lt;a href=&quot;#1-1-设备树的引入&quot; class=&quot;headerlink&quot; title=&quot;1.1 设备树的引入&quot;&gt;&lt;/a&gt;1.1 设备树的引入&lt;/h3&gt;&lt;p&gt;如果按照上面的方式来让我们的Linux内核支持所有的主控和开发板；也许常用的主控芯片并不是很多，但是基于主控芯片所设计出的开发板就是那就是千千万万了。如果要将所有的开发板的引脚配置编译到内核中，那内核中将充斥大量的高度重复的文件。为此，引入了设备树的概念，&lt;strong&gt;设备树用来给内核里的驱动程序指定硬件的信息&lt;/strong&gt;：&lt;/p&gt;
@@ -46,7 +130,7 @@
     <link href="http://example.com/2024/01/02/LED%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F%E6%A1%86%E6%9E%B6/"/>
     <id>http://example.com/2024/01/02/LED%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F%E6%A1%86%E6%9E%B6/</id>
     <published>2024-01-02T03:02:18.000Z</published>
-    <updated>2024-01-02T03:06:04.000Z</updated>
+    <updated>2024-01-06T04:29:14.832Z</updated>
     
     
     <summary type="html">&lt;h2 id=&quot;1-LED驱动程序框架设计-分离&quot;&gt;&lt;a href=&quot;#1-LED驱动程序框架设计-分离&quot; class=&quot;headerlink&quot; title=&quot;1.LED驱动程序框架设计-分离&quot;&gt;&lt;/a&gt;1.LED驱动程序框架设计-分离&lt;/h2&gt;&lt;p&gt;在上一篇博文中编写的驱动程序仅能操作固定开发板上的一个LED灯。考虑现实情况，使用同一款主控芯片，不同厂家可能会设计不同的PCB板，针对硬件使用的芯片引脚各不相同，但是同一款主控针对同一硬件的设置都是相似的。因此，我们考虑针对通用LED驱动程序，主控芯片，开发板来分离出三层，以便我们的LED驱动程序能够支持不同主控不同开发板使用：&lt;/p&gt;
@@ -536,114 +620,6 @@
 &lt;td&gt;输出详细编译信息（比如说库文件查找路径）&lt;/td&gt;
 &lt;/tr&gt;
 &lt;/tbody&gt;&lt;/table&gt;</summary>
-    
-    
-    
-    <category term="Linux应用开发" scheme="http://example.com/categories/Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/"/>
-    
-    
-    <category term="嵌入式" scheme="http://example.com/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/"/>
-    
-    <category term="Linux" scheme="http://example.com/tags/Linux/"/>
-    
-    <category term="C/C++" scheme="http://example.com/tags/C-C/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>imx6null-mini开发板</title>
-    <link href="http://example.com/2023/09/05/%E5%BC%80%E5%8F%91%E6%9D%BF/"/>
-    <id>http://example.com/2023/09/05/%E5%BC%80%E5%8F%91%E6%9D%BF/</id>
-    <published>2023-09-05T12:27:59.000Z</published>
-    <updated>2023-09-12T07:35:40.780Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;1-硬件资源简介&quot;&gt;&lt;a href=&quot;#1-硬件资源简介&quot; class=&quot;headerlink&quot; title=&quot;1.硬件资源简介&quot;&gt;&lt;/a&gt;1.硬件资源简介&lt;/h2&gt;&lt;p&gt;&lt;img src=&quot;/../images/%E5%BC%80%E5%8F%91%E6%9D%BF/image-20230905203618081.png&quot; alt=&quot;image-20230905203618081&quot;&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src=&quot;/../images/%E5%BC%80%E5%8F%91%E6%9D%BF/image-20230905204358901.png&quot; alt=&quot;image-20230905204358901&quot;&gt;&lt;/p&gt;
-&lt;h2 id=&quot;2-启动方式&quot;&gt;&lt;a href=&quot;#2-启动方式&quot; class=&quot;headerlink&quot; title=&quot;2. 启动方式&quot;&gt;&lt;/a&gt;2. 启动方式&lt;/h2&gt;&lt;p&gt;&lt;img src=&quot;/../images/%E5%BC%80%E5%8F%91%E6%9D%BF/image-20230905204619465.png&quot; alt=&quot;image-20230905204619465&quot;&gt;&lt;/p&gt;</summary>
-    
-    
-    
-    <category term="Linux应用开发" scheme="http://example.com/categories/Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/"/>
-    
-    
-    <category term="嵌入式" scheme="http://example.com/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/"/>
-    
-    <category term="Linux" scheme="http://example.com/tags/Linux/"/>
-    
-    <category term="C/C++" scheme="http://example.com/tags/C-C/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Linux系统基本知识</title>
-    <link href="http://example.com/2023/09/01/Linux%E7%B3%BB%E7%BB%9F%E5%9F%BA%E6%9C%AC%E7%9F%A5%E8%AF%86/"/>
-    <id>http://example.com/2023/09/01/Linux%E7%B3%BB%E7%BB%9F%E5%9F%BA%E6%9C%AC%E7%9F%A5%E8%AF%86/</id>
-    <published>2023-09-01T11:43:29.000Z</published>
-    <updated>2023-12-23T11:02:38.333Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;1-根目录结构（FSH标准）&quot;&gt;&lt;a href=&quot;#1-根目录结构（FSH标准）&quot; class=&quot;headerlink&quot; title=&quot;1.根目录结构（FSH标准）&quot;&gt;&lt;/a&gt;1.根目录结构（FSH标准）&lt;/h2&gt;&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;&amp;#x2F;bin：&lt;strong&gt;所有用户&lt;/strong&gt;都可以使用的、&lt;strong&gt;基本的&lt;/strong&gt;命令&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&amp;#x2F;boot：启动文件，比如内核等&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&amp;#x2F;dev：以文件的形式保存 Linux 所有的设备及接口设备&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&amp;#x2F;etc：配置文件&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&amp;#x2F;home：家目录&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&amp;#x2F;root：root用户的家目录&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&amp;#x2F;lib：主要放置系统开机使用的、&amp;#x2F;bin 和 &amp;#x2F;sbin 目录下的命令使用的库函数&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&amp;#x2F;media：插上U盘等外设会挂在到该目录上&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&amp;#x2F;mnt：用来挂载其他文件系统&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&amp;#x2F;opt：第三方软件放置的目录&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&amp;#x2F;proc：这个目录是一个虚拟文件系统，它放置的数据都是在内存当中，例如进程、外部设备状态、网络状态等&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&amp;#x2F;sbin：该目录下放置开机过程中需要的命令，包括开机、修复、还原系统等&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&amp;#x2F;sys：用来挂载虛拟的sys文件系统，可以查看系统信息:比如设备信息&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&amp;#x2F;tmp：置文件的地方&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&amp;#x2F;var：放置常态化变动的文件，例如缓存、登录日志文件、软件运行产生的文件等&lt;/p&gt;
-&lt;/li&gt;
-&lt;li&gt;&lt;p&gt;&amp;#x2F;usr：&lt;code&gt;Unix Software Resource&lt;/code&gt;，存放可分享的与&lt;strong&gt;不可变动&lt;/strong&gt;的数据&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;&amp;#x2F;bin：绝大部分的用户可使用指令都放在这里(与开机无关)，&amp;#x2F;bin中的命令跟开机有关&lt;/li&gt;
-&lt;li&gt;&amp;#x2F;include：C&amp;#x2F;C++的头文件和包含文件&lt;/li&gt;
-&lt;li&gt;&amp;#x2F;lib：库&lt;/li&gt;
-&lt;li&gt;&amp;#x2F;local：系统管理员在本机自行下载的软件&lt;/li&gt;
-&lt;li&gt;&amp;#x2F;usr&amp;#x2F;src&amp;#x2F;：源码放置的地方&lt;/li&gt;
-&lt;li&gt;&amp;#x2F;usr&amp;#x2F;share&amp;#x2F;：放置共享文件的地方&lt;/li&gt;
-&lt;li&gt;&amp;#x2F;usr&amp;#x2F;sbin&amp;#x2F;：非系统正常运行需要的系统命令&lt;/li&gt;
-&lt;/ul&gt;
-&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&quot;1-1-Shell的执行&quot;&gt;&lt;a href=&quot;#1-1-Shell的执行&quot; class=&quot;headerlink&quot; title=&quot;1.1 Shell的执行&quot;&gt;&lt;/a&gt;1.1 Shell的执行&lt;/h3&gt;&lt;ol&gt;
-&lt;li&gt;解析用户输入(以空格分割字符串)&lt;/li&gt;
-&lt;li&gt;第一个参数为需要待执行程序的名称（&lt;strong&gt;在指定路径或者环境变量包含路径中寻找&lt;/strong&gt;）&lt;/li&gt;
-&lt;li&gt;其余参数为传递给该程序的参数&lt;/li&gt;
-&lt;/ol&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;p&gt;举例：&lt;/p&gt;
-&lt;figure class=&quot;highlight c&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;4&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;5&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;6&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;7&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;8&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;9&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;10&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;comment&quot;&gt;//hello.c&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;meta&quot;&gt;#&lt;span class=&quot;keyword&quot;&gt;include&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;&amp;lt;stdio.h&amp;gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;type&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;title function_&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;(&lt;span class=&quot;type&quot;&gt;int&lt;/span&gt; ac, &lt;span class=&quot;type&quot;&gt;char&lt;/span&gt;*av[])&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&amp;#123;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;	&lt;span class=&quot;keyword&quot;&gt;if&lt;/span&gt;(ac &amp;gt;= &lt;span class=&quot;number&quot;&gt;2&lt;/span&gt;)&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;		&lt;span class=&quot;built_in&quot;&gt;printf&lt;/span&gt;(&lt;span class=&quot;string&quot;&gt;&amp;quot;Hello %s&#92;n&amp;quot;&lt;/span&gt;, av[&lt;span class=&quot;number&quot;&gt;1&lt;/span&gt;]);&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;	&lt;span class=&quot;keyword&quot;&gt;else&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;		&lt;span class=&quot;built_in&quot;&gt;printf&lt;/span&gt;(&lt;span class=&quot;string&quot;&gt;&amp;quot;Hello wrold&#92;n&amp;quot;&lt;/span&gt;);&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;	&lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;number&quot;&gt;0&lt;/span&gt;;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&amp;#125;&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-
-&lt;p&gt;使用如下命令编译并执行，则在当前目录下寻找可执行文件hello：&lt;/p&gt;
-&lt;figure class=&quot;highlight shell&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;meta prompt_&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;language-bash&quot;&gt;gcc hello.c -o hello&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;meta prompt_&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;language-bash&quot;&gt;./hello Krocz&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-
-&lt;p&gt;如果使用如下命令执行，则会在环境变量保存的所有路径中寻找可执行文件hello：&lt;/p&gt;
-&lt;figure class=&quot;highlight shell&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;meta prompt_&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;language-bash&quot;&gt;hello Krocz&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-
-&lt;p&gt;可以选择将文件hello放到PATH保存的某个路径中，例如&lt;code&gt;/usr/bin&lt;/code&gt;；也可以为环境变量PATH添加新路径&lt;/p&gt;
-&lt;/li&gt;
-&lt;/ul&gt;</summary>
     
     
     

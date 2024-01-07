@@ -40,7 +40,7 @@
 <meta property="og:image" content="http://example.com/images/%E4%BD%BF%E7%94%A8%E8%AE%BE%E5%A4%87%E6%A0%91%E7%9A%84LED%E9%A9%B1%E5%8A%A8%E6%A1%86%E6%9E%B6/image-20240102114920931.png">
 <meta property="og:image" content="http://example.com/images/%E4%BD%BF%E7%94%A8%E8%AE%BE%E5%A4%87%E6%A0%91%E7%9A%84LED%E9%A9%B1%E5%8A%A8%E6%A1%86%E6%9E%B6/image-20240102115755062.png">
 <meta property="article:published_time" content="2024-01-02T03:02:49.000Z">
-<meta property="article:modified_time" content="2024-01-02T03:59:05.501Z">
+<meta property="article:modified_time" content="2024-01-06T04:29:11.167Z">
 <meta property="article:author" content="Krocz">
 <meta property="article:tag" content="嵌入式">
 <meta property="article:tag" content="Linux">
@@ -238,10 +238,16 @@
                 <i class="far fa-calendar"></i>
               </span>
               <span class="post-meta-item-text">发表于</span>
-              
 
-              <time title="创建时间：2024-01-02 11:02:49 / 修改时间：11:59:05" itemprop="dateCreated datePublished" datetime="2024-01-02T11:02:49+08:00">2024-01-02</time>
+              <time title="创建时间：2024-01-02 11:02:49" itemprop="dateCreated datePublished" datetime="2024-01-02T11:02:49+08:00">2024-01-02</time>
             </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-01-06 12:29:11" itemprop="dateModified" datetime="2024-01-06T12:29:11+08:00">2024-01-06</time>
+              </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
                 <i class="far fa-folder"></i>
@@ -483,7 +489,7 @@
 <li><p>根节点下含有 compatile 属性的<strong>子节点</strong></p>
 </li>
 <li><p>含有特定 compatile 属性的<strong>节点的子节点</strong></p>
-<p>如果一个节点的 compatile 属性，它的值包括这 4 者之一：<code>simplebus</code>，<code>simple-mfd</code>，<code>isa</code>，<code>arm,amba-bus</code>，那么它的子结点( <strong>需含 compatile 属性</strong>)也可以转换为 platform_device。</p>
+<p>如果一个节点的 compatile 属性，它的值包括这 4 者之一：<code>simple-bus</code>，<code>simple-mfd</code>，<code>isa</code>，<code>arm,amba-bus</code>，那么它的子结点( <strong>需含 compatile 属性</strong>)也可以转换为 platform_device。</p>
 </li>
 <li><p>总线 I2C、SPI 节点下的子节点：<strong>不转换</strong>为 platform_device</p>
 <p>某个总线下到子节点，应该交给对应的总线驱动程序来处理, 它们不应该被转换为 platform_device。</p>
@@ -582,7 +588,10 @@
     <a href="/2024/01/02/LED%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F%E6%A1%86%E6%9E%B6/" rel="prev" title="LED驱动程序框架">
       <i class="fa fa-chevron-left"></i> LED驱动程序框架
     </a></div>
-      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2024/01/02/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/" rel="next" title="Pinctrl和GPIO子系统">
+      Pinctrl和GPIO子系统 <i class="fa fa-chevron-right"></i>
+    </a></div>
     </div>
       </footer>
     
@@ -656,7 +665,7 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">19</span>
+          <span class="site-state-item-count">22</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
