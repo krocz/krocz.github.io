@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2024-01-07T06:53:30.825Z</updated>
+  <updated>2024-01-12T11:23:10.156Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,63 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>mmap</title>
+    <link href="http://example.com/2024/01/12/mmap/"/>
+    <id>http://example.com/2024/01/12/mmap/</id>
+    <published>2024-01-12T03:38:50.000Z</published>
+    <updated>2024-01-12T11:23:10.156Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;1-为什么要使用-mmap&quot;&gt;&lt;a href=&quot;#1-为什么要使用-mmap&quot; class=&quot;headerlink&quot; title=&quot;1. 为什么要使用 mmap&quot;&gt;&lt;/a&gt;1. 为什么要使用 mmap&lt;/h2&gt;&lt;p&gt;应用程序和驱动程序之间传递数据时，可以通过 read、write 函数进行，如下图：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/../images/mmap/image-20240112114136049.png&quot; alt=&quot;image-20240112114136049&quot;&gt;&lt;/p&gt;
+&lt;p&gt;应用程序不能直接读写驱动程序中的 buffer，需要在用户态 buffer 和内核态 buffer 之间进行一次数据拷贝。这种方式在数据量比较小时没什么问题； 但是数据量比较大时效率太低。例如更新 LCD，假设 LCD 采用 &lt;code&gt;1024 × 600 × 32 bpp&lt;/code&gt; 的格式，则一帧数据就有 2.3 M左右，拷贝的步骤效率太低。&lt;/p&gt;
+&lt;p&gt;应该允许程序直接读写驱动程序中的 buffer，这可以通过 mmap 实现(memory map)，把内核的 buffer 映射到用户态，让 APP 在用户态直接读写。&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="Linux应用开发" scheme="http://example.com/categories/Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/"/>
+    
+    
+    <category term="嵌入式" scheme="http://example.com/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/"/>
+    
+    <category term="Linux" scheme="http://example.com/tags/Linux/"/>
+    
+    <category term="C/C++" scheme="http://example.com/tags/C-C/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>驱动程序的必要基础</title>
+    <link href="http://example.com/2024/01/09/%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F%E7%9A%84%E5%BF%85%E8%A6%81%E5%9F%BA%E7%A1%80/"/>
+    <id>http://example.com/2024/01/09/%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F%E7%9A%84%E5%BF%85%E8%A6%81%E5%9F%BA%E7%A1%80/</id>
+    <published>2024-01-09T01:52:05.000Z</published>
+    <updated>2024-01-11T12:22:33.597Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;1-休眠与唤醒&quot;&gt;&lt;a href=&quot;#1-休眠与唤醒&quot; class=&quot;headerlink&quot; title=&quot;1. 休眠与唤醒&quot;&gt;&lt;/a&gt;1. 休眠与唤醒&lt;/h2&gt;&lt;h3 id=&quot;1-1-使用示例&quot;&gt;&lt;a href=&quot;#1-1-使用示例&quot; class=&quot;headerlink&quot; title=&quot;1.1 使用示例&quot;&gt;&lt;/a&gt;1.1 使用示例&lt;/h3&gt;&lt;p&gt;使用休眠-唤醒机制来编写按键驱动程序：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;APP 调用 read 等函数试图读取数据，比如读取按键；&lt;/li&gt;
+&lt;li&gt;APP 进入内核态，也就是调用驱动中的对应函数，发现有数据则复制到用户空间并马上返回；&lt;/li&gt;
+&lt;li&gt;如果 APP 在内核态，也就是在驱动程序中发现没有数据，则 APP 休眠，进程&amp;#x2F;线程状态改为非 Running；&lt;/li&gt;
+&lt;li&gt;当有数据时，比如当按下按键时，驱动程序的中断服务程序被调用，它会记录数据、将 APP 的进程&amp;#x2F;线程状态修改为 Running；&lt;/li&gt;
+&lt;li&gt;调度器调度 APP 继续运行它的内核态代码，也就是驱动程序中的函数，复制数据到用户空间并马上返回。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;如下图所示：&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="Linux应用开发" scheme="http://example.com/categories/Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/"/>
+    
+    
+    <category term="嵌入式" scheme="http://example.com/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/"/>
+    
+    <category term="Linux" scheme="http://example.com/tags/Linux/"/>
+    
+    <category term="C/C++" scheme="http://example.com/tags/C-C/"/>
+    
+  </entry>
   
   <entry>
     <title>APP读取按键的几种方式</title>
@@ -45,7 +102,7 @@
     <link href="http://example.com/2024/01/05/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/"/>
     <id>http://example.com/2024/01/05/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/</id>
     <published>2024-01-05T02:36:47.000Z</published>
-    <updated>2024-01-07T07:25:10.537Z</updated>
+    <updated>2024-01-11T02:17:01.175Z</updated>
     
     
     <summary type="html">&lt;h2 id=&quot;1-异常和中断&quot;&gt;&lt;a href=&quot;#1-异常和中断&quot; class=&quot;headerlink&quot; title=&quot;1.异常和中断&quot;&gt;&lt;/a&gt;1.异常和中断&lt;/h2&gt;&lt;h3 id=&quot;1-1-异常和中断的概念&quot;&gt;&lt;a href=&quot;#1-1-异常和中断的概念&quot; class=&quot;headerlink&quot; title=&quot;1.1 异常和中断的概念&quot;&gt;&lt;/a&gt;1.1 异常和中断的概念&lt;/h3&gt;&lt;p&gt;异常不可屏蔽，中断可以屏蔽，中断一种特殊的异常。&lt;/p&gt;
@@ -155,7 +212,7 @@
     <link href="http://example.com/2023/11/10/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E6%A8%A1%E6%9D%BF/"/>
     <id>http://example.com/2023/11/10/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E6%A8%A1%E6%9D%BF/</id>
     <published>2023-11-10T03:54:12.000Z</published>
-    <updated>2024-01-02T07:38:37.418Z</updated>
+    <updated>2024-01-17T03:59:34.174Z</updated>
     
     
     <summary type="html">&lt;h2 id=&quot;1-链表&quot;&gt;&lt;a href=&quot;#1-链表&quot; class=&quot;headerlink&quot; title=&quot;1.链表&quot;&gt;&lt;/a&gt;1.链表&lt;/h2&gt;&lt;h3 id=&quot;1-静态链表（数组模拟）&quot;&gt;&lt;a href=&quot;#1-静态链表（数组模拟）&quot; class=&quot;headerlink&quot; title=&quot;1.静态链表（数组模拟）&quot;&gt;&lt;/a&gt;1.静态链表（数组模拟）&lt;/h3&gt;&lt;h4 id=&quot;1-1-单链表&quot;&gt;&lt;a href=&quot;#1-1-单链表&quot; class=&quot;headerlink&quot; title=&quot;1.1 单链表&quot;&gt;&lt;/a&gt;1.1 单链表&lt;/h4&gt;&lt;figure class=&quot;highlight c++&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;4&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;5&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;6&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;7&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;8&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;9&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;10&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;11&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;12&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;13&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;14&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;15&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;16&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;17&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;18&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;19&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;20&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;21&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;22&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;23&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;24&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;25&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;26&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;27&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;28&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;29&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;30&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;31&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;32&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;33&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;34&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;35&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;36&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;37&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;38&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;39&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;40&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;41&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;42&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;43&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;44&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;45&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;46&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;47&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;48&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;49&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;50&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;meta&quot;&gt;#&lt;span class=&quot;keyword&quot;&gt;include&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;&amp;lt;iostream&amp;gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;using&lt;/span&gt; &lt;span class=&quot;keyword&quot;&gt;namespace&lt;/span&gt; std;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;type&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;type&quot;&gt;int&lt;/span&gt; N = &lt;span class=&quot;number&quot;&gt;100010&lt;/span&gt;;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;type&quot;&gt;int&lt;/span&gt; e[N], ne[N], idx, head = &lt;span class=&quot;number&quot;&gt;-1&lt;/span&gt;;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;function&quot;&gt;&lt;span class=&quot;type&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;add_head&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;(&lt;span class=&quot;type&quot;&gt;int&lt;/span&gt; v)&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;function&quot;&gt;&lt;/span&gt;&amp;#123;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    e[idx] = v, ne[idx] = head, head = idx++;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&amp;#125;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;function&quot;&gt;&lt;span class=&quot;type&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;add&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;(&lt;span class=&quot;type&quot;&gt;int&lt;/span&gt; k, &lt;span class=&quot;type&quot;&gt;int&lt;/span&gt; v)&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;function&quot;&gt;&lt;/span&gt;&amp;#123;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    e[idx] = v, ne[idx] = ne[k], ne[k] = idx++;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&amp;#125;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;function&quot;&gt;&lt;span class=&quot;type&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;remove&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;(&lt;span class=&quot;type&quot;&gt;int&lt;/span&gt; k)&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;function&quot;&gt;&lt;/span&gt;&amp;#123;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;if&lt;/span&gt;(~k) ne[k] = ne[ne[k]];&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;else&lt;/span&gt; head = ne[head];&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&amp;#125;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;function&quot;&gt;&lt;span class=&quot;type&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;()&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;function&quot;&gt;&lt;/span&gt;&amp;#123;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    &lt;span class=&quot;type&quot;&gt;int&lt;/span&gt; m;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    cin &amp;gt;&amp;gt; m;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;while&lt;/span&gt;(m --)&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    &amp;#123;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;        &lt;span class=&quot;type&quot;&gt;int&lt;/span&gt; k, v;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;        &lt;span class=&quot;type&quot;&gt;char&lt;/span&gt; c;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;        cin &amp;gt;&amp;gt; c;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;        &lt;span class=&quot;keyword&quot;&gt;switch&lt;/span&gt;(c)&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;        &amp;#123;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;            &lt;span class=&quot;keyword&quot;&gt;case&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;&amp;#x27;H&amp;#x27;&lt;/span&gt;:&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;                cin &amp;gt;&amp;gt; v;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;                &lt;span class=&quot;built_in&quot;&gt;add_head&lt;/span&gt;(v);&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;                &lt;span class=&quot;keyword&quot;&gt;break&lt;/span&gt;;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;            &lt;span class=&quot;comment&quot;&gt;// 题中对于k的计数从1开始，但是存储下标从0开始，因此需要k - 1&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;            &lt;span class=&quot;keyword&quot;&gt;case&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;&amp;#x27;I&amp;#x27;&lt;/span&gt;:&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;                cin &amp;gt;&amp;gt; k &amp;gt;&amp;gt; v;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;                &lt;span class=&quot;built_in&quot;&gt;add&lt;/span&gt;(k - &lt;span class=&quot;number&quot;&gt;1&lt;/span&gt;, v);&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;                &lt;span class=&quot;keyword&quot;&gt;break&lt;/span&gt;;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;            &lt;span class=&quot;keyword&quot;&gt;case&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;&amp;#x27;D&amp;#x27;&lt;/span&gt;:&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;                cin &amp;gt;&amp;gt; k;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;                &lt;span class=&quot;built_in&quot;&gt;remove&lt;/span&gt;(k - &lt;span class=&quot;number&quot;&gt;1&lt;/span&gt;);&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;        &amp;#125;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    &amp;#125;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;for&lt;/span&gt;(&lt;span class=&quot;type&quot;&gt;int&lt;/span&gt; i = head; ~i; i = ne[i])&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;        cout &amp;lt;&amp;lt; e[i] &amp;lt;&amp;lt; &lt;span class=&quot;string&quot;&gt;&amp;quot; &amp;quot;&lt;/span&gt;;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;number&quot;&gt;0&lt;/span&gt;;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&amp;#125;&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
@@ -178,7 +235,7 @@
     <link href="http://example.com/2023/10/31/%E7%AE%97%E6%B3%95%E6%A8%A1%E6%9D%BF/"/>
     <id>http://example.com/2023/10/31/%E7%AE%97%E6%B3%95%E6%A8%A1%E6%9D%BF/</id>
     <published>2023-10-31T03:54:06.000Z</published>
-    <updated>2024-01-02T07:38:48.559Z</updated>
+    <updated>2024-01-19T06:25:40.431Z</updated>
     
     
     <summary type="html">&lt;h2 id=&quot;1-快速排序&quot;&gt;&lt;a href=&quot;#1-快速排序&quot; class=&quot;headerlink&quot; title=&quot;1.快速排序&quot;&gt;&lt;/a&gt;1.快速排序&lt;/h2&gt;&lt;p&gt;时间复杂度：$O(nlogn)$&lt;/p&gt;
@@ -529,104 +586,6 @@
     
     <category term="《Unix-Linux编程实践教程》" scheme="http://example.com/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E3%80%8AUnix-Linux%E7%BC%96%E7%A8%8B%E5%AE%9E%E8%B7%B5%E6%95%99%E7%A8%8B%E3%80%8B/"/>
     
-    
-    <category term="Linux" scheme="http://example.com/tags/Linux/"/>
-    
-    <category term="C/C++" scheme="http://example.com/tags/C-C/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Unix-Linux编程实践教程-章节1笔记</title>
-    <link href="http://example.com/2023/09/12/Unix-Linux%E7%BC%96%E7%A8%8B%E5%AE%9E%E8%B7%B5%E6%95%99%E7%A8%8B-%E7%AB%A0%E8%8A%821%E7%AC%94%E8%AE%B0/"/>
-    <id>http://example.com/2023/09/12/Unix-Linux%E7%BC%96%E7%A8%8B%E5%AE%9E%E8%B7%B5%E6%95%99%E7%A8%8B-%E7%AB%A0%E8%8A%821%E7%AC%94%E8%AE%B0/</id>
-    <published>2023-09-12T07:18:52.000Z</published>
-    <updated>2023-10-23T12:42:31.772Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;more&quot;&gt;&lt;a href=&quot;#more&quot; class=&quot;headerlink&quot; title=&quot;more&quot;&gt;&lt;/a&gt;more&lt;/h2&gt;&lt;h3 id=&quot;more的三种用法&quot;&gt;&lt;a href=&quot;#more的三种用法&quot; class=&quot;headerlink&quot; title=&quot;more的三种用法&quot;&gt;&lt;/a&gt;more的三种用法&lt;/h3&gt;&lt;figure class=&quot;highlight shell&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;more filename      //分页显示文件内容&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;command | more     //将command命令的输出分页显示&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;more &amp;lt; filename    //more从标准输入中获取要分页显示的内容，而标准输入被从重定向到filename&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;enter&lt;/code&gt;显示下一行，&lt;code&gt;space&lt;/code&gt;显示下一页，&lt;code&gt;q&lt;/code&gt;退出&lt;/li&gt;
-&lt;li&gt;管道命令&lt;code&gt;|&lt;/code&gt;将command的输出重定向到more的输入&lt;/li&gt;
-&lt;/ul&gt;
-&lt;p&gt;例如命令&lt;code&gt;ls /bin | more&lt;/code&gt;，ls命令的标准输出重定向到more的标准输入，如果还是使用&lt;code&gt;getchar()&lt;/code&gt;来读取用户的输入，那么就会从ls的输出中读取，这显然不行，所以需要其他方式&lt;/p&gt;</summary>
-    
-    
-    
-    <category term="读书笔记" scheme="http://example.com/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/"/>
-    
-    <category term="《Unix-Linux编程实践教程》" scheme="http://example.com/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E3%80%8AUnix-Linux%E7%BC%96%E7%A8%8B%E5%AE%9E%E8%B7%B5%E6%95%99%E7%A8%8B%E3%80%8B/"/>
-    
-    
-    <category term="Linux" scheme="http://example.com/tags/Linux/"/>
-    
-    <category term="C/C++" scheme="http://example.com/tags/C-C/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>GCC和Makefile学习</title>
-    <link href="http://example.com/2023/09/10/makefile%E5%AD%A6%E4%B9%A0/"/>
-    <id>http://example.com/2023/09/10/makefile%E5%AD%A6%E4%B9%A0/</id>
-    <published>2023-09-10T01:50:10.000Z</published>
-    <updated>2023-12-01T09:47:22.626Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;1-GCC编译器的使用&quot;&gt;&lt;a href=&quot;#1-GCC编译器的使用&quot; class=&quot;headerlink&quot; title=&quot;1.GCC编译器的使用&quot;&gt;&lt;/a&gt;1.GCC编译器的使用&lt;/h2&gt;&lt;p&gt; &lt;img src=&quot;/../images/makefile%E5%AD%A6%E4%B9%A0/image-20230910100317585.png&quot; alt=&quot;image-20230910100317585&quot;&gt;&lt;/p&gt;
-&lt;ul&gt;
-&lt;li&gt;预处理：预处理阶段会根据指令对源代码进行&lt;strong&gt;替换、宏展开&lt;/strong&gt;等操作。在这个阶段，编译器会根据#include指令查找头文件，并&lt;strong&gt;将头文件的内容插入到main.c文件中&lt;/strong&gt;。预处理后的文件通常以.i或.ii为扩展名。&lt;/li&gt;
-&lt;li&gt;编译：编译阶段将预处理后的文件翻译成汇编语言文件（通常使用. s扩展名）。编译器将C代码转换为汇编代码，将高级语言代码转换成底层机器语言的表示形式，同时&lt;strong&gt;进行语法检查和优化&lt;/strong&gt;。&lt;/li&gt;
-&lt;li&gt;汇编：汇编阶段将汇编语言代码转换成机器码指令。汇编器将每条汇编指令转换为可执行的机器码，并生成目标文件（通常使用.o扩展名）。目标文件包含机器码指令和一些附加信息，如符号表等。&lt;/li&gt;
-&lt;li&gt;链接：链接阶段将目标文件与其他库文件进行组装，生成最终的可执行程序。在这个阶段，链接器会解析代码中的符号引用，并将其与库函数的定义进行关联。如果找不到某个符号的定义，链接将会失败，并报出”&lt;strong&gt;undefined reference&lt;/strong&gt;“的错误。&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&quot;1-1-常用编译选项&quot;&gt;&lt;a href=&quot;#1-1-常用编译选项&quot; class=&quot;headerlink&quot; title=&quot;1.1 常用编译选项&quot;&gt;&lt;/a&gt;1.1 常用编译选项&lt;/h3&gt;&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;常用选项&lt;/th&gt;
-&lt;th&gt;描述&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-&lt;tbody&gt;&lt;tr&gt;
-&lt;td&gt;-E&lt;/td&gt;
-&lt;td&gt;预处理&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;-S&lt;/td&gt;
-&lt;td&gt;编译&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;-c&lt;/td&gt;
-&lt;td&gt;进行预处理、编译、汇编，但是不链接&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;-o&lt;/td&gt;
-&lt;td&gt;指定输出文件&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;-I&lt;/td&gt;
-&lt;td&gt;指定头文件目录&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;-L&lt;/td&gt;
-&lt;td&gt;指定链接时库文件目录&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;-l&lt;/td&gt;
-&lt;td&gt;指定链接哪一个库文件&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;-v&lt;/td&gt;
-&lt;td&gt;输出详细编译信息（比如说库文件查找路径）&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;&lt;/table&gt;</summary>
-    
-    
-    
-    <category term="Linux应用开发" scheme="http://example.com/categories/Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/"/>
-    
-    
-    <category term="嵌入式" scheme="http://example.com/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/"/>
     
     <category term="Linux" scheme="http://example.com/tags/Linux/"/>
     

@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="1. 为什么要使用 mmap应用程序和驱动程序之间传递数据时，可以通过 read、write 函数进行，如下图：  应用程序不能直接读写驱动程序中的 buffer，需要在用户态 buffer 和内核态 buffer 之间进行一次数据拷贝。这种方式在数据量比较小时没什么问题； 但是数据量比较大时效率太低。例如更新 LCD，假设 LCD 采用 1024 × 600 × 32 bpp 的格式，则一帧数据">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mmap">
+<meta property="og:url" content="http://example.com/2024/01/12/mmap/index.html">
+<meta property="og:site_name" content="Krocz&#39;s Blog">
+<meta property="og:description" content="1. 为什么要使用 mmap应用程序和驱动程序之间传递数据时，可以通过 read、write 函数进行，如下图：  应用程序不能直接读写驱动程序中的 buffer，需要在用户态 buffer 和内核态 buffer 之间进行一次数据拷贝。这种方式在数据量比较小时没什么问题； 但是数据量比较大时效率太低。例如更新 LCD，假设 LCD 采用 1024 × 600 × 32 bpp 的格式，则一帧数据">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/images/mmap/image-20240112114136049.png">
+<meta property="og:image" content="http://example.com/images/mmap/image-20240112151412038.png">
+<meta property="og:image" content="http://example.com/images/mmap/image-20240112151746736.png">
+<meta property="og:image" content="http://example.com/images/mmap/image-20240112153131551.png">
+<meta property="og:image" content="http://example.com/images/mmap/image-20240112153334851.png">
+<meta property="og:image" content="http://example.com/images/mmap/image-20240112154619471.png">
+<meta property="og:image" content="http://example.com/images/mmap/image-20240112160229903.png">
+<meta property="og:image" content="http://example.com/images/mmap/image-20240112155507090.png">
+<meta property="og:image" content="http://example.com/images/mmap/image-20240112160148135.png">
+<meta property="og:image" content="http://example.com/images/mmap/image-20240112161445090.png">
+<meta property="og:image" content="http://example.com/images/mmap/image-20240112161652547.png">
+<meta property="og:image" content="http://example.com/images/mmap/image-20240112192222526.png">
+<meta property="article:published_time" content="2024-01-12T03:38:50.000Z">
+<meta property="article:modified_time" content="2024-01-12T11:23:10.156Z">
+<meta property="article:author" content="Krocz">
+<meta property="article:tag" content="嵌入式">
+<meta property="article:tag" content="Linux">
+<meta property="article:tag" content="C&#x2F;C++">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/mmap/image-20240112114136049.png">
+
+<link rel="canonical" href="http://example.com/2024/01/12/mmap/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>mmap | Krocz's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+  <script src="/live2d-widget/autoload.js"></script>
+ <link rel="alternate" href="/atom.xml" title="Krocz's Blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+
+   <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 1; pointer-events: none;" ></canvas> 
+   <script type="text/javascript" src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script> 
+   <script type="text/javascript" src="/js/cursor/fireworks.js"></script>
+
+
+
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Krocz's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">望云登坡</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-首页">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-归档">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-标签">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-分类">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/01/12/mmap/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="Krocz">
+      <meta itemprop="description" content="时间不等人，喜欢就去做">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Krocz's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          mmap
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2024-01-12 11:38:50 / 修改时间：19:23:10" itemprop="dateCreated datePublished" datetime="2024-01-12T11:38:50+08:00">2024-01-12</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/" itemprop="url" rel="index"><span itemprop="name">Linux应用开发</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>7.3k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>13 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="1-为什么要使用-mmap"><a href="#1-为什么要使用-mmap" class="headerlink" title="1. 为什么要使用 mmap"></a>1. 为什么要使用 mmap</h2><p>应用程序和驱动程序之间传递数据时，可以通过 read、write 函数进行，如下图：</p>
+<p><img src="/../images/mmap/image-20240112114136049.png" alt="image-20240112114136049"></p>
+<p>应用程序不能直接读写驱动程序中的 buffer，需要在用户态 buffer 和内核态 buffer 之间进行一次数据拷贝。这种方式在数据量比较小时没什么问题； 但是数据量比较大时效率太低。例如更新 LCD，假设 LCD 采用 <code>1024 × 600 × 32 bpp</code> 的格式，则一帧数据就有 2.3 M左右，拷贝的步骤效率太低。</p>
+<p>应该允许程序直接读写驱动程序中的 buffer，这可以通过 mmap 实现(memory map)，把内核的 buffer 映射到用户态，让 APP 在用户态直接读写。</p>
+<h2 id="2-虚拟地址和物理地址"><a href="#2-虚拟地址和物理地址" class="headerlink" title="2. 虚拟地址和物理地址"></a>2. 虚拟地址和物理地址</h2><p>编写一个测试程序：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> a;</span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> **argv)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">if</span> (argc != <span class="number">2</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;Usage: %s &lt;number&gt;\n&quot;</span>, argv[<span class="number">0</span>]);</span><br><span class="line">		<span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	a = strtol(argv[<span class="number">1</span>], <span class="literal">NULL</span>, <span class="number">0</span>);</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;a&#x27;s address = 0x%lx, a&#x27;s value = %d\n&quot;</span>, (<span class="type">long</span> <span class="type">unsigned</span> <span class="type">int</span>)&amp;a, a);</span><br><span class="line">	<span class="keyword">while</span> (<span class="number">1</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		sleep(<span class="number">10</span>);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>程序运行结果如下：</p>
+<p><img src="/../images/mmap/image-20240112151412038.png" alt="image-20240112151412038"></p>
+<p>两次运行分别产生了两个进程，打印出来的都是<strong>各自进程内变量的虚拟地址</strong>。使用<code>cat /proc/进程PID/maps</code>：可以查看进程内划分的不同虚拟内存区域：</p>
+<p><img src="/../images/mmap/image-20240112151746736.png" alt="image-20240112151746736"></p>
+<p>例如第一行是代码段，第二行是只读数据段（data段，存放初始化的全局变量和静态变量），第三行是可读写数据段（bss段，存放的是未初始化的全局变量和静态变量）。</p>
+<h3 id="2-1-虚拟地址转换物理地址"><a href="#2-1-虚拟地址转换物理地址" class="headerlink" title="2.1 虚拟地址转换物理地址"></a>2.1 虚拟地址转换物理地址</h3><p>CPU 发出的地址是虚拟地址 ，它经过 MMU(Memory Manage Unit，内存管理单元)映射到物理地址上，对于不同进程的同一个虚拟地址，MMU 会把它们映射到不同的物理地址。如下图：</p>
+<p><img src="/../images/mmap/image-20240112153131551.png" alt="image-20240112153131551"></p>
+<p>每一个进程在内核里都有一个 tast_struct，这个结构体中保存有内存信息：mm_struct。而虚拟地址、物理地址的映射关系保存在页目录表中，如下图所示：</p>
+<p><img src="/../images/mmap/image-20240112153334851.png" alt="image-20240112153334851"></p>
+<ul>
+<li>内存有虚拟地址、物理地址，mm_struct 中用 mmap 来描述虚拟地址，用 pgd (Page Global Directory)来描述对应的物理地址。</li>
+<li>每个进程都有一系列的 VMA：virtual memory；比如代码段、数据段、BSS 段、栈，共享库等等，内核用一系列 vm_area_struct 来表述</li>
+<li>vm_area_struct 中的 vm_start、vm_end 是虚拟地址，通过寻址 pgd 转换为 物理地址</li>
+</ul>
+<h4 id="2-1-1-ARM架构内存映射简介"><a href="#2-1-1-ARM架构内存映射简介" class="headerlink" title="2.1.1 ARM架构内存映射简介"></a>2.1.1 ARM架构内存映射简介</h4><p>ARM 架构支持一级页表映射，也就是说 MMU 根据 CPU 发来的虚拟地址可以找到第 1 个页表，从第 1 个页表里就可以知道这个虚拟地址对应的物理地址。<strong>一级页表里地址映射的最小单位是 1M</strong>。</p>
+<p>ARM 架构还支持二级页表映射，也就是说 MMU 根据 CPU 发来的虚拟地址先找到第 1 个页表，从第 1 个页表里就可以知道第 2 级页表在哪里；再取出第 2 级页表，从第 2 个页表里才能确定这个虚拟地址对应的物理地址。<strong>二级页表地址映射的最小单位有 4K、1K，Linux 使用 4K。</strong></p>
+<p>一级页表项中的内容，决定了它是指向一块物理内存，还是指问二级页表，如下图：</p>
+<p><img src="/../images/mmap/image-20240112154619471.png" alt="image-20240112154619471"></p>
+<p>二级页表项的内容：</p>
+<p><img src="/../images/mmap/image-20240112160229903.png" alt="image-20240112160229903"></p>
+<h5 id="（1）一级页表映射过程"><a href="#（1）一级页表映射过程" class="headerlink" title="（1）一级页表映射过程"></a>（1）一级页表映射过程</h5><p>一级页表中每一个表项用来设置 1M 的空间，对于 32 位的系统，虚拟地址空间有 4G，4G&#x2F;1M&#x3D;4096。所以一级页表要映射整个 4G 空间的话，需要 4096 个页表项。</p>
+<p>第 0 个页表项用来表示虚拟地址第 0 个 1M(虚拟地址为 0～0xFFFFF)对应哪一块物理内存，并且有一些权限设置；依次类推。</p>
+<p>使用一级页表时，先在内存里设置好各个页表项，然后把页表基地址告诉 MMU， 就可以启动 MMU 进行地址映射，如下图：</p>
+<p><img src="/../images/mmap/image-20240112155507090.png" alt="image-20240112155507090"></p>
+<p>使用虚拟地址的 index 部分寻址页表，在页表项中找到该页面的物理基地址，然后将基地址和 offset 拼接就得到了物理地址。</p>
+<h5 id="（2）-二级页表映射过程"><a href="#（2）-二级页表映射过程" class="headerlink" title="（2） 二级页表映射过程"></a>（2） 二级页表映射过程</h5><p><img src="/../images/mmap/image-20240112160148135.png" alt="image-20240112160148135"></p>
+<p>使用 vaddr[31:20] 寻址一级页表，得到二级页表项的物理地址，将二级页表从磁盘中取出放入内存；然后后面的过程与一级页表映射过程类似。</p>
+<h2 id="3-给-APP-新建一块内存映射"><a href="#3-给-APP-新建一块内存映射" class="headerlink" title="3. 给 APP 新建一块内存映射"></a>3. 给 APP 新建一块内存映射</h2><h3 id="3-1-mmap-调用过程"><a href="#3-1-mmap-调用过程" class="headerlink" title="3.1 mmap 调用过程"></a>3.1 mmap 调用过程</h3><p>从上面内存映射的过程可以知道，要给 APP 新开劈一块虚拟内存，并且让它指向某块内核 buffer，我们要做这些事：</p>
+<ol>
+<li>得到一个 vm_area_struct，它表示 APP 的一块虚拟内存空间：APP 调用 mmap 系统函数时 ，内核就帮我们构造了一个 vm_area_stuct 结构体。里面含有虚拟地址的地址范围、权限。</li>
+<li>确定物理地址：你想映射某个内核 buffer，你需要得到它的物理地址，这得由驱动程序提供。</li>
+<li>给 vm_area_struct 和物理地址建立映射关系</li>
+</ol>
+<p>APP 里调用 mmap 时，导致的内核相关函数调用过程如下：</p>
+<p><img src="/../images/mmap/image-20240112161445090.png" alt="image-20240112161445090"></p>
+<h3 id="3-2-cache-和-buffer"><a href="#3-2-cache-和-buffer" class="headerlink" title="3.2 cache 和 buffer"></a>3.2 cache 和 buffer</h3><p>使用 mmap 时，需要有 cache、buffer 的知识。下图是 CPU 和内存之间的关系，有 cache、buffer(写缓冲器)。Cache 是一块高速内存；写缓冲器相当于 一个 FIFO，可以把多个写操作集合起来一次写入内存。</p>
+<p><img src="/../images/mmap/image-20240112161652547.png" alt="image-20240112161652547"></p>
+<p>基于局部性原理，为了提高内存数据的读写速度，在内存和CPU之间引入了 cache 。引入 cache 之后读写内存的变化：</p>
+<ol>
+<li><p>读取内存 addr 处的数据：</p>
+<p>先看看 cache 中有没有 addr 的数据，如果有就直接从 cache 里返回 数据，即 cache 命中。否则，从内存里把一个 cache line 大小的数据读入 cache，基于局部性原理 CPU 很可能会再次用到这个 addr 的数据，或是会用到它附近的数据。</p>
+</li>
+<li><p>写数据：</p>
+<p>CPU 要写数据时，可以直接写内存，这很慢；也可以先把数据写入 cache， 这很快。但是 cache 中的数据终究是要写入内存，有 2 种写策略：</p>
+<ul>
+<li>**写通(write through)**：数据要同时写入 cache 和内存，所以 <strong>cache 和内存中的数据保持一致</strong>。但是写内存很慢，因此可以选择引入写缓冲器，写缓冲器有“写合并”的功能，比如 CPU 执行了 4 条写指令： 写第 0、1、2、3 个字节，每次写 1 字节；写缓冲器会把这 4 个写操作合并成一个写操作：写 word，从而提高了写内存的效率。</li>
+<li><strong>写回(write back)<strong>：新数据只是写入 cache，不会立刻写入内存，</strong>cache 和内存中的数据不一致</strong>。新数据写入 cache 时，这一行 cache 被标为“脏”(dirty)；当 cache 不够用时，才需要把脏的数据写入内存。</li>
+</ul>
+</li>
+</ol>
+<p>是否使用 cache、是否使用 buffer，就有 4 种组合，参见 <code>arch\arm\include\asm\pgtable-2level.h</code></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> L_PTE_MT_UNCACHED	(_AT(pteval_t, 0x00) &lt;&lt; 2)	<span class="comment">/* 0000 */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> L_PTE_MT_BUFFERABLE	(_AT(pteval_t, 0x01) &lt;&lt; 2)	<span class="comment">/* 0001 */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> L_PTE_MT_WRITETHROUGH	(_AT(pteval_t, 0x02) &lt;&lt; 2)	<span class="comment">/* 0010 */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> L_PTE_MT_WRITEBACK	(_AT(pteval_t, 0x03) &lt;&lt; 2)	<span class="comment">/* 0011 */</span></span></span><br></pre></td></tr></table></figure>
+
+<p>上面 4 种组合对应下表中的各项：</p>
+<table>
+<thead>
+<tr>
+<th>是否启用 cache</th>
+<th>是否启用 buffer</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>否</td>
+<td>否</td>
+<td>Non-cached, non-buffered (NCNB) 读、写都直达外设硬件</td>
+</tr>
+<tr>
+<td>否</td>
+<td>是</td>
+<td>Non-cached buffered (NCB) 读、写都直达外设硬件； 写操作通过 buffer 实现，CPU 不等待写操作完成，CPU 会马上执行下一条指令</td>
+</tr>
+<tr>
+<td>是</td>
+<td>否</td>
+<td>Cached, write-through mode (WT)，写通策略。不使用 buffer，写会直达外设硬件</td>
+</tr>
+<tr>
+<td>是</td>
+<td>是</td>
+<td>Cached, write-back mode (WB)，写回策略。写操作通过 buffer 实现，cache hit 时新数据不会到达硬件， 而是在 cahce 中被标为“脏”；cache miss 时，通过 buffer 写入硬件，CPU 不等待写操作完成，CPU 会马上执行下一条指令</td>
+</tr>
+</tbody></table>
+<ul>
+<li>第 1 种是不使用 cache 也不使用 buffer，读写时都直达硬件，这适合寄存器的读写。 </li>
+<li>第 2 种是不使用 cache 但是使用 buffer，写数据时会用 buffer 进行优化，可能会有“写合并”，这适合显存的操作。因为对显存很少有读操作，基本都是写操作，而写操作即使被“合并”也没有关系。</li>
+<li>第 3 种是使用 cache 不使用 buffer，就是“write through”，适用于只读设备：在读数据时用 cache 加速，基本不需要写。 </li>
+<li>第 4 种是既使用 cache 又使用 buffer，适合一般的内存读写。</li>
+</ul>
+<h3 id="3-3-编写-APP-测试程序"><a href="#3-3-编写-APP-测试程序" class="headerlink" title="3.3 编写 APP 测试程序"></a>3.3 编写 APP 测试程序</h3><p>mmap 函数的原型如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/mman.h&gt;</span>        </span></span><br><span class="line"><span class="type">void</span> *<span class="title function_">mmap</span><span class="params">(<span class="type">void</span> *addr, <span class="type">size_t</span> length, <span class="type">int</span> prot, <span class="type">int</span> flags, <span class="type">int</span> fd, <span class="type">off_t</span> offset)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>各参数的描述如下：</p>
+<ul>
+<li>addr：指定映射的虚拟内存地址，可以设置为 NULL，让 Linux 内核自动选择合适的虚拟内存地址。</li>
+<li>length：映射的长度。</li>
+<li>prot：映射内存的保护模式，可选值如下：<ul>
+<li>PROT_EXEC：可以被执行。</li>
+<li>PROT_READ：可以被读取。</li>
+<li>PROT_WRITE：可以被写入。</li>
+<li>PROT_NONE：不可访问。</li>
+</ul>
+</li>
+<li>flags：指定映射的类型，常用的可选值如下：<ul>
+<li>MAP_SHARED：与其它所有映射到这个文件的进程共享映射空间（可实现共享内存）。</li>
+<li>MAP_PRIVATE：建立一个写时复制（Copy on Write）的私有映射空间。</li>
+<li>…</li>
+</ul>
+</li>
+<li>fd：进行映射的文件句柄。</li>
+<li>offset：文件偏移量（从文件的何处开始映射），该值必须是 <code>sysconf(_SC_PAGE_SIZE)</code> 函数返回的页面大小的倍数。</li>
+</ul>
+<p>返回值：</p>
+<p>成功时返回映射区域的虚拟地址的指针，失败时返回 MAP_FAILED </p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> MAP_FAILED	((void *) -1)</span></span><br></pre></td></tr></table></figure>
+
+
+
+<p>mumap() 函数原型如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">munmap</span><span class="params">(<span class="type">void</span> *addr, <span class="type">size_t</span> length)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>该系统调用删除指定地址范围的映射，并导致对该范围内地址的进一步引用生成无效的内存引用。进程终止时，区域也会自动取消映射。另一方面，关闭文件描述符并不会取消映射该区域。</p>
+<p>返回值：成功返回 0，失败返回 -1</p>
+<h4 id="3-3-1-MAP-SHARED-和-MAP-PRIVATE-的区别"><a href="#3-3-1-MAP-SHARED-和-MAP-PRIVATE-的区别" class="headerlink" title="3.3.1 MAP_SHARED 和 MAP_PRIVATE 的区别"></a>3.3.1 MAP_SHARED 和 MAP_PRIVATE 的区别</h4><p>使用 MAP_PRIVATE 映射时，在没有发生写操作时，APP、驱动访问的都是同一块内存； 当 APP 发起写操作时，就会触发“copy on write”，即内核会先创建该内存块的拷贝，APP 的写操作在这个新内存块上进行，<strong>这个新内存块是 APP 私有的，别的 APP、驱动看不到</strong>。 </p>
+<p>MAP_PRIVATE 映射是很有用的，Linux 中多个 APP 都会使用同一个动态库， 在没有写操作之前大家都使用内存中唯一一份代码。当 APP1 发起写操作时，内核会为它复制一份代码，再执行写操作，<strong>APP1 就有了专享的、私有的动态库，在里面做的修改只会影响到 APP1</strong>。其他程序仍然共享原先的、未修改的代码。</p>
+<p>仅用 MAP_SHARED 参数时，<strong>多个 APP、驱动读、写时，操作的都是同一个内存块</strong>，“共享”。</p>
+<h4 id="3-3-2-APP-代码"><a href="#3-3-2-APP-代码" class="headerlink" title="3.3.2  APP 代码"></a>3.3.2  APP 代码</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> **argv)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">int</span> fd;</span><br><span class="line">	<span class="type">char</span> *buf;</span><br><span class="line">	<span class="type">int</span> len;</span><br><span class="line">	<span class="type">char</span> str[<span class="number">1024</span>];</span><br><span class="line">	</span><br><span class="line">	</span><br><span class="line">	<span class="comment">/* 1. 打开文件 */</span></span><br><span class="line">	fd = open(<span class="string">&quot;/dev/hello&quot;</span>, O_RDWR);</span><br><span class="line">	<span class="keyword">if</span> (fd == <span class="number">-1</span>)   <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* 2. mmap */</span></span><br><span class="line">	buf =  mmap(<span class="literal">NULL</span>, <span class="number">1024</span>*<span class="number">8</span>, PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, <span class="number">0</span>);</span><br><span class="line">	<span class="keyword">if</span> (buf == MAP_FAILED)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;can not mmap file /dev/hello\n&quot;</span>);</span><br><span class="line">		<span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;mmap address = 0x%x\n&quot;</span>, buf);</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;buf origin data = %s\n&quot;</span>, buf); </span><br><span class="line"></span><br><span class="line">	<span class="comment">/* 3. write */</span></span><br><span class="line">	<span class="built_in">strcpy</span>(buf, <span class="string">&quot;new&quot;</span>);</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* 4. read &amp; compare */</span></span><br><span class="line">	read(fd, str, <span class="number">1024</span>);  </span><br><span class="line">	<span class="keyword">if</span> (<span class="built_in">strcmp</span>(buf, str) == <span class="number">0</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="comment">/* 对于MAP_SHARED映射，APP写的数据驱动可见</span></span><br><span class="line"><span class="comment">		 * APP和驱动访问的是同一个内存块</span></span><br><span class="line"><span class="comment">		 */</span></span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;compare ok!\n&quot;</span>);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span></span><br><span class="line">	&#123;</span><br><span class="line">		<span class="comment">/* 对于MAP_PRIVATE映射，APP写数据时, 是写入原来内存块的&quot;拷贝&quot;</span></span><br><span class="line"><span class="comment">		 * 而 read 函数读取的是驱动中分配的原来内存块的数据</span></span><br><span class="line"><span class="comment">		 * 因此，str 和 buf 的数据不同</span></span><br><span class="line"><span class="comment">		 */</span></span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;compare err!\n&quot;</span>);</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;str = %s!\n&quot;</span>, str);  <span class="comment">/* old */</span></span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;buf = %s!\n&quot;</span>, buf);  <span class="comment">/* new */</span></span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">while</span> (<span class="number">1</span>)</span><br><span class="line">		sleep(<span class="number">10</span>);  </span><br><span class="line">	</span><br><span class="line">	munmap(buf, <span class="number">1024</span>*<span class="number">8</span>);</span><br><span class="line">	close(fd);</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>运行 APP 后，查看该进程的内存映射信息，可以看到驱动为其分配的内存对应的数据段：</p>
+<p><img src="/../images/mmap/image-20240112192222526.png" alt="image-20240112192222526"></p>
+<h4 id="3-3-3-驱动编程"><a href="#3-3-3-驱动编程" class="headerlink" title="3.3.3 驱动编程"></a>3.3.3 驱动编程</h4><p>在驱动程序中提供 mmap 支持，需要分配一块内存，并在 file_operations.mmap 函数中建立 APP 虚拟地址到这块内存物理地址的映射。</p>
+<p>分配内存使用的函数：</p>
+<table>
+<thead>
+<tr>
+<th>函数名</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>kmalloc</td>
+<td>分配到的内存物理地址是连续的</td>
+</tr>
+<tr>
+<td>kzalloc</td>
+<td>分配到的内存物理地址是连续的，内容清 0</td>
+</tr>
+<tr>
+<td>vmalloc</td>
+<td>分配到的内存物理地址不保证是连续的</td>
+</tr>
+<tr>
+<td>vzalloc</td>
+<td>分配到的内存物理地址不保证是连续的，内容清 0</td>
+</tr>
+</tbody></table>
+<p>我们应该使用 kmalloc 或 kzalloc，这样得到的内存物理地址是连续的，在 mmap 时后 APP 才可以使用同一个基地址去访问这块内存。(如果物理地址不连续，就要执行多次 mmap 了)。</p>
+<p>在安装内核模块时分配内存：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">char</span> *kernel_buf;</span><br><span class="line">kernel_buf = kmalloc(<span class="number">1024</span>*<span class="number">8</span>, GFP_KERNEL);</span><br><span class="line"><span class="built_in">strcpy</span>(kernel_buf, <span class="string">&quot;old&quot;</span>);  <span class="comment">//做实验用，用来验证对于MAP_PRIVATE映射，写数据时是否会写入新的内存中</span></span><br></pre></td></tr></table></figure>
+
+<p>在卸载模块时释放内存：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kfree(kernel_buf);</span><br></pre></td></tr></table></figure>
+
+<p>file_operations.mmap 函数的编写如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">hello_drv_mmap</span><span class="params">(<span class="keyword">struct</span> file *file, <span class="keyword">struct</span> vm_area_struct *vma)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="comment">/* 获得物理地址 */</span></span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> phy = virt_to_phys(kernel_buf);</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* 设置属性: cache, buffer */</span></span><br><span class="line">	vma-&gt;vm_page_prot = pgprot_writecombine(vma-&gt;vm_page_prot);</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* map */</span></span><br><span class="line">	<span class="keyword">if</span> (remap_pfn_range(vma, vma-&gt;vm_start, phy &gt;&gt; PAGE_SHIFT,</span><br><span class="line">			    vma-&gt;vm_end - vma-&gt;vm_start, vma-&gt;vm_page_prot)) &#123;</span><br><span class="line">		printk(<span class="string">&quot;mmap remap_pfn_range failed\n&quot;</span>);</span><br><span class="line">		<span class="keyword">return</span> -ENOBUFS;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>宏 pgprot_writecombine 的定义如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> __pgprot_modify(prot,mask,bits)		\</span></span><br><span class="line"><span class="meta">	__pgprot((pgprot_val(prot) &amp; ~(mask)) | (bits))</span></span><br><span class="line">	</span><br><span class="line"><span class="meta">#<span class="keyword">define</span> pgprot_writecombine(prot) \</span></span><br><span class="line"><span class="meta">	__pgprot_modify(prot, L_PTE_MT_MASK, L_PTE_MT_BUFFERABLE)</span></span><br></pre></td></tr></table></figure>
+
+<p>设置不使用 cache, 使用 buffer。函数 remap_pfn_range 的定义如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * remap_pfn_range - remap kernel memory to userspace</span></span><br><span class="line"><span class="comment"> * @vma: user vma to map to</span></span><br><span class="line"><span class="comment"> * @addr: target user address to start at</span></span><br><span class="line"><span class="comment"> * @pfn: physical address of kernel memory</span></span><br><span class="line"><span class="comment"> * @size: size of map area</span></span><br><span class="line"><span class="comment"> * @prot: page protection flags for this mapping</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *  Note: this is only safe if the mm semaphore is held when called.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">remap_pfn_range</span><span class="params">(<span class="keyword">struct</span> vm_area_struct *vma, <span class="type">unsigned</span> <span class="type">long</span> addr,</span></span><br><span class="line"><span class="params">		    <span class="type">unsigned</span> <span class="type">long</span> pfn, <span class="type">unsigned</span> <span class="type">long</span> size, <span class="type">pgprot_t</span> prot)</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>注意</strong>：pfn 表示 page frame number，因此需要将物理地址 phy 除以页面大小，得到对应的页号，即 <code>phy &gt;&gt; PAGE_SHIFT</code></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/" rel="tag"># 嵌入式</a>
+              <a href="/tags/Linux/" rel="tag"># Linux</a>
+              <a href="/tags/C-C/" rel="tag"># C/C++</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/01/09/%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F%E7%9A%84%E5%BF%85%E8%A6%81%E5%9F%BA%E7%A1%80/" rel="prev" title="驱动程序的必要基础">
+      <i class="fa fa-chevron-left"></i> 驱动程序的必要基础
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E4%BD%BF%E7%94%A8-mmap"><span class="nav-number">1.</span> <span class="nav-text">1. 为什么要使用 mmap</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E8%99%9A%E6%8B%9F%E5%9C%B0%E5%9D%80%E5%92%8C%E7%89%A9%E7%90%86%E5%9C%B0%E5%9D%80"><span class="nav-number">2.</span> <span class="nav-text">2. 虚拟地址和物理地址</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E8%99%9A%E6%8B%9F%E5%9C%B0%E5%9D%80%E8%BD%AC%E6%8D%A2%E7%89%A9%E7%90%86%E5%9C%B0%E5%9D%80"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 虚拟地址转换物理地址</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-1-ARM%E6%9E%B6%E6%9E%84%E5%86%85%E5%AD%98%E6%98%A0%E5%B0%84%E7%AE%80%E4%BB%8B"><span class="nav-number">2.1.1.</span> <span class="nav-text">2.1.1 ARM架构内存映射简介</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%EF%BC%881%EF%BC%89%E4%B8%80%E7%BA%A7%E9%A1%B5%E8%A1%A8%E6%98%A0%E5%B0%84%E8%BF%87%E7%A8%8B"><span class="nav-number">2.1.1.1.</span> <span class="nav-text">（1）一级页表映射过程</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%EF%BC%882%EF%BC%89-%E4%BA%8C%E7%BA%A7%E9%A1%B5%E8%A1%A8%E6%98%A0%E5%B0%84%E8%BF%87%E7%A8%8B"><span class="nav-number">2.1.1.2.</span> <span class="nav-text">（2） 二级页表映射过程</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E7%BB%99-APP-%E6%96%B0%E5%BB%BA%E4%B8%80%E5%9D%97%E5%86%85%E5%AD%98%E6%98%A0%E5%B0%84"><span class="nav-number">3.</span> <span class="nav-text">3. 给 APP 新建一块内存映射</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-mmap-%E8%B0%83%E7%94%A8%E8%BF%87%E7%A8%8B"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 mmap 调用过程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-cache-%E5%92%8C-buffer"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 cache 和 buffer</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-%E7%BC%96%E5%86%99-APP-%E6%B5%8B%E8%AF%95%E7%A8%8B%E5%BA%8F"><span class="nav-number">3.3.</span> <span class="nav-text">3.3 编写 APP 测试程序</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-3-1-MAP-SHARED-%E5%92%8C-MAP-PRIVATE-%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-number">3.3.1.</span> <span class="nav-text">3.3.1 MAP_SHARED 和 MAP_PRIVATE 的区别</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-3-2-APP-%E4%BB%A3%E7%A0%81"><span class="nav-number">3.3.2.</span> <span class="nav-text">3.3.2  APP 代码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-3-3-%E9%A9%B1%E5%8A%A8%E7%BC%96%E7%A8%8B"><span class="nav-number">3.3.3.</span> <span class="nav-text">3.3.3 驱动编程</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Krocz"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">Krocz</p>
+  <div class="site-description" itemprop="description">时间不等人，喜欢就去做</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">25</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">5</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/krocz" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;krocz" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1668154689@qq.com" title="E-Mail → mailto:1668154689@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+         
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Krocz</span>
+</div>
+
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动 -->
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
