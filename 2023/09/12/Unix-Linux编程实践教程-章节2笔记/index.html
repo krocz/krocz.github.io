@@ -20,12 +20,12 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="who 把程序的可执行文件放到任意的一个目录中（&#x2F;bin &#x2F;usr&#x2F;bin &#x2F;usr&#x2F;local&#x2F;bin），就可以为系统添加新的命令  寻找who的踪迹 man who:发现文件utmp,wtmp很关键 man -k utmp:按关键字搜索utmp，发现：  123utmp (5)            - login recordslo">
+  <meta name="description" content="who  把程序的可执行文件放到任意的一个目录中（&#x2F;bin &#x2F;usr&#x2F;bin &#x2F;usr&#x2F;local&#x2F;bin），就可以为系统添加新的命令   寻找who的踪迹  man who:发现文件utmp,wtmp很关键 man -k utmp:按关键字搜索utmp，发现：  123utmp (5)            - login recordslogin (3)            - write">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Unix-Linux编程实践教程-章节2笔记">
 <meta property="og:url" content="http://example.com/2023/09/12/Unix-Linux%E7%BC%96%E7%A8%8B%E5%AE%9E%E8%B7%B5%E6%95%99%E7%A8%8B-%E7%AB%A0%E8%8A%822%E7%AC%94%E8%AE%B0/index.html">
 <meta property="og:site_name" content="Krocz&#39;s Blog">
-<meta property="og:description" content="who 把程序的可执行文件放到任意的一个目录中（&#x2F;bin &#x2F;usr&#x2F;bin &#x2F;usr&#x2F;local&#x2F;bin），就可以为系统添加新的命令  寻找who的踪迹 man who:发现文件utmp,wtmp很关键 man -k utmp:按关键字搜索utmp，发现：  123utmp (5)            - login recordslo">
+<meta property="og:description" content="who  把程序的可执行文件放到任意的一个目录中（&#x2F;bin &#x2F;usr&#x2F;bin &#x2F;usr&#x2F;local&#x2F;bin），就可以为系统添加新的命令   寻找who的踪迹  man who:发现文件utmp,wtmp很关键 man -k utmp:按关键字搜索utmp，发现：  123utmp (5)            - login recordslogin (3)            - write">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2023-09-12T07:19:04.000Z">
 <meta property="article:modified_time" content="2023-09-12T07:34:58.560Z">
@@ -267,44 +267,49 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="who"><a href="#who" class="headerlink" title="who"></a>who</h2><ul>
-<li>把程序的可执行文件放到任意的一个目录中（&#x2F;bin &#x2F;usr&#x2F;bin &#x2F;usr&#x2F;local&#x2F;bin），就可以为系统添加新的命令</li>
+        <h2 id="who"><a class="markdownIt-Anchor" href="#who"></a> who</h2>
+<ul>
+<li>把程序的可执行文件放到任意的一个目录中（/bin /usr/bin /usr/local/bin），就可以为系统添加新的命令</li>
 </ul>
-<h3 id="寻找who的踪迹"><a href="#寻找who的踪迹" class="headerlink" title="寻找who的踪迹"></a>寻找who的踪迹</h3><ul>
+<h3 id="寻找who的踪迹"><a class="markdownIt-Anchor" href="#寻找who的踪迹"></a> 寻找who的踪迹</h3>
+<ul>
 <li><code>man who</code>:发现文件utmp,wtmp很关键</li>
 <li><code>man -k utmp</code>:按关键字搜索utmp，发现：</li>
 </ul>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">utmp (5)            - login records</span><br><span class="line">login (3)            - write utmp and wtmp entries</span><br><span class="line">logout (3)           - write utmp and wtmp entries</span><br></pre></td></tr></table></figure>
-
 <ul>
-<li><p><code>man 5 utmp</code>:发现<code>&lt;utmp.h&gt;</code>中关于utmp结构体的定义</p>
+<li>
+<p><code>man 5 utmp</code>:发现<code>&lt;utmp.h&gt;</code>中关于utmp结构体的定义</p>
 </li>
-<li><p>通过阅读以上信息，知道<code>who</code>通过读文件获得需要的信息，而每一个登录用户的信息在文件中都有记录,所以编写<code>who</code>命令分为两步：</p>
+<li>
+<p>通过阅读以上信息，知道<code>who</code>通过读文件获得需要的信息，而每一个登录用户的信息在文件中都有记录,所以编写<code>who</code>命令分为两步：</p>
 <ul>
 <li>a.从<code>UTMP_FILE</code>文件中读取数据结构</li>
 <li>b.将结构体中的信息以适当的形式显示出来</li>
 </ul>
 </li>
 </ul>
-<h3 id="如何读取数据结构"><a href="#如何读取数据结构" class="headerlink" title="如何读取数据结构"></a>如何读取数据结构</h3><ul>
-<li><p><code>man -k file | grep read</code>：将man的输出重定向到grep的输入，grep查找符合条件的字符串，发现：</p>
+<h3 id="如何读取数据结构"><a class="markdownIt-Anchor" href="#如何读取数据结构"></a> 如何读取数据结构</h3>
+<ul>
+<li>
+<p><code>man -k file | grep read</code>：将man的输出重定向到grep的输入，grep查找符合条件的字符串，发现：</p>
 <ul>
 <li><code>read (2)             - read from a file descriptor</code></li>
 <li>注：grep的查找关键字是随意输入的主题相关的单词</li>
 </ul>
 </li>
-<li><p><code>man 2 read</code>:发现文件操作必须的三个函数<code>read、open、close</code></p>
+<li>
+<p><code>man 2 read</code>:发现文件操作必须的三个函数<code>read、open、close</code></p>
 </li>
 </ul>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line">ssize_t read(int fd, void *buf, size_t count);</span><br></pre></td></tr></table></figure>
-
 <ul>
 <li>返回值：成功则返回读取数量，遇到错误返回-1</li>
 </ul>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;fcntl.h&gt;</span><br><span class="line">int open(const char *pathname, int flags);</span><br></pre></td></tr></table></figure>
-
 <ul>
-<li>参数：<ul>
+<li>参数：
+<ul>
 <li>flags:O_RDONLY, O_WRONLY, or O_RDWR，分别对应只读，只写，读写三种</li>
 </ul>
 </li>
@@ -312,78 +317,94 @@
 <li>打开文件可能出错的原因多种多样，具体请查看文档</li>
 </ul>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line">int close(int fd);</span><br></pre></td></tr></table></figure>
-
 <ul>
 <li>返回值：0表示成功关闭，-1表示出现错误</li>
 </ul>
 <p>通过以上三个函数即可读取登录信息记录文件<code>UTMP_FILE</code>:</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">if((utmpfd = open(UTMP_FILE , O_RDONLY)) == -1)</span><br><span class="line">    perror(UTMP_FILE);   //用法</span><br><span class="line"></span><br><span class="line">while (read(utmpfd , &amp;current_record , len) == len)</span><br><span class="line">    show_info(&amp;current_record);</span><br><span class="line"></span><br><span class="line">close(utmpfd);</span><br></pre></td></tr></table></figure>
-
-<h3 id="将结构体中的信息显示"><a href="#将结构体中的信息显示" class="headerlink" title="将结构体中的信息显示"></a>将结构体中的信息显示</h3><p>主要是以合适格式显示登录时间，通过以下命令查询相关函数：</p>
+<h3 id="将结构体中的信息显示"><a class="markdownIt-Anchor" href="#将结构体中的信息显示"></a> 将结构体中的信息显示</h3>
+<p>主要是以合适格式显示登录时间，通过以下命令查询相关函数：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">man -k time | grep transform</span><br><span class="line">man 3 ctime</span><br></pre></td></tr></table></figure>
-
 <p>函数ctime的信息如下：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;time.h&gt;</span><br><span class="line">char *ctime(const time_t *timep);</span><br></pre></td></tr></table></figure>
-
 <ul>
 <li>返回值：格式为<code>&quot;Wed Jun 30 21:49:08 1993\n&quot;</code>的字符串</li>
 <li><code>time_t</code>为<code>long int</code>类型</li>
 <li>utmp文件中的<code>ut-&gt;time</code>表示用户从登录时间到初始时间所经过的秒数</li>
 </ul>
-<h3 id="who的工作流程"><a href="#who的工作流程" class="headerlink" title="who的工作流程"></a>who的工作流程</h3><p>1.打开UTMP_FILE路径对应的文件<br>2.读出一个utmp结构，并显示<br>3.关闭utmp文件</p>
-<h4 id="在用户空间中使用缓冲区"><a href="#在用户空间中使用缓冲区" class="headerlink" title="在用户空间中使用缓冲区"></a>在用户空间中使用缓冲区</h4><p>1.一次读取16个utmp结构，以供显示<br>2.当缓冲区中的内容显示完成之后，在进行系统调用，从内核中读取utmp结构数据</p>
-<h4 id="内核中的缓冲技术"><a href="#内核中的缓冲技术" class="headerlink" title="内核中的缓冲技术"></a>内核中的缓冲技术</h4><ul>
+<h3 id="who的工作流程"><a class="markdownIt-Anchor" href="#who的工作流程"></a> who的工作流程</h3>
+<p>1.打开UTMP_FILE路径对应的文件<br />
+2.读出一个utmp结构，并显示<br />
+3.关闭utmp文件</p>
+<h4 id="在用户空间中使用缓冲区"><a class="markdownIt-Anchor" href="#在用户空间中使用缓冲区"></a> 在用户空间中使用缓冲区</h4>
+<p>1.一次读取16个utmp结构，以供显示<br />
+2.当缓冲区中的内容显示完成之后，在进行系统调用，从内核中读取utmp结构数据</p>
+<h4 id="内核中的缓冲技术"><a class="markdownIt-Anchor" href="#内核中的缓冲技术"></a> 内核中的缓冲技术</h4>
+<ul>
 <li>read()将数据从内核缓冲区读取到进程缓冲区。如果进程所要求的数据块不在内核缓冲区，则内核会把对该数据块的请求加入到请求数据队列中，然后将进程挂起；当内核把数据块从磁盘读取到内核缓冲区之后，再把数据从内核缓冲区复制到进程缓冲区，最后再唤醒挂起的进程。</li>
 <li>write()将数据从进程缓冲区复制到内核缓冲区。内核会把需要写的数据暂时存在缓冲区中，积累到一定数量之后再一次性写入到磁盘中。如果发生意外情况(停电)，有可能内核来不及将数据写入到磁盘中，就会导致数据丢失。</li>
 </ul>
-<h3 id="修改用户登录信息"><a href="#修改用户登录信息" class="headerlink" title="修改用户登录信息"></a>修改用户登录信息</h3><p>1.打开utmp文件<br>2.查找需要修改的登录记录，并修改<br>3.关闭文件</p>
-<h4 id="文件读取过程"><a href="#文件读取过程" class="headerlink" title="文件读取过程"></a>文件读取过程</h4><ul>
+<h3 id="修改用户登录信息"><a class="markdownIt-Anchor" href="#修改用户登录信息"></a> 修改用户登录信息</h3>
+<p>1.打开utmp文件<br />
+2.查找需要修改的登录记录，并修改<br />
+3.关闭文件</p>
+<h4 id="文件读取过程"><a class="markdownIt-Anchor" href="#文件读取过程"></a> 文件读取过程</h4>
+<ul>
 <li>从文件读数据时，从指针标明的地方开始读取指定字节并将指针移动至下一未被读取的字节</li>
 <li>指针与文件描述符相关，所以两个程序同时读一个文件时互不影响</li>
 </ul>
-<h4 id="lseek-函数"><a href="#lseek-函数" class="headerlink" title="lseek()函数"></a>lseek()函数</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;sys/type.h&gt;</span><br><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line">off_t oldpos = lseek(int fd , off_t dist , int base)</span><br></pre></td></tr></table></figure>
-
+<h4 id="lseek函数"><a class="markdownIt-Anchor" href="#lseek函数"></a> lseek()函数</h4>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;sys/type.h&gt;</span><br><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line">off_t oldpos = lseek(int fd , off_t dist , int base)</span><br></pre></td></tr></table></figure>
 <ul>
-<li>参数：<ul>
+<li>参数：
+<ul>
 <li>dist:移动的距离</li>
 <li>base:基准位置 <code>SEEK_SET -&gt; 文件开始</code>，<code>SEEK_CUR -&gt; 当前位置</code> ， <code>SEEK_END -&gt; 文件结尾</code></li>
 </ul>
 </li>
 <li>返回值：返回指针变化前的位置，返回-1表示遇到错误</li>
 </ul>
-<h3 id="修改UTMP文件中记录的ut-type"><a href="#修改UTMP文件中记录的ut-type" class="headerlink" title="修改UTMP文件中记录的ut-&gt;type"></a>修改UTMP文件中记录的ut-&gt;type</h3><ul>
-<li><code>ut-&gt;type</code>表示该记录的某种状态，例如<code>USER_PROCESS</code>表示正常的登录进程，<code>DEAD_PROCESS</code>表示终止的登录进程<ul>
+<h3 id="修改utmp文件中记录的ut-type"><a class="markdownIt-Anchor" href="#修改utmp文件中记录的ut-type"></a> 修改UTMP文件中记录的ut-&gt;type</h3>
+<ul>
+<li><code>ut-&gt;type</code>表示该记录的某种状态，例如<code>USER_PROCESS</code>表示正常的登录进程，<code>DEAD_PROCESS</code>表示终止的登录进程
+<ul>
 <li>不过用户logout之后并不会修改其为<code>DEAD_PROCESS</code>,不确定什么情况下会使用<code>DEAD_PROCESS</code>来标记登录记录</li>
 </ul>
 </li>
 <li><code>/var/lib/wtmp</code>:记录了本系统中历史登录信息</li>
 <li><code>/var/run/utmp</code>:记录当前的登录信息</li>
 </ul>
-<h4 id="编写logout-tty-函数"><a href="#编写logout-tty-函数" class="headerlink" title="编写logout_tty()函数"></a>编写logout_tty()函数</h4><p>1.打开wtmp文件<br>2.循环读取，寻找匹配记录<br>3.定位文件指针到该记录的开始位置<br>4.写入需要修改的内容<br>5.关闭文件</p>
+<h4 id="编写logout_tty函数"><a class="markdownIt-Anchor" href="#编写logout_tty函数"></a> 编写logout_tty()函数</h4>
+<p>1.打开wtmp文件<br />
+2.循环读取，寻找匹配记录<br />
+3.定位文件指针到该记录的开始位置<br />
+4.写入需要修改的内容<br />
+5.关闭文件</p>
 <ul>
 <li>通过对比传入的ut_line来修改对应记录的<code>ut-&gt;type</code>属性</li>
-<li>编写时注意<code>open()</code>传入的flags应为<code>O_RDWR</code><ul>
+<li>编写时注意<code>open()</code>传入的flags应为<code>O_RDWR</code>
+<ul>
 <li>如果传了<code>O_RDONLY</code>则写入时会perror报<code>/var/log/wtmp: Bad file descriptor</code></li>
 <li><code>Bad file descriptor</code>:如果文件描述符有问题，也会报出这个错误(一般文件描述符不会太大，太大时八成是没有初始化)</li>
 </ul>
 </li>
-<li>查看一下<code>/var/lib/wtmp</code>的信息以及当前用户和root用户的所属组：<ul>
+<li>查看一下<code>/var/lib/wtmp</code>的信息以及当前用户和root用户的所属组：
+<ul>
 <li>该文件属于root用户，而我们和root用户不同组，属于其他组，没有写入权限，报<code>/var/log/wtmp: Permission denied</code></li>
 <li>可以切换成root用户再执行</li>
 </ul>
 </li>
 </ul>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">//wtmp信息</span><br><span class="line">-rw-rw-r-- 1 root utmp 22656 10月 26 16:54 /var/log/wtmp</span><br><span class="line"></span><br><span class="line">// 用户所属组信息</span><br><span class="line">zhaoyan : zhaoyan adm cdrom sudo dip plugdev lpadmin lxd sambashare</span><br><span class="line">root : root</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="cp"><a href="#cp" class="headerlink" title="cp"></a>cp</h2><ul>
+<h2 id="cp"><a class="markdownIt-Anchor" href="#cp"></a> cp</h2>
+<ul>
 <li>拷贝：<code>cp source_file target_file</code></li>
 </ul>
-<h3 id="使用的系统调用"><a href="#使用的系统调用" class="headerlink" title="使用的系统调用"></a>使用的系统调用</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;fcntl.h&gt;</span><br><span class="line">int creat(const char *pathname, mode_t mode);</span><br></pre></td></tr></table></figure>
-
+<h3 id="使用的系统调用"><a class="markdownIt-Anchor" href="#使用的系统调用"></a> 使用的系统调用</h3>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;fcntl.h&gt;</span><br><span class="line">int creat(const char *pathname, mode_t mode);</span><br></pre></td></tr></table></figure>
 <ul>
-<li>参数：<ul>
+<li>参数：
+<ul>
 <li>mode:访问模式(mode_t应该是unsigned int类型)</li>
 </ul>
 </li>
@@ -391,37 +412,42 @@
 <li>没有则创建文件，如果文件存在则它的内容会被清空。</li>
 </ul>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line">ssize_t write(int fd, const void *buf, size_t count);</span><br></pre></td></tr></table></figure>
-
 <ul>
 <li>返回值：成功则返回写入的字节数，失败则返回-1</li>
-<li>为什么写入字节数会少于指定数量：<ul>
+<li>为什么写入字节数会少于指定数量：
+<ul>
 <li>系统对文件的最大长度有限制，或者磁盘空间不足</li>
 <li>因此有必要校验是否完全写入</li>
 </ul>
 </li>
 </ul>
-<h4 id="linux权限"><a href="#linux权限" class="headerlink" title="linux权限"></a>linux权限</h4><p>例如<code>-rw--r--r-</code>:</p>
+<h4 id="linux权限"><a class="markdownIt-Anchor" href="#linux权限"></a> linux权限</h4>
+<p>例如<code>-rw--r--r-</code>:</p>
 <ul>
 <li>第一位表示文件类型，-表示文件，d表示目录</li>
 <li>从左到右分别是文件所有者的权限(u)，文件所有者所属组成员的权限(g)，所有者所属组之外的用户的权限(o)</li>
 <li>r对应4，w对应2，x对应1，-对应0，所以可以用<code>0644</code>来描述（<strong>0表示该数是一个八进制数</strong>）</li>
 <li>权限一般用八进制表示，因为二进制每三位对应一组权限，用十六或者十进制都得需要计算一下，不如八进制方便</li>
 </ul>
-<h2 id="错误提示"><a href="#错误提示" class="headerlink" title="错误提示"></a>错误提示</h2><ul>
+<h2 id="错误提示"><a class="markdownIt-Anchor" href="#错误提示"></a> 错误提示</h2>
+<ul>
 <li>在&lt;errno.h&gt;中包含错误类型和相应的说明。当系统调用出错时，就会把该文件中的errno全局变量设置为相应的错误代码，然后返回-1。程序可以通过检查errno来确定错误类型，并采取相应的措施。</li>
 <li>更方便是使用perror()函数，它可以自己查找错误代码，并在标准错误输出中显示相应的错误信息，string是同时显示的描述信息</li>
 </ul>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">void perror(const char *s);</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="cat"><a href="#cat" class="headerlink" title="cat"></a>cat</h2><p>1.判断pathname是一个文件还是目录<br>2.打开该文件，并通过缓存读取并输出<br>3.关闭该文件</p>
-<h3 id="如何判断是文件还是目录"><a href="#如何判断是文件还是目录" class="headerlink" title="如何判断是文件还是目录"></a>如何判断是文件还是目录</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">- man 2 stat</span><br><span class="line"></span><br><span class="line">#include &lt;sys/types.h&gt;</span><br><span class="line">#include &lt;sys/stat.h&gt;</span><br><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line"></span><br><span class="line">int stat(const char *pathname, struct stat *statbuf);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">struct stat &#123;</span><br><span class="line">    dev_t     st_dev;         /* ID of device containing file */</span><br><span class="line">    ino_t     st_ino;         /* Inode number */ 索引编号</span><br><span class="line">    mode_t    st_mode;        /* File type and mode */</span><br><span class="line">    nlink_t   st_nlink;       /* Number of hard links */</span><br><span class="line">    uid_t     st_uid;         /* User ID of owner */</span><br><span class="line">    gid_t     st_gid;         /* Group ID of owner */</span><br><span class="line">    dev_t     st_rdev;        /* Device ID (if special file) */</span><br><span class="line">    off_t     st_size;        /* Total size, in bytes */</span><br><span class="line">    blksize_t st_blksize;     /* Block size for filesystem I/O */</span><br><span class="line">    blkcnt_t  st_blocks;      /* Number of 512B blocks allocated */</span><br><span class="line"></span><br><span class="line">    /* Since Linux 2.6, the kernel supports nanosecond</span><br><span class="line">        precision for the following timestamp fields.</span><br><span class="line">        For the details before Linux 2.6, see NOTES. */</span><br><span class="line"></span><br><span class="line">    struct timespec st_atim;  /* Time of last access */</span><br><span class="line">    struct timespec st_mtim;  /* Time of last modification */</span><br><span class="line">    struct timespec st_ctim;  /* Time of last status change */</span><br><span class="line"></span><br><span class="line">#define st_atime st_atim.tv_sec      /* Backward compatibility */</span><br><span class="line">#define st_mtime st_mtim.tv_sec</span><br><span class="line">#define st_ctime st_ctim.tv_sec</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">//检查文件类型</span><br><span class="line">#define	__S_ISTYPE(mode, mask)	(((mode) &amp; __S_IFMT) == (mask))</span><br><span class="line"></span><br><span class="line">#define	S_ISDIR(mode)	 __S_ISTYPE((mode), __S_IFDIR)  //目录</span><br><span class="line">#define	S_ISCHR(mode)	 __S_ISTYPE((mode), __S_IFCHR)  //字符特殊设备</span><br><span class="line">#define	S_ISBLK(mode)	 __S_ISTYPE((mode), __S_IFBLK)  //块特殊设备</span><br><span class="line">#define	S_ISREG(mode)	 __S_ISTYPE((mode), __S_IFREG)  //普通文件</span><br></pre></td></tr></table></figure>
-
+<h2 id="cat"><a class="markdownIt-Anchor" href="#cat"></a> cat</h2>
+<p>1.判断pathname是一个文件还是目录<br />
+2.打开该文件，并通过缓存读取并输出<br />
+3.关闭该文件</p>
+<h3 id="如何判断是文件还是目录"><a class="markdownIt-Anchor" href="#如何判断是文件还是目录"></a> 如何判断是文件还是目录</h3>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">- man 2 stat</span><br><span class="line"></span><br><span class="line">#include &lt;sys/types.h&gt;</span><br><span class="line">#include &lt;sys/stat.h&gt;</span><br><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line"></span><br><span class="line">int stat(const char *pathname, struct stat *statbuf);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">struct stat &#123;</span><br><span class="line">    dev_t     st_dev;         /* ID of device containing file */</span><br><span class="line">    ino_t     st_ino;         /* Inode number */ 索引编号</span><br><span class="line">    mode_t    st_mode;        /* File type and mode */</span><br><span class="line">    nlink_t   st_nlink;       /* Number of hard links */</span><br><span class="line">    uid_t     st_uid;         /* User ID of owner */</span><br><span class="line">    gid_t     st_gid;         /* Group ID of owner */</span><br><span class="line">    dev_t     st_rdev;        /* Device ID (if special file) */</span><br><span class="line">    off_t     st_size;        /* Total size, in bytes */</span><br><span class="line">    blksize_t st_blksize;     /* Block size for filesystem I/O */</span><br><span class="line">    blkcnt_t  st_blocks;      /* Number of 512B blocks allocated */</span><br><span class="line"></span><br><span class="line">    /* Since Linux 2.6, the kernel supports nanosecond</span><br><span class="line">        precision for the following timestamp fields.</span><br><span class="line">        For the details before Linux 2.6, see NOTES. */</span><br><span class="line"></span><br><span class="line">    struct timespec st_atim;  /* Time of last access */</span><br><span class="line">    struct timespec st_mtim;  /* Time of last modification */</span><br><span class="line">    struct timespec st_ctim;  /* Time of last status change */</span><br><span class="line"></span><br><span class="line">#define st_atime st_atim.tv_sec      /* Backward compatibility */</span><br><span class="line">#define st_mtime st_mtim.tv_sec</span><br><span class="line">#define st_ctime st_ctim.tv_sec</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">//检查文件类型</span><br><span class="line">#define	__S_ISTYPE(mode, mask)	(((mode) &amp; __S_IFMT) == (mask))</span><br><span class="line"></span><br><span class="line">#define	S_ISDIR(mode)	 __S_ISTYPE((mode), __S_IFDIR)  //目录</span><br><span class="line">#define	S_ISCHR(mode)	 __S_ISTYPE((mode), __S_IFCHR)  //字符特殊设备</span><br><span class="line">#define	S_ISBLK(mode)	 __S_ISTYPE((mode), __S_IFBLK)  //块特殊设备</span><br><span class="line">#define	S_ISREG(mode)	 __S_ISTYPE((mode), __S_IFREG)  //普通文件</span><br></pre></td></tr></table></figure>
 <ul>
 <li>返回值：如果成功返回0，否则返回-1，并且<code>error</code>会设置为相应的错误类型</li>
 </ul>
-<h2 id="习题"><a href="#习题" class="headerlink" title="习题"></a>习题</h2><p>习题写了cat head last命令，<br>其中last命令，由于没有找到用户logout信息在哪里存放，所以无法和系统的last保持一致<br>此外，与head命令相对应的tail命令不是很好写，难在“怎么定位一个文件的倒数10行开始处”这个问题怎么优雅的解决</p>
+<h2 id="习题"><a class="markdownIt-Anchor" href="#习题"></a> 习题</h2>
+<p>习题写了cat head last命令，<br />
+其中last命令，由于没有找到用户logout信息在哪里存放，所以无法和系统的last保持一致<br />
+此外，与head命令相对应的tail命令不是很好写，难在“怎么定位一个文件的倒数10行开始处”这个问题怎么优雅的解决</p>
 
     </div>
 
@@ -506,7 +532,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#who"><span class="nav-number">1.</span> <span class="nav-text">who</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%BB%E6%89%BEwho%E7%9A%84%E8%B8%AA%E8%BF%B9"><span class="nav-number">1.1.</span> <span class="nav-text">寻找who的踪迹</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E8%AF%BB%E5%8F%96%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84"><span class="nav-number">1.2.</span> <span class="nav-text">如何读取数据结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B0%86%E7%BB%93%E6%9E%84%E4%BD%93%E4%B8%AD%E7%9A%84%E4%BF%A1%E6%81%AF%E6%98%BE%E7%A4%BA"><span class="nav-number">1.3.</span> <span class="nav-text">将结构体中的信息显示</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#who%E7%9A%84%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B"><span class="nav-number">1.4.</span> <span class="nav-text">who的工作流程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9C%A8%E7%94%A8%E6%88%B7%E7%A9%BA%E9%97%B4%E4%B8%AD%E4%BD%BF%E7%94%A8%E7%BC%93%E5%86%B2%E5%8C%BA"><span class="nav-number">1.4.1.</span> <span class="nav-text">在用户空间中使用缓冲区</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%86%85%E6%A0%B8%E4%B8%AD%E7%9A%84%E7%BC%93%E5%86%B2%E6%8A%80%E6%9C%AF"><span class="nav-number">1.4.2.</span> <span class="nav-text">内核中的缓冲技术</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9%E7%94%A8%E6%88%B7%E7%99%BB%E5%BD%95%E4%BF%A1%E6%81%AF"><span class="nav-number">1.5.</span> <span class="nav-text">修改用户登录信息</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E8%BF%87%E7%A8%8B"><span class="nav-number">1.5.1.</span> <span class="nav-text">文件读取过程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#lseek-%E5%87%BD%E6%95%B0"><span class="nav-number">1.5.2.</span> <span class="nav-text">lseek()函数</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9UTMP%E6%96%87%E4%BB%B6%E4%B8%AD%E8%AE%B0%E5%BD%95%E7%9A%84ut-type"><span class="nav-number">1.6.</span> <span class="nav-text">修改UTMP文件中记录的ut-&gt;type</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BC%96%E5%86%99logout-tty-%E5%87%BD%E6%95%B0"><span class="nav-number">1.6.1.</span> <span class="nav-text">编写logout_tty()函数</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cp"><span class="nav-number">2.</span> <span class="nav-text">cp</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E7%9A%84%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8"><span class="nav-number">2.1.</span> <span class="nav-text">使用的系统调用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#linux%E6%9D%83%E9%99%90"><span class="nav-number">2.1.1.</span> <span class="nav-text">linux权限</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%94%99%E8%AF%AF%E6%8F%90%E7%A4%BA"><span class="nav-number">3.</span> <span class="nav-text">错误提示</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cat"><span class="nav-number">4.</span> <span class="nav-text">cat</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E5%88%A4%E6%96%AD%E6%98%AF%E6%96%87%E4%BB%B6%E8%BF%98%E6%98%AF%E7%9B%AE%E5%BD%95"><span class="nav-number">4.1.</span> <span class="nav-text">如何判断是文件还是目录</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B9%A0%E9%A2%98"><span class="nav-number">5.</span> <span class="nav-text">习题</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#who"><span class="nav-number">1.</span> <span class="nav-text"> who</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%BB%E6%89%BEwho%E7%9A%84%E8%B8%AA%E8%BF%B9"><span class="nav-number">1.1.</span> <span class="nav-text"> 寻找who的踪迹</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E8%AF%BB%E5%8F%96%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84"><span class="nav-number">1.2.</span> <span class="nav-text"> 如何读取数据结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B0%86%E7%BB%93%E6%9E%84%E4%BD%93%E4%B8%AD%E7%9A%84%E4%BF%A1%E6%81%AF%E6%98%BE%E7%A4%BA"><span class="nav-number">1.3.</span> <span class="nav-text"> 将结构体中的信息显示</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#who%E7%9A%84%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B"><span class="nav-number">1.4.</span> <span class="nav-text"> who的工作流程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9C%A8%E7%94%A8%E6%88%B7%E7%A9%BA%E9%97%B4%E4%B8%AD%E4%BD%BF%E7%94%A8%E7%BC%93%E5%86%B2%E5%8C%BA"><span class="nav-number">1.4.1.</span> <span class="nav-text"> 在用户空间中使用缓冲区</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%86%85%E6%A0%B8%E4%B8%AD%E7%9A%84%E7%BC%93%E5%86%B2%E6%8A%80%E6%9C%AF"><span class="nav-number">1.4.2.</span> <span class="nav-text"> 内核中的缓冲技术</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9%E7%94%A8%E6%88%B7%E7%99%BB%E5%BD%95%E4%BF%A1%E6%81%AF"><span class="nav-number">1.5.</span> <span class="nav-text"> 修改用户登录信息</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E8%AF%BB%E5%8F%96%E8%BF%87%E7%A8%8B"><span class="nav-number">1.5.1.</span> <span class="nav-text"> 文件读取过程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#lseek%E5%87%BD%E6%95%B0"><span class="nav-number">1.5.2.</span> <span class="nav-text"> lseek()函数</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9utmp%E6%96%87%E4%BB%B6%E4%B8%AD%E8%AE%B0%E5%BD%95%E7%9A%84ut-type"><span class="nav-number">1.6.</span> <span class="nav-text"> 修改UTMP文件中记录的ut-&gt;type</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BC%96%E5%86%99logout_tty%E5%87%BD%E6%95%B0"><span class="nav-number">1.6.1.</span> <span class="nav-text"> 编写logout_tty()函数</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cp"><span class="nav-number">2.</span> <span class="nav-text"> cp</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E7%9A%84%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8"><span class="nav-number">2.1.</span> <span class="nav-text"> 使用的系统调用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#linux%E6%9D%83%E9%99%90"><span class="nav-number">2.1.1.</span> <span class="nav-text"> linux权限</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%94%99%E8%AF%AF%E6%8F%90%E7%A4%BA"><span class="nav-number">3.</span> <span class="nav-text"> 错误提示</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#cat"><span class="nav-number">4.</span> <span class="nav-text"> cat</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E5%88%A4%E6%96%AD%E6%98%AF%E6%96%87%E4%BB%B6%E8%BF%98%E6%98%AF%E7%9B%AE%E5%BD%95"><span class="nav-number">4.1.</span> <span class="nav-text"> 如何判断是文件还是目录</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B9%A0%E9%A2%98"><span class="nav-number">5.</span> <span class="nav-text"> 习题</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
