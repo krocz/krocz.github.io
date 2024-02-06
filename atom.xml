@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2024-01-12T11:23:10.156Z</updated>
+  <updated>2024-02-06T09:23:38.797Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,6 +15,34 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>test latex</title>
+    <link href="http://example.com/2024/02/06/test-latex/"/>
+    <id>http://example.com/2024/02/06/test-latex/</id>
+    <published>2024-02-06T09:23:17.000Z</published>
+    <updated>2024-02-06T09:23:38.797Z</updated>
+    
+    
+      
+      
+    <summary type="html">&lt;p&gt;&lt;span class=&quot;math inline&quot;&gt;&#92;(DIr&#92;)&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;&lt;span class=&quot;math inline&quot;&gt;&#92;(&#92;beta&#92;)&lt;/span&gt;&lt;/p&gt;
+</summary>
+      
+    
+    
+    
+    <category term="Linux应用开发" scheme="http://example.com/categories/Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/"/>
+    
+    
+    <category term="嵌入式" scheme="http://example.com/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/"/>
+    
+    <category term="Linux" scheme="http://example.com/tags/Linux/"/>
+    
+    <category term="C/C++" scheme="http://example.com/tags/C-C/"/>
+    
+  </entry>
   
   <entry>
     <title>mmap</title>
@@ -634,39 +662,6 @@ Framebuffer，在 Framebuffer 中写入数据&lt;/li&gt;
 &lt;li&gt;目录是一种特殊的文件，它的内容一条条记录，每一个记录代表一个文件或者目录&lt;/li&gt;
 &lt;li&gt;目录文件永远不空，至少包含两个特殊项&quot;.&quot;或者&quot;..&quot;&lt;/li&gt;
 &lt;/ul&gt;</summary>
-    
-    
-    
-    <category term="读书笔记" scheme="http://example.com/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/"/>
-    
-    <category term="《Unix-Linux编程实践教程》" scheme="http://example.com/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E3%80%8AUnix-Linux%E7%BC%96%E7%A8%8B%E5%AE%9E%E8%B7%B5%E6%95%99%E7%A8%8B%E3%80%8B/"/>
-    
-    
-    <category term="Linux" scheme="http://example.com/tags/Linux/"/>
-    
-    <category term="C/C++" scheme="http://example.com/tags/C-C/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Unix-Linux编程实践教程-章节2笔记</title>
-    <link href="http://example.com/2023/09/12/Unix-Linux%E7%BC%96%E7%A8%8B%E5%AE%9E%E8%B7%B5%E6%95%99%E7%A8%8B-%E7%AB%A0%E8%8A%822%E7%AC%94%E8%AE%B0/"/>
-    <id>http://example.com/2023/09/12/Unix-Linux%E7%BC%96%E7%A8%8B%E5%AE%9E%E8%B7%B5%E6%95%99%E7%A8%8B-%E7%AB%A0%E8%8A%822%E7%AC%94%E8%AE%B0/</id>
-    <published>2023-09-12T07:19:04.000Z</published>
-    <updated>2023-09-12T07:34:58.560Z</updated>
-    
-    
-    <summary type="html">&lt;h2 id=&quot;who&quot;&gt;who&lt;/h2&gt;
-&lt;ul&gt;
-&lt;li&gt;把程序的可执行文件放到任意的一个目录中（/bin /usr/bin
-/usr/local/bin），就可以为系统添加新的命令&lt;/li&gt;
-&lt;/ul&gt;
-&lt;h3 id=&quot;寻找who的踪迹&quot;&gt;寻找who的踪迹&lt;/h3&gt;
-&lt;ul&gt;
-&lt;li&gt;&lt;code&gt;man who&lt;/code&gt;:发现文件utmp,wtmp很关键&lt;/li&gt;
-&lt;li&gt;&lt;code&gt;man -k utmp&lt;/code&gt;:按关键字搜索utmp，发现：&lt;/li&gt;
-&lt;/ul&gt;
-&lt;figure class=&quot;highlight plaintext&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;utmp (5)            - login records&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;login (3)            - write utmp and wtmp entries&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;logout (3)           - write utmp and wtmp entries&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;</summary>
     
     
     
