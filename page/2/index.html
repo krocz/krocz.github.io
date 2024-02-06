@@ -268,6 +268,7 @@
       
           <h2 id="1-编写驱动程序的框架"><a href="#1-编写驱动程序的框架" class="headerlink" title="1. 编写驱动程序的框架"></a>1. 编写驱动程序的框架</h2><h3 id="1-1-APP-打开的文件在内核中如何表示"><a href="#1-1-APP-打开的文件在内核中如何表示" class="headerlink" title="1.1 APP 打开的文件在内核中如何表示"></a>1.1 APP 打开的文件在内核中如何表示</h3><p>APP 打开文件时，可以得到一个整数，这个整数被称为文件句柄。对于 APP 的每一个文件句柄，在内核里面都有一个<code>struct file</code>结构体与之对应:</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">file</span> &#123;</span></span><br><span class="line">	<span class="class"><span class="keyword">union</span> &#123;</span></span><br><span class="line">		<span class="class"><span class="keyword">struct</span> <span class="title">llist_node</span>	<span class="title">fu_llist</span>;</span></span><br><span class="line">		<span class="class"><span class="keyword">struct</span> <span class="title">rcu_head</span> 	<span class="title">fu_rcuhead</span>;</span></span><br><span class="line">	&#125; f_u;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">path</span>		<span class="title">f_path</span>;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">inode</span>		*<span class="title">f_inode</span>;</span>	<span class="comment">/* cached value */</span></span><br><span class="line">	<span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">file_operations</span>	*<span class="title">f_op</span>;</span></span><br><span class="line">	<span class="comment">/*</span></span><br><span class="line"><span class="comment">	 * Protects f_ep_links, f_flags.</span></span><br><span class="line"><span class="comment">	 * Must not be taken from IRQ context.</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="type">spinlock_t</span>		f_lock;</span><br><span class="line">	<span class="type">atomic_long_t</span>		f_count;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span> 		f_flags;</span><br><span class="line">	<span class="type">fmode_t</span>			f_mode;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">mutex</span>		<span class="title">f_pos_lock</span>;</span></span><br><span class="line">	<span class="type">loff_t</span>			f_pos;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">fown_struct</span>	<span class="title">f_owner</span>;</span></span><br><span class="line">	<span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">cred</span>	*<span class="title">f_cred</span>;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">file_ra_state</span>	<span class="title">f_ra</span>;</span></span><br></pre></td></tr></table></figure>
+
 <p>在APP中调用open函数打开文件时，传入的flags、mode等参数会记录在内核相应的<code>struct file</code>成员<code>f_flags\f_mode</code>中；读写文件的偏移地址也会保存在<code>struct file</code>结构体的<code>f_pos</code>成员中。</p>
           <!--noindex-->
             <div class="post-button">
@@ -363,14 +364,14 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="1-I2C协议"><a href="#1-I2C协议" class="headerlink" title="1. I2C协议"></a>1. I2C协议</h2><p><img src="../images/IIC应用编程/image-20231013195434388.png" alt="image-20231013195434388"></p>
+          <h2 id="1-I2C协议"><a href="#1-I2C协议" class="headerlink" title="1. I2C协议"></a>1. I2C协议</h2><p><img src="/../images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231013195434388.png" alt="image-20231013195434388"></p>
 <ul>
 <li>起始信号</li>
 <li>停止信号</li>
 <li>传输1Bit数据时的信号</li>
 <li>应答信号（<strong>0：应答，1：非应答</strong>）</li>
 </ul>
-<h3 id="1-1-I2C写操作"><a href="#1-1-I2C写操作" class="headerlink" title="1.1 I2C写操作"></a>1.1 I2C写操作</h3><p><img src="../images/IIC应用编程/image-20231013200107130.png" alt="image-20231013200107130"></p>
+<h3 id="1-1-I2C写操作"><a href="#1-1-I2C写操作" class="headerlink" title="1.1 I2C写操作"></a>1.1 I2C写操作</h3><p><img src="/../images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231013200107130.png" alt="image-20231013200107130"></p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2023/10/13/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/#more" rel="contents">
@@ -471,7 +472,7 @@
 <p><a target="_blank" rel="noopener" href="https://taoshu.in/tty.html">解密 TTY 设备</a></p>
 </blockquote>
 <h3 id="1-1-终端机"><a href="#1-1-终端机" class="headerlink" title="1.1 终端机"></a>1.1 终端机</h3><p>从历史上看，终端刚开始就是终端机，配有打印机，键盘，带有一个串口，通过串口传送数据到主机端，然后主机处理完交给终端打印出来。电传打字机(teletype)可以被看作是这类设备的统称，因此终端也被简称为 TTY(teletype 的缩写)：</p>
-<p><img src="../images/UART应用编程/image-20231006145708741.png" alt="image-20231006145708741"></p>
+<p><img src="/../images/UART%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231006145708741.png" alt="image-20231006145708741"></p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2023/10/06/UART%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/#more" rel="contents">
@@ -569,6 +570,9 @@
           <h2 id="1-线程的标识-pthread-t"><a href="#1-线程的标识-pthread-t" class="headerlink" title="1. 线程的标识 pthread_t"></a>1. 线程的标识 pthread_t</h2><p>对于每一个进程都有唯一PID号与之对应，而对于线程而言，也有类似的tid号，即一个pthread_t类型的变量。线程号是表示线程的唯一标识，<strong>但是对于线程号而言，其仅仅在其所属的进程上下文中才有意义。</strong></p>
 <p>获取当前线程的线程号：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span> </span></span><br><span class="line"><span class="type">pthread_t</span> <span class="title function_">pthread_self</span><span class="params">(<span class="type">void</span>)</span>;</span><br></pre></td></tr></table></figure>
+
+
+
 <h2 id="2-线程的创建"><a href="#2-线程的创建" class="headerlink" title="2. 线程的创建"></a>2. 线程的创建</h2>
           <!--noindex-->
             <div class="post-button">
@@ -664,7 +668,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="1-TCP-UDP网络通信流程图"><a href="#1-TCP-UDP网络通信流程图" class="headerlink" title="1. TCP/UDP网络通信流程图"></a>1. TCP/UDP网络通信流程图</h2><h3 id="1-1-TCP"><a href="#1-1-TCP" class="headerlink" title="1.1 TCP"></a>1.1 TCP</h3><p><img src="../images/网络编程/image-20230926192207003.png" alt="image-20230926192207003"></p>
+          <h2 id="1-TCP-UDP网络通信流程图"><a href="#1-TCP-UDP网络通信流程图" class="headerlink" title="1. TCP&#x2F;UDP网络通信流程图"></a>1. TCP&#x2F;UDP网络通信流程图</h2><h3 id="1-1-TCP"><a href="#1-1-TCP" class="headerlink" title="1.1 TCP"></a>1.1 TCP</h3><p><img src="/../images/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/image-20230926192207003.png" alt="image-20230926192207003"></p>
 <h4 id="1-1-1-代码"><a href="#1-1-1-代码" class="headerlink" title="1.1.1 代码"></a>1.1.1 代码</h4><h5 id="server-c"><a href="#server-c" class="headerlink" title="server.c"></a>server.c</h5>
           <!--noindex-->
             <div class="post-button">
@@ -760,7 +764,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="1-电阻屏和电容屏定位原理"><a href="#1-电阻屏和电容屏定位原理" class="headerlink" title="1. 电阻屏和电容屏定位原理"></a>1. 电阻屏和电容屏定位原理</h2><h3 id="1-1-电阻屏"><a href="#1-1-电阻屏" class="headerlink" title="1.1 电阻屏"></a>1.1 电阻屏</h3><p><img src="../images/使用电阻屏和电容屏/image-20230922200403814.png" alt="image-20230922200403814"></p>
+          <h2 id="1-电阻屏和电容屏定位原理"><a href="#1-电阻屏和电容屏定位原理" class="headerlink" title="1. 电阻屏和电容屏定位原理"></a>1. 电阻屏和电容屏定位原理</h2><h3 id="1-1-电阻屏"><a href="#1-1-电阻屏" class="headerlink" title="1.1 电阻屏"></a>1.1 电阻屏</h3><p><img src="/../images/%E4%BD%BF%E7%94%A8%E7%94%B5%E9%98%BB%E5%B1%8F%E5%92%8C%E7%94%B5%E5%AE%B9%E5%B1%8F/image-20230922200403814.png" alt="image-20230922200403814"></p>
 <ul>
 <li>根据分压原理，计算电阻值。假设材料长度和电阻成线性关系，则可以计算出相对距离</li>
 <li>电阻屏分为上下两层薄膜，一层通电时，另一层在按压时作为探针获取分压值，从而进行计算</li>
@@ -861,7 +865,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="1-输入系统框架及调试"><a href="#1-输入系统框架及调试" class="headerlink" title="1. 输入系统框架及调试"></a>1. 输入系统框架及调试</h2><h3 id="1-1-框架概述"><a href="#1-1-框架概述" class="headerlink" title="1.1 框架概述"></a>1.1 框架概述</h3><p><img src="../images/输入系统应用编程/image-20230917174044630.png" alt="image-20230917174044630"></p>
+          <h2 id="1-输入系统框架及调试"><a href="#1-输入系统框架及调试" class="headerlink" title="1. 输入系统框架及调试"></a>1. 输入系统框架及调试</h2><h3 id="1-1-框架概述"><a href="#1-1-框架概述" class="headerlink" title="1.1 框架概述"></a>1.1 框架概述</h3><p><img src="/../images/%E8%BE%93%E5%85%A5%E7%B3%BB%E7%BB%9F%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20230917174044630.png" alt="image-20230917174044630"></p>
 <ol>
 <li><p>APP 发起读操作，若无数据则休眠； </p>
 </li>
@@ -876,7 +880,7 @@
 </li>
 <li><p>最常用的是 evdev_handler：它只是把 input_event 结构体保存在内核buffer 等，APP 来读取时就原原本本地返回。它支持多个 APP 同时访问输入设备，每个 APP 都可以获得同一份输入事件。 </p>
 </li>
-<li><p>当 APP 正在等待数据时，evdev_handler 会把它唤醒，这样 APP 就可以返回数据。 </p>
+<li><p>当 APP 正在等待数据时，evdev_handler 会把它唤醒，这样 APP 就可以返回数据。</p>
 </li>
 </ul>
 </li>
@@ -989,7 +993,7 @@
 <li>应用程序：使用 ioctl 获得 LCD 分辨率、BPP；通过 mmap 映射 Framebuffer，在 Framebuffer 中写入数据</li>
 <li>LCD控制器周而复始的从内存中取出LCD屏幕上每一个像素点的显示数据</li>
 </ol>
-<p><img src="../images/使用LCD屏幕/image-20230912204455923.png" alt="image-20230912204455923"></p>
+<p><img src="/../images/%E4%BD%BF%E7%94%A8LCD%E5%B1%8F%E5%B9%95/image-20230912204455923.png" alt="image-20230912204455923"></p>
 <p>计算（x,y）坐标处像素对应Framebuffer地址：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(x，y)像素起始地址 = fb_base + (xres * bpp / 8) * y + x * bpp / 8</span><br></pre></td></tr></table></figure>
           <!--noindex-->
@@ -1173,7 +1177,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>4.8k</span>
+              <span>4.9k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -1193,7 +1197,7 @@
 
       
           <h2 id="who"><a href="#who" class="headerlink" title="who"></a>who</h2><ul>
-<li>把程序的可执行文件放到任意的一个目录中（/bin /usr/bin /usr/local/bin），就可以为系统添加新的命令</li>
+<li>把程序的可执行文件放到任意的一个目录中（&#x2F;bin &#x2F;usr&#x2F;bin &#x2F;usr&#x2F;local&#x2F;bin），就可以为系统添加新的命令</li>
 </ul>
 <h3 id="寻找who的踪迹"><a href="#寻找who的踪迹" class="headerlink" title="寻找who的踪迹"></a>寻找who的踪迹</h3><ul>
 <li><code>man who</code>:发现文件utmp,wtmp很关键</li>

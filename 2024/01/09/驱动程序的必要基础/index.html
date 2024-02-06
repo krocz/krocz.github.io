@@ -20,19 +20,19 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="1. 休眠与唤醒1.1 使用示例使用休眠-唤醒机制来编写按键驱动程序：  APP 调用 read 等函数试图读取数据，比如读取按键； APP 进入内核态，也就是调用驱动中的对应函数，发现有数据则复制到用户空间并马上返回； 如果 APP 在内核态，也就是在驱动程序中发现没有数据，则 APP 休眠，进程&#x2F;线程状态改为非 Running； 当有数据时，比如当按下按键时，驱动程序的中断服务程序被调用，它会">
+  <meta name="description" content="1. 休眠与唤醒1.1 使用示例使用休眠-唤醒机制来编写按键驱动程序：  APP 调用 read 等函数试图读取数据，比如读取按键； APP 进入内核态，也就是调用驱动中的对应函数，发现有数据则复制到用户空间并马上返回； 如果 APP 在内核态，也就是在驱动程序中发现没有数据，则 APP 休眠，进程&#x2F;线程状态改为非 Running； 当有数据时，比如当按下按键时，驱动程序的中断服务程序被">
 <meta property="og:type" content="article">
 <meta property="og:title" content="驱动程序的必要基础">
 <meta property="og:url" content="http://example.com/2024/01/09/%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F%E7%9A%84%E5%BF%85%E8%A6%81%E5%9F%BA%E7%A1%80/index.html">
 <meta property="og:site_name" content="Krocz&#39;s Blog">
-<meta property="og:description" content="1. 休眠与唤醒1.1 使用示例使用休眠-唤醒机制来编写按键驱动程序：  APP 调用 read 等函数试图读取数据，比如读取按键； APP 进入内核态，也就是调用驱动中的对应函数，发现有数据则复制到用户空间并马上返回； 如果 APP 在内核态，也就是在驱动程序中发现没有数据，则 APP 休眠，进程&#x2F;线程状态改为非 Running； 当有数据时，比如当按下按键时，驱动程序的中断服务程序被调用，它会">
+<meta property="og:description" content="1. 休眠与唤醒1.1 使用示例使用休眠-唤醒机制来编写按键驱动程序：  APP 调用 read 等函数试图读取数据，比如读取按键； APP 进入内核态，也就是调用驱动中的对应函数，发现有数据则复制到用户空间并马上返回； 如果 APP 在内核态，也就是在驱动程序中发现没有数据，则 APP 休眠，进程&#x2F;线程状态改为非 Running； 当有数据时，比如当按下按键时，驱动程序的中断服务程序被">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/2024/01/09/images/%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F%E7%9A%84%E5%BF%85%E8%A6%81%E5%9F%BA%E7%A1%80/image-20240109100440021.png">
-<meta property="og:image" content="http://example.com/2024/01/09/images/%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F%E7%9A%84%E5%BF%85%E8%A6%81%E5%9F%BA%E7%A1%80/image-20240109103704728.png">
-<meta property="og:image" content="http://example.com/2024/01/09/images/%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F%E7%9A%84%E5%BF%85%E8%A6%81%E5%9F%BA%E7%A1%80/image-20240109114754933.png">
-<meta property="og:image" content="http://example.com/2024/01/09/images/%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F%E7%9A%84%E5%BF%85%E8%A6%81%E5%9F%BA%E7%A1%80/image-20240110112150973.png">
-<meta property="og:image" content="http://example.com/2024/01/09/images/%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F%E7%9A%84%E5%BF%85%E8%A6%81%E5%9F%BA%E7%A1%80/image-20240110180354646.png">
-<meta property="og:image" content="http://example.com/2024/01/09/images/%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F%E7%9A%84%E5%BF%85%E8%A6%81%E5%9F%BA%E7%A1%80/image-20240111201435120.png">
+<meta property="og:image" content="http://example.com/images/%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F%E7%9A%84%E5%BF%85%E8%A6%81%E5%9F%BA%E7%A1%80/image-20240109100440021.png">
+<meta property="og:image" content="http://example.com/images/%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F%E7%9A%84%E5%BF%85%E8%A6%81%E5%9F%BA%E7%A1%80/image-20240109103704728.png">
+<meta property="og:image" content="http://example.com/images/%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F%E7%9A%84%E5%BF%85%E8%A6%81%E5%9F%BA%E7%A1%80/image-20240109114754933.png">
+<meta property="og:image" content="http://example.com/images/%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F%E7%9A%84%E5%BF%85%E8%A6%81%E5%9F%BA%E7%A1%80/image-20240110112150973.png">
+<meta property="og:image" content="http://example.com/images/%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F%E7%9A%84%E5%BF%85%E8%A6%81%E5%9F%BA%E7%A1%80/image-20240110180354646.png">
+<meta property="og:image" content="http://example.com/images/%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F%E7%9A%84%E5%BF%85%E8%A6%81%E5%9F%BA%E7%A1%80/image-20240111201435120.png">
 <meta property="article:published_time" content="2024-01-09T01:52:05.000Z">
 <meta property="article:modified_time" content="2024-01-11T12:22:33.597Z">
 <meta property="article:author" content="Krocz">
@@ -40,7 +40,7 @@
 <meta property="article:tag" content="Linux">
 <meta property="article:tag" content="C&#x2F;C++">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://example.com/2024/01/09/images/%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F%E7%9A%84%E5%BF%85%E8%A6%81%E5%9F%BA%E7%A1%80/image-20240109100440021.png">
+<meta name="twitter:image" content="http://example.com/images/%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F%E7%9A%84%E5%BF%85%E8%A6%81%E5%9F%BA%E7%A1%80/image-20240109100440021.png">
 
 <link rel="canonical" href="http://example.com/2024/01/09/%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F%E7%9A%84%E5%BF%85%E8%A6%81%E5%9F%BA%E7%A1%80/">
 
@@ -281,25 +281,23 @@
 <ol>
 <li>APP 调用 read 等函数试图读取数据，比如读取按键；</li>
 <li>APP 进入内核态，也就是调用驱动中的对应函数，发现有数据则复制到用户空间并马上返回；</li>
-<li>如果 APP 在内核态，也就是在驱动程序中发现没有数据，则 APP 休眠，进程/线程状态改为非 Running；</li>
-<li>当有数据时，比如当按下按键时，驱动程序的中断服务程序被调用，它会记录数据、将 APP 的进程/线程状态修改为 Running；</li>
+<li>如果 APP 在内核态，也就是在驱动程序中发现没有数据，则 APP 休眠，进程&#x2F;线程状态改为非 Running；</li>
+<li>当有数据时，比如当按下按键时，驱动程序的中断服务程序被调用，它会记录数据、将 APP 的进程&#x2F;线程状态修改为 Running；</li>
 <li>调度器调度 APP 继续运行它的内核态代码，也就是驱动程序中的函数，复制数据到用户空间并马上返回。</li>
 </ol>
 <p>如下图所示：</p>
-<p><img src="../images/驱动程序的必要基础/image-20240109100440021.png" alt="image-20240109100440021"></p>
+<p><img src="/../images/%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F%E7%9A%84%E5%BF%85%E8%A6%81%E5%9F%BA%E7%A1%80/image-20240109100440021.png" alt="image-20240109100440021"></p>
 <h3 id="1-2-内核函数"><a href="#1-2-内核函数" class="headerlink" title="1.2 内核函数"></a>1.2 内核函数</h3><blockquote>
 <p>参考内核源码：include\linux\wait.h</p>
 </blockquote>
-<h4 id="1-2-1-休眠函数"><a href="#1-2-1-休眠函数" class="headerlink" title="1.2.1 休眠函数"></a>1.2.1 休眠函数</h4><div class="table-container">
-<table>
+<h4 id="1-2-1-休眠函数"><a href="#1-2-1-休眠函数" class="headerlink" title="1.2.1 休眠函数"></a>1.2.1 休眠函数</h4><table>
 <thead>
 <tr>
 <th>函数</th>
 <th>说明</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>wait_event_interruptible(wq, condition)</td>
 <td>休眠，直到 condition 为真； 休眠期间是可被打断的，可以被信号打断</td>
 </tr>
@@ -315,27 +313,24 @@
 <td>wait_event_timeout(wq, condition, timeout)</td>
 <td>休眠，直到 condition 为真； 退出的唯一条件是 condition 为真，信号也不好使</td>
 </tr>
-</tbody>
-</table>
-</div>
+</tbody></table>
 <ul>
-<li><p>wq 是指 waitqueue，等待队列，休眠时除了把程序状态改为非 RUNNING 之外，还要把进程/进程放入 wq 中，以后中断服务程序要从 wq 中把它取出来唤醒。声明等待队列头的源码如下：</p>
+<li><p>wq 是指 waitqueue，等待队列，休眠时除了把程序状态改为非 RUNNING 之外，还要把进程&#x2F;进程放入 wq 中，以后中断服务程序要从 wq 中把它取出来唤醒。声明等待队列头的源码如下：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> __WAIT_QUEUE_HEAD_INITIALIZER(name) &#123;				\</span></span><br><span class="line"><span class="meta">	.lock		= __SPIN_LOCK_UNLOCKED(name.lock),		\</span></span><br><span class="line"><span class="meta">	.task_list	= &#123; &amp;(name).task_list, &amp;(name).task_list &#125; &#125;</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> DECLARE_WAIT_QUEUE_HEAD(name) \</span></span><br><span class="line"><span class="meta">	wait_queue_head_t name = __WAIT_QUEUE_HEAD_INITIALIZER(name)</span></span><br></pre></td></tr></table></figure>
+
 <p>只需要调用宏 <code>DECLARE_WAIT_QUEUE_HEAD</code> 就可以将一个变量修饰为等待队列头</p>
 </li>
 <li><p>condition 可以是一个变量，也可以是任何表达式。表示“一直等待，直到 condition 为 TRUE ”。</p>
 </li>
 </ul>
-<h4 id="1-2-2-唤醒函数"><a href="#1-2-2-唤醒函数" class="headerlink" title="1.2.2 唤醒函数"></a>1.2.2 唤醒函数</h4><div class="table-container">
-<table>
+<h4 id="1-2-2-唤醒函数"><a href="#1-2-2-唤醒函数" class="headerlink" title="1.2.2 唤醒函数"></a>1.2.2 唤醒函数</h4><table>
 <thead>
 <tr>
 <th>函数</th>
 <th>说明</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>wake_up_interruptible(x)</td>
 <td>唤醒 x 队列中状态为“TASK_INTERRUPTIBLE”的线程，只唤醒其中的一个线程</td>
 </tr>
@@ -359,14 +354,13 @@
 <td>wake_up_all(x)</td>
 <td>唤醒 x 队列中状态为 “ TASK_INTERRUPTIBLE ”或 “TASK_UNINTERRUPTIBLE”的线程，唤醒其中的所有线程</td>
 </tr>
-</tbody>
-</table>
-</div>
+</tbody></table>
 <h3 id="1-3-使用休眠-唤醒机制编写按键驱动"><a href="#1-3-使用休眠-唤醒机制编写按键驱动" class="headerlink" title="1.3 使用休眠-唤醒机制编写按键驱动"></a>1.3 使用休眠-唤醒机制编写按键驱动</h3><p>主要步骤如下图：</p>
-<p><img src="../images/驱动程序的必要基础/image-20240109103704728.png" alt="image-20240109103704728"></p>
+<p><img src="/../images/%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F%E7%9A%84%E5%BF%85%E8%A6%81%E5%9F%BA%E7%A1%80/image-20240109103704728.png" alt="image-20240109103704728"></p>
 <p>代码：</p>
-<p>内核模块init/exit，platform_driver 的 probe/remove，中断的声明和注册，都和之前类似，主要代码是 file_operations 中的操作：</p>
+<p>内核模块init&#x2F;exit，platform_driver 的 probe&#x2F;remove，中断的声明和注册，都和之前类似，主要代码是 file_operations 中的操作：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="title function_">DECLARE_WAIT_QUEUE_HEAD</span><span class="params">(gpio_key_wait)</span>;   <span class="comment">// 声明等待队列头</span></span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">irqreturn_t</span> <span class="title function_">gpio_key_isr</span><span class="params">(<span class="type">int</span> irq, <span class="type">void</span> *dev_id)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">gpio_key</span> *<span class="title">gpio_key</span> =</span> dev_id;</span><br><span class="line">	<span class="type">int</span> val, key;</span><br><span class="line">	</span><br><span class="line">	val = gpiod_get_value(gpio_key-&gt;gpiod);</span><br><span class="line">	printk(<span class="string">&quot;key %d %d\n&quot;</span>, gpio_key-&gt;gpio, val);</span><br><span class="line">	key = (gpio_key-&gt;gpio &lt;&lt; <span class="number">8</span>) | val;</span><br><span class="line">	put_key(key);</span><br><span class="line">	wake_up_interruptible(&amp;gpio_key_wait);   <span class="comment">// 有数据，唤醒休眠进程/线程</span></span><br><span class="line">	</span><br><span class="line">	<span class="keyword">return</span> IRQ_HANDLED;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">ssize_t</span> <span class="title function_">gpio_key_drv_read</span> <span class="params">(<span class="keyword">struct</span> file *file, <span class="type">char</span> __user *buf, <span class="type">size_t</span> size, <span class="type">loff_t</span> *offset)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">int</span> err, key;</span><br><span class="line">	wait_event_interruptible(gpio_key_wait, !is_key_buf_empty());  <span class="comment">//根据队列是否空，决定是否进入休眠状态，并将进程/线程放入等待队列中</span></span><br><span class="line">	key = get_key();</span><br><span class="line">	err = copy_to_user(buf, &amp;key, <span class="number">4</span>);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">4</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">file_operations</span> <span class="title">gpio_key_drv</span> =</span> &#123;</span><br><span class="line">	.owner	 = THIS_MODULE,</span><br><span class="line">	.read    = gpio_key_drv_read,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
 <p>代码中使用 <code>put_key,get_key</code> 等函数封装了循环队列，用以保存 APP 程序未运行时的按键数据。APP 程序仅需要打开设备文件之后，一直读取即可。</p>
 <h2 id="2-POLL-机制"><a href="#2-POLL-机制" class="headerlink" title="2. POLL 机制"></a>2. POLL 机制</h2><h3 id="2-1-使用示例"><a href="#2-1-使用示例" class="headerlink" title="2.1 使用示例"></a>2.1 使用示例</h3><p>使用 POLL 机制来编写按键驱动程序：</p>
 <ol>
@@ -376,14 +370,13 @@
 <li><strong>APP 根据 poll 函数的返回值就可以知道是否有数据，如果有数据就调用 read 得到数据</strong></li>
 </ol>
 <p>如下图所示：</p>
-<p><img src="../images/驱动程序的必要基础/image-20240109114754933.png" alt="image-20240109114754933"></p>
+<p><img src="/../images/%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F%E7%9A%84%E5%BF%85%E8%A6%81%E5%9F%BA%E7%A1%80/image-20240109114754933.png" alt="image-20240109114754933"></p>
 <p>注意事项：</p>
 <ol>
 <li>内核函数 <code>sys_poll</code> 封装了实现 poll 机制的步骤，仅需要用户<strong>将线程放入等待队列，并返回判断条件 event 的状态</strong>即可</li>
 <li>通过上图中 <code>sys_poll</code> 的伪代码示例，用户提供的 <code>drv_poll</code> 可能会被调用两次，使用内核函数 <code>poll_wait</code>  把线程挂入队列，如果线程已经在队列里 了，它就不会再次挂入，避免重复挂入相同的线程。</li>
 </ol>
-<h3 id="2-2-应用编程"><a href="#2-2-应用编程" class="headerlink" title="2.2 应用编程"></a>2.2 应用编程</h3><p>APP 可以调用 poll 或者 select 函数，这 2 个函数的作用是一致的。poll/select 函数可以监测多个文件，可以监测多种事件：</p>
-<div class="table-container">
+<h3 id="2-2-应用编程"><a href="#2-2-应用编程" class="headerlink" title="2.2 应用编程"></a>2.2 应用编程</h3><p>APP 可以调用 poll 或者 select 函数，这 2 个函数的作用是一致的。poll&#x2F;select 函数可以监测多个文件，可以监测多种事件：</p>
 <table>
 <thead>
 <tr>
@@ -392,8 +385,7 @@
 <th>描述</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>POLLIN</td>
 <td>0x0001</td>
 <td>表示可读数据，即文件描述符有数据可读</td>
@@ -443,11 +435,10 @@
 <td>0x0200</td>
 <td>Priority data may be written</td>
 </tr>
-</tbody>
-</table>
-</div>
+</tbody></table>
 <p><strong>系统调用</strong>：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;poll.h&gt;</span></span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">pollfd</span> &#123;</span></span><br><span class="line">    <span class="type">int</span>   fd;         <span class="comment">/* file descriptor */</span></span><br><span class="line">    <span class="type">short</span> events;     <span class="comment">/* requested events */</span></span><br><span class="line">    <span class="type">short</span> revents;    <span class="comment">/* returned events */</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">poll</span><span class="params">(<span class="keyword">struct</span> pollfd *fds, <span class="type">nfds_t</span> nfds, <span class="type">int</span> timeout)</span>;</span><br></pre></td></tr></table></figure>
+
 <ul>
 <li><p>返回值：</p>
 <ul>
@@ -458,11 +449,17 @@
 </li>
 <li><p>events 表示请求的事件，revents 表示返回的事件：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mask = f.file-&gt;f_op-&gt;poll(f.file, pwait);</span><br><span class="line"><span class="comment">/* Mask out unneeded events. */</span> 			</span><br><span class="line">mask &amp;= pollfd-&gt;events | POLLERR | POLLHUP;</span><br></pre></td></tr></table></figure>
+
 <p>内核中会将 file_operations.poll 函数返回的事件 mask 和请求的事件 events相与，<code>POLLERR | POLLHUP</code> 是两个严重事件，所以无论 APP有没有请求，只要这两个事件发生就一定会返回</p>
 </li>
 </ul>
 <p><strong>主要代码</strong>：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">pollfd</span> <span class="title">fds</span>[1];</span></span><br><span class="line"><span class="type">int</span> timeout_ms = <span class="number">5000</span>;</span><br><span class="line"><span class="type">int</span> ret;</span><br><span class="line"></span><br><span class="line">fds[<span class="number">0</span>].fd = fd;</span><br><span class="line">fds[<span class="number">0</span>].events = POLLIN;</span><br><span class="line"></span><br><span class="line">ret = poll(fds, <span class="number">1</span>, timeout_ms);</span><br><span class="line"><span class="keyword">if</span> ((ret == <span class="number">1</span>) &amp;&amp; (fds[<span class="number">0</span>].revents &amp; POLLIN))</span><br><span class="line">&#123;</span><br><span class="line">    read(fd, &amp;val, <span class="number">4</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;get button : 0x%x\n&quot;</span>, val);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;timeout\n&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
 <h3 id="2-3-驱动编程"><a href="#2-3-驱动编程" class="headerlink" title="2.3 驱动编程"></a>2.3 驱动编程</h3><p>实现 poll 机制，只需要在 file_operations.poll 函数中做两件事情：</p>
 <ol>
 <li>将线程放入等待队列（调用 poll_wait 函数可以自动将线程放入，并且不会重复放入）</li>
@@ -470,6 +467,7 @@
 </ol>
 <p>代码如下：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">unsigned</span> <span class="type">int</span> <span class="title function_">gpio_key_drv_poll</span><span class="params">(<span class="keyword">struct</span> file *fp, poll_table * wait)</span></span><br><span class="line">&#123;</span><br><span class="line">	printk(<span class="string">&quot;%s %s line %d\n&quot;</span>, __FILE__, __FUNCTION__, __LINE__);</span><br><span class="line">	poll_wait(fp, &amp;gpio_key_wait, wait);</span><br><span class="line">	<span class="keyword">return</span> is_key_buf_empty() ? <span class="number">0</span> : POLLIN | POLLRDNORM;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">file_operations</span> <span class="title">gpio_key_drv</span> =</span> &#123;</span><br><span class="line">	.owner	 = THIS_MODULE,</span><br><span class="line">	.read    = gpio_key_drv_read,</span><br><span class="line">	.poll    = gpio_key_drv_poll,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
 <p>其余部分与 1.3 节中的代码一致。</p>
 <blockquote>
 <p>注：(POLLIN | POLLRDNORM) 或 (POLLOUT | POLLWRNORM) 一般一起返回，之所以需要加上 POLLRDNORM 和 POLLWRNORM 是为了兼容某些 APP</p>
@@ -484,13 +482,22 @@
 <li>APP 收到信号之后，自动调用信号处理函数，可以在处理函数中调用 read 函数读取按键</li>
 </ol>
 <p>如下图所示：</p>
-<p><img src="../images/驱动程序的必要基础/image-20240110112150973.png" alt="image-20240110112150973"></p>
+<p><img src="/../images/%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F%E7%9A%84%E5%BF%85%E8%A6%81%E5%9F%BA%E7%A1%80/image-20240110112150973.png" alt="image-20240110112150973"></p>
 <h3 id="3-1-应用编程"><a href="#3-1-应用编程" class="headerlink" title="3.1 应用编程"></a>3.1 应用编程</h3><p><strong>系统调用-signal</strong> ：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;signal.h&gt;</span></span></span><br><span class="line"><span class="keyword">typedef</span> <span class="title function_">void</span> <span class="params">(*<span class="type">sighandler_t</span>)</span><span class="params">(<span class="type">int</span>)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">sighandler_t</span> <span class="title function_">signal</span><span class="params">(<span class="type">int</span> signum, <span class="type">sighandler_t</span> handler)</span>;</span><br></pre></td></tr></table></figure>
+
 <p><strong>主要代码</strong>：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 信号处理函数</span></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">sig_func</span><span class="params">(<span class="type">int</span> sig)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">int</span> val;</span><br><span class="line">	read(fd, &amp;val, <span class="number">4</span>);</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;get button : 0x%x\n&quot;</span>, val);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 1.注册信号处理函数</span></span><br><span class="line"> 	signal(SIGIO, sig_func);</span><br><span class="line">    <span class="comment">// 2.打开设备文件 </span></span><br><span class="line">    fd = open(argv[<span class="number">1</span>], O_RDWR);</span><br><span class="line">    <span class="keyword">if</span> (fd == <span class="number">-1</span>)    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    <span class="comment">// 3.在内核sys_fasync函数中写入pid</span></span><br><span class="line">    fcntl(fd, F_SETOWN, getpid());</span><br><span class="line">    <span class="comment">// 4.为设备文件添加 FASYNC 位</span></span><br><span class="line">    flags = fcntl(fd, F_GETFL);</span><br><span class="line">    fcntl(fd, F_SETFL, flags | FASYNC);</span><br><span class="line">    <span class="comment">// 5.处理其他事务</span></span><br><span class="line">    <span class="keyword">while</span> (<span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;www.100ask.net \n&quot;</span>);</span><br><span class="line">        sleep(<span class="number">2</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    close(fd);   </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
 <h3 id="3-2-驱动编程"><a href="#3-2-驱动编程" class="headerlink" title="3.2 驱动编程"></a>3.2 驱动编程</h3><p>可参考 1.3 节，为了实现异步通知机制，仅需要提供<code>file_operations.fasync</code>函数，并在中断函数中调用 <code>kill_fasync</code>函数发送信号进行通知：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">fasync_struct</span> *<span class="title">button_fasync</span>;</span></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">gpio_key_drv_fasync</span><span class="params">(<span class="type">int</span> fd, <span class="keyword">struct</span> file *file, <span class="type">int</span> on)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// fasync_helper 会分配构造 button_fasync，fasync_struct 结构体中包含 PID</span></span><br><span class="line">	<span class="keyword">if</span> (fasync_helper(fd, file, on, &amp;button_fasync) &gt;= <span class="number">0</span>)</span><br><span class="line">		<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">else</span></span><br><span class="line">		<span class="keyword">return</span> -EIO;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">irqreturn_t</span> <span class="title function_">gpio_key_isr</span><span class="params">(<span class="type">int</span> irq, <span class="type">void</span> *dev_id)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">gpio_key</span> *<span class="title">gpio_key</span> =</span> dev_id;</span><br><span class="line">	<span class="type">int</span> val;</span><br><span class="line">	<span class="type">int</span> key;</span><br><span class="line">	</span><br><span class="line">	val = gpiod_get_value(gpio_key-&gt;gpiod);</span><br><span class="line">	printk(<span class="string">&quot;key %d %d\n&quot;</span>, gpio_key-&gt;gpio, val);</span><br><span class="line">	key = (gpio_key-&gt;gpio &lt;&lt; <span class="number">8</span>) | val;</span><br><span class="line">	put_key(key);</span><br><span class="line">	<span class="comment">// 发送IO信号，发送IO信号的原因是 POLL_IN 有数据可读</span></span><br><span class="line">	kill_fasync(&amp;button_fasync, SIGIO, POLL_IN);</span><br><span class="line">	<span class="keyword">return</span> IRQ_HANDLED;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
 <h2 id="4-阻塞和非阻塞"><a href="#4-阻塞和非阻塞" class="headerlink" title="4.阻塞和非阻塞"></a>4.阻塞和非阻塞</h2><p>APP 可以基于 POLL 机制进行休眠，也可以在调用 open 函数时传入 O_NONBLOCK <strong>表示使用非阻塞模式打开文件（默认是阻塞方式）</strong>。POLL 机制的实现需要驱动程序支持，而以非阻塞方式打开文件，同样需要：</p>
 <blockquote>
 <ol>
@@ -502,10 +509,22 @@
 </blockquote>
 <p>在内核的文件系统层会为设备文件创建一个 <code>struct file</code> 结构体，该结构体中的成员 <code>f_flags</code> 表示设备文件的标志，对于 APP 可以在 open 时以相应的标志打开文件，也可以通过 fcntl 函数来设置设备文件的标志位：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">fd = open(argv[<span class="number">1</span>], O_RDWR | O_NONBLOCK);   </span><br><span class="line"></span><br><span class="line">flags = fcntl(fd, F_GETFL);</span><br><span class="line">fcntl(fd, F_SETFL, flags &amp; ~O_NONBLOCK);</span><br></pre></td></tr></table></figure>
+
 <p>对于驱动程序可以通过判断 <code>f_flags</code> 是否含有 O_NONBLOCK 标志位，并进行相应操作：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (file-&gt;f_flags &amp; O_NONBLOCK)</span><br></pre></td></tr></table></figure>
+
+
+
+
+
 <h3 id="4-1-应用程序"><a href="#4-1-应用程序" class="headerlink" title="4.1 应用程序"></a>4.1 应用程序</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">fd = open(argv[<span class="number">1</span>], O_RDWR | O_NONBLOCK);</span><br><span class="line"><span class="keyword">if</span> (read(fd, &amp;val, <span class="number">4</span>) == <span class="number">4</span>)    <span class="built_in">printf</span>(<span class="string">&quot;get button: 0x%x\n&quot;</span>, val);</span><br><span class="line"><span class="keyword">else</span>                           <span class="built_in">printf</span>(<span class="string">&quot;get button: -1\n&quot;</span>);</span><br><span class="line"></span><br><span class="line">flags = fcntl(fd, F_GETFL);</span><br><span class="line">fcntl(fd, F_SETFL, flags &amp; ~O_NONBLOCK);</span><br><span class="line"><span class="keyword">if</span> (read(fd, &amp;val, <span class="number">4</span>) == <span class="number">4</span>)    <span class="built_in">printf</span>(<span class="string">&quot;get button: 0x%x\n&quot;</span>, val);</span><br><span class="line"><span class="keyword">else</span>                           <span class="built_in">printf</span>(<span class="string">&quot;while get button: -1\n&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+
+
 <h3 id="4-2-驱动程序"><a href="#4-2-驱动程序" class="headerlink" title="4.2 驱动程序"></a>4.2 驱动程序</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">ssize_t</span> <span class="title function_">gpio_key_drv_read</span> <span class="params">(<span class="keyword">struct</span> file *file, <span class="type">char</span> __user *buf, <span class="type">size_t</span> size, <span class="type">loff_t</span> *offset)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">int</span> err, key;</span><br><span class="line">    <span class="comment">// 没有数据且不阻塞时返回错误的一种</span></span><br><span class="line">	<span class="keyword">if</span> (is_key_buf_empty() &amp;&amp; (file-&gt;f_flags &amp; O_NONBLOCK))</span><br><span class="line">		<span class="keyword">return</span> -EAGAIN;</span><br><span class="line">	<span class="comment">// 阻塞方式，则根据有无数据来决定是否休眠</span></span><br><span class="line">	wait_event_interruptible(gpio_key_wait, !is_key_buf_empty());</span><br><span class="line">	key = get_key();</span><br><span class="line">	err = copy_to_user(buf, &amp;key, <span class="number">4</span>);</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">return</span> <span class="number">4</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
 <h2 id="5-定时器"><a href="#5-定时器" class="headerlink" title="5.定时器"></a>5.定时器</h2><p>按键操作中存在机械抖动，如果硬件设计中没有电容去抖动的话，那么就需要我们在软件设计上延时一段时间来等待抖动过去，在按键稳定之后再读取电平。实现延时的选择自然就是定时器了。</p>
 <h3 id="5-1-定时器的内核函数"><a href="#5-1-定时器的内核函数" class="headerlink" title="5.1 定时器的内核函数"></a>5.1 定时器的内核函数</h3><blockquote>
 <p>参考内核源码：include\linux\timer.h</p>
@@ -513,51 +532,66 @@
 <ol>
 <li><p>设置定时器</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">setup_timer(timer, fn, data)</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> setup_timer(timer, fn, data)					\</span></span><br><span class="line"><span class="meta">	__setup_timer((timer), (fn), (data), 0)</span></span><br><span class="line">	</span><br><span class="line"><span class="meta">#<span class="keyword">define</span> __setup_timer(_timer, _fn, _data, _flags)			\</span></span><br><span class="line"><span class="meta">	do &#123;								\</span></span><br><span class="line"><span class="meta">		__init_timer((_timer), (_flags));			\</span></span><br><span class="line"><span class="meta">		(_timer)-&gt;function = (_fn);				\</span></span><br><span class="line"><span class="meta">		(_timer)-&gt;data = (_data);				\</span></span><br><span class="line"><span class="meta">	&#125; while (0)</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> __init_timer(_timer, _flags)					\</span></span><br><span class="line"><span class="meta">	init_timer_key((_timer), (_flags), NULL, NULL)</span></span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line"><span class="type">void</span> <span class="title function_">init_timer_key</span><span class="params">(<span class="keyword">struct</span> timer_list *timer, <span class="type">unsigned</span> <span class="type">int</span> flags,</span></span><br><span class="line"><span class="params">		    <span class="type">const</span> <span class="type">char</span> *name, <span class="keyword">struct</span> lock_class_key *key)</span></span><br><span class="line">&#123;</span><br><span class="line">    debug_init(timer);</span><br><span class="line">	do_init_timer(timer, flags, name, key);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>设置定时器，主要是初始化 timer_list 结构体，设置其中的处理函数和传入参数，<strong>可将地址作为数据传入</strong>。</p>
 <p><code>struct timer_list</code> 结构体内容如下：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">timer_list</span> &#123;</span></span><br><span class="line">	<span class="comment">/*</span></span><br><span class="line"><span class="comment">	 * All fields that change during normal runtime grouped to the</span></span><br><span class="line"><span class="comment">	 * same cacheline</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">hlist_node</span>	<span class="title">entry</span>;</span></span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span>		expires;</span><br><span class="line">	<span class="type">void</span>			(*function)(<span class="type">unsigned</span> <span class="type">long</span>);</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span>		data;</span><br><span class="line">	u32			flags;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
 </li>
-</ol>
-<ol>
 <li><p>向内核添加定时器</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">add_timer</span><span class="params">(<span class="keyword">struct</span> timer_list *timer)</span></span><br></pre></td></tr></table></figure>
+
 <p>调用之前需要设置超时时间 expires；当超时时间到达时，内核会调用函数 <code>timer-&gt;function(timer-&gt;data)</code></p>
 </li>
 <li><p>修改超时时间</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">mod_timer</span><span class="params">(<span class="keyword">struct</span> timer_list *timer, <span class="type">unsigned</span> <span class="type">long</span> expires)</span></span><br></pre></td></tr></table></figure>
+
 <p>等价于<code>del_timer(timer); timer-&gt;expires = expires; add_timer(timer);</code> 但更加高效；</p>
 <p>当修改一个非运行的定时器时返回 0 ，反之返回1</p>
 </li>
 <li><p>删除定时器</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">del_timer</span><span class="params">(<span class="keyword">struct</span> timer_list *timer)</span></span><br></pre></td></tr></table></figure>
-</li>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">del_timer</span><span class="params">(<span class="keyword">struct</span> timer_list *timer)</span></span><br></pre></td></tr></table></figure></li>
 </ol>
 <h3 id="5-2-定时器的时间单位"><a href="#5-2-定时器的时间单位" class="headerlink" title="5.2 定时器的时间单位"></a>5.2 定时器的时间单位</h3><p>编译内核时，可以在内核源码根目录下用“ls -a”看到一个隐藏文件，它就是内核配置文件。打开后可以看到如下这项：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CONFIG_HZ=100</span><br></pre></td></tr></table></figure>
+
 <p>这表示内核每秒中会发生 100 次系统滴答中断(tick)，这就像人类的心跳一样，这是 Linux 系统的心跳。每发生一次 tick 中断，全局变量 jiffies 就会累加 1</p>
 <p>因此，设置超时时间的方式：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">timer.expires = jiffies + xxx;  <span class="comment">// xxx 表示多少个滴答后超时，也就是 xxx*10ms </span></span><br><span class="line">timer.expires = jiffies + <span class="number">2</span>*HZ; <span class="comment">// HZ 等于 CONFIG_HZ，2*HZ 就相当于 2 秒</span></span><br></pre></td></tr></table></figure>
+
+
+
+
+
 <h3 id="5-3-使用定时器编写按键驱动"><a href="#5-3-使用定时器编写按键驱动" class="headerlink" title="5.3 使用定时器编写按键驱动"></a>5.3 使用定时器编写按键驱动</h3><p>编程的思路，如下：</p>
 <ol>
 <li>初始化定时器并设置超时时间为INF，然后添加定时器</li>
 <li>当触发按键中断后，修改超时时间为当前时间的 10ms 后</li>
 <li>当定时器软中断触发后，在读取稳定的电平，从而判断按键的状态</li>
 </ol>
-<p><img src="../images/驱动程序的必要基础/image-20240110180354646.png" alt="image-20240110180354646"></p>
+<p><img src="/../images/%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F%E7%9A%84%E5%BF%85%E8%A6%81%E5%9F%BA%E7%A1%80/image-20240110180354646.png" alt="image-20240110180354646"></p>
 <p>为了独立监测每一个按键，我们在按键结构体中为每一个按键都分配一个 <code>struct timer_list</code>：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">struct gpio_key&#123;</span><br><span class="line">	int gpio;</span><br><span class="line">	struct gpio_desc *gpiod;</span><br><span class="line">	int flag;</span><br><span class="line">	int irq;</span><br><span class="line">	struct timer_list key_timer;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
 <p>在 probe 函数中初始化每一个按键的定时器，在 remove 函数中删除定时器：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">setup_timer(&amp;gpio_keys_100ask[i].key_timer, key_timer_expire, &amp;gpio_keys_100ask[i]);</span><br><span class="line">gpio_keys_100ask[i].key_timer.expires = ~<span class="number">0</span>;</span><br><span class="line">add_timer(&amp;gpio_keys_100ask[i].key_timer);</span><br><span class="line"></span><br><span class="line">del_timer(&amp;gpio_keys_100ask[i].key_timer);</span><br></pre></td></tr></table></figure>
+
 <p>在按键中断处理函数中，修改定时器的超时时间：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">irqreturn_t</span> <span class="title function_">gpio_key_isr</span><span class="params">(<span class="type">int</span> irq, <span class="type">void</span> *dev_id)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">gpio_key</span> *<span class="title">gpio_key</span> =</span> dev_id;</span><br><span class="line">	printk(<span class="string">&quot;gpio_key_isr key %d irq happened\n&quot;</span>, gpio_key-&gt;gpio);</span><br><span class="line">	mod_timer(&amp;gpio_key-&gt;key_timer, jiffies + HZ/<span class="number">100</span>);</span><br><span class="line">	<span class="keyword">return</span> IRQ_HANDLED;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>在定时器软中断处理函数中，读取电平：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">key_timer_expire</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> data)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">gpio_key</span> *<span class="title">gpio_key</span> =</span> data;</span><br><span class="line">	<span class="type">int</span> val, key;</span><br><span class="line">	val = gpiod_get_value(gpio_key-&gt;gpiod);</span><br><span class="line">	printk(<span class="string">&quot;key_timer_expire key %d %d\n&quot;</span>, gpio_key-&gt;gpio, val);</span><br><span class="line">	key = (gpio_key-&gt;gpio &lt;&lt; <span class="number">8</span>) | val;</span><br><span class="line">	put_key(key);</span><br><span class="line">	wake_up_interruptible(&amp;gpio_key_wait);</span><br><span class="line">	kill_fasync(&amp;button_fasync, SIGIO, POLL_IN);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
 <h2 id="6-中断下半部-tasklet"><a href="#6-中断下半部-tasklet" class="headerlink" title="6.中断下半部 tasklet"></a>6.中断下半部 tasklet</h2><p>使用软中断 tasklet 实现中断下半部的方式通常用来处理相对不复杂的任务（复杂耗时的会使用工作队列线程化的处理），tasklet 的具体实现机制参见“异常和中断”的第 2.1.3 节。</p>
 <h3 id="6-1-tasklet-的内核函数"><a href="#6-1-tasklet-的内核函数" class="headerlink" title="6.1 tasklet 的内核函数"></a>6.1 tasklet 的内核函数</h3><blockquote>
 <p>参见内核源码：include\linux\interrupt.h</p>
 </blockquote>
 <p>中断下半部使用结构体 tasklet_struct 来表示：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">tasklet_struct</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">tasklet_struct</span> *<span class="title">next</span>;</span></span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> state;</span><br><span class="line">	<span class="type">atomic_t</span> count;</span><br><span class="line">	<span class="type">void</span> (*func)(<span class="type">unsigned</span> <span class="type">long</span>);</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> data;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
 <ul>
 <li><p>state 有两位：</p>
 <ul>
@@ -576,14 +610,16 @@
 <ol>
 <li><p>定义结构体 tasklet_struct</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> DECLARE_TASKLET(name, func, data) \</span></span><br><span class="line"><span class="meta">struct tasklet_struct name = &#123; NULL, 0, ATOMIC_INIT(0), func, data &#125;</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> DECLARE_TASKLET_DISABLED(name, func, data) \</span></span><br><span class="line"><span class="meta">struct tasklet_struct name = &#123; NULL, 0, ATOMIC_INIT(1), func, data &#125;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">extern</span> <span class="type">void</span> <span class="title function_">tasklet_init</span><span class="params">(<span class="keyword">struct</span> tasklet_struct *t, <span class="type">void</span> (*func)(<span class="type">unsigned</span> <span class="type">long</span>), <span class="type">unsigned</span> <span class="type">long</span> data)</span>;</span><br></pre></td></tr></table></figure>
+
 <ul>
 <li>使用 DECLARE_TASKLET 定义的 tasklet 结构体，它是使能的</li>
 <li>使用 DECLARE_TASKLET_DISABLED 定义的 tasklet 结构体，它是禁止的；使用之前要先调用 tasklet_enable 使能它</li>
 <li>使用 tasklet_init 定义的结构体也是使能的</li>
 </ul>
 </li>
-<li><p>使能/失能 tasklet</p>
+<li><p>使能&#x2F;失能 tasklet</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">void</span> <span class="title function_">tasklet_enable</span><span class="params">(<span class="keyword">struct</span> tasklet_struct *t)</span>; </span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">void</span> <span class="title function_">tasklet_disable</span><span class="params">(<span class="keyword">struct</span> tasklet_struct *t)</span>;</span><br></pre></td></tr></table></figure>
+
 <ul>
 <li>tasklet_enable 把 count 减 1</li>
 <li>tasklet_disable 把 count 加 1</li>
@@ -591,12 +627,14 @@
 </li>
 <li><p>调度 tasklet</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">void</span> <span class="title function_">tasklet_schedule</span><span class="params">(<span class="keyword">struct</span> tasklet_struct *t)</span>;</span><br></pre></td></tr></table></figure>
+
 <ul>
 <li>把 tasklet 放入链表，并且设置它的 TASKLET_STATE_SCHED 状态为 1。</li>
 </ul>
 </li>
 <li><p>kill tasklet</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">extern</span> <span class="type">void</span> <span class="title function_">tasklet_kill</span><span class="params">(<span class="keyword">struct</span> tasklet_struct *t)</span>;</span><br></pre></td></tr></table></figure>
+
 <ul>
 <li>如果一个 tasklet 已被放入链表且未被调度，则 tasklet_kill 会将它的 TASKLET_STATE_SCHED 状态清 0 </li>
 <li>如果一个 tasklet 已被调度，tasklet_kill 会等待它执行完华，再它的 TASKLET_STATE_SCHED 状态清 0</li>
@@ -606,10 +644,17 @@
 <h3 id="6-2-为驱动程序添加-tasklet"><a href="#6-2-为驱动程序添加-tasklet" class="headerlink" title="6.2 为驱动程序添加 tasklet"></a>6.2 为驱动程序添加 tasklet</h3><p>在按键驱动中，并没有多少复杂耗时的操作，不过我们可以象征性的将一些操作放入到 tasklet 的处理函数中。</p>
 <p>在 probe 函数中初始化每一个按键的 tasklet 结构体，在 remove 函数中 kill 掉 tasklet 结构体：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">tasklet_init(&amp;gpio_keys_100ask[i].tasklet, key_tasklet_func, &amp;gpio_keys_100ask[i]);</span><br><span class="line"></span><br><span class="line">tasklet_kill(&amp;gpio_keys_100ask[i].tasklet);</span><br></pre></td></tr></table></figure>
+
 <p>在按键中断结束时，调度 tasklet：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">irqreturn_t</span> <span class="title function_">gpio_key_isr</span><span class="params">(<span class="type">int</span> irq, <span class="type">void</span> *dev_id)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">gpio_key</span> *<span class="title">gpio_key</span> =</span> dev_id;</span><br><span class="line">	tasklet_schedule(&amp;gpio_key-&gt;tasklet);</span><br><span class="line">	mod_timer(&amp;gpio_key-&gt;key_timer, jiffies + HZ/<span class="number">100</span>);</span><br><span class="line">	<span class="keyword">return</span> IRQ_HANDLED;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>tasklet 的处理函数：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">key_tasklet_func</span><span class="params">(<span class="type">unsigned</span> <span class="type">long</span> data)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">gpio_key</span> *<span class="title">gpio_key</span> =</span> data;</span><br><span class="line">	<span class="type">int</span> val;</span><br><span class="line"></span><br><span class="line">	val = gpiod_get_value(gpio_key-&gt;gpiod);</span><br><span class="line">	printk(<span class="string">&quot;key_tasklet_func key %d %d\n&quot;</span>, gpio_key-&gt;gpio, val);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
 <h2 id="7-工作队列"><a href="#7-工作队列" class="headerlink" title="7. 工作队列"></a>7. 工作队列</h2><p>前面讲的定时器、下半部 tasklet 都属于软中断，都是在中断上下文中执行的，无法休眠。这些更耗时的工作放在定时器或是下半部中，会使得系统很卡，因此可以使用线程来处理这些耗时的工作，从而解决系统卡顿的问题，因为线程可以休眠。</p>
 <p>对于耗时而不是非常耗时的逻辑，我们并不需要自己去创建线程，可以使用“工作队列” (workqueue)。我们只需要将“工作”放入“工作队列”中，当对应的<strong>内核线程</strong>被调度时就会取出“工作”，执行处理函数。</p>
 <p><strong>在多 CPU 的系统下，一个工作队列可以有多个内核线程，可以在一定程度上 缓解这个问题。</strong></p>
@@ -619,62 +664,142 @@
 </blockquote>
 <p>work_struct 结构体的定义如下：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">work_struct</span> &#123;</span></span><br><span class="line">	<span class="type">atomic_long_t</span> data;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">entry</span>;</span></span><br><span class="line">	<span class="type">work_func_t</span> func;</span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> CONFIG_LOCKDEP</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">lockdep_map</span> <span class="title">lockdep_map</span>;</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+
+
 <ol>
 <li><p>定义 work </p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> DECLARE_WORK(n, f)						\</span></span><br><span class="line"><span class="meta">	struct work_struct n = __WORK_INITIALIZER(n, f)</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> DECLARE_DELAYED_WORK(n, f)					\</span></span><br><span class="line"><span class="meta">	struct delayed_work n = __DELAYED_WORK_INITIALIZER(n, f, 0)</span></span><br></pre></td></tr></table></figure>
+
 <ul>
 <li>第 1 个宏是用来定义一个 work_struct 结构体，要指定它的函数</li>
 <li>第 2 个宏用来定义一个 delayed_work 结构体，也要指定它的函数。区别在于要让它运行时，可以指定某段时间之后再执行。</li>
 </ul>
 <p>上面用来直接声明工作队列结构体，如果想要在代码中初始化 work_struct 结构体，可以使用：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">#define INIT_WORK(_work, _func)</span><br></pre></td></tr></table></figure>
+
+
 </li>
-</ol>
-<ol>
 <li><p>使用 work</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">bool</span> <span class="title function_">schedule_work</span><span class="params">(<span class="keyword">struct</span> work_struct *work)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">return</span> queue_work(system_wq, work);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>调用 schedule_work 时，就会把 work_struct 结构体放入队列中，并唤醒对应的内核线程。内核线程就会从队列里把 work_struct 结构体取出来，执行里面的函数</p>
 <p>返回 false 表示 work 已经在工作队列中，否则返回 true</p>
 </li>
-</ol>
-<ol>
 <li><p>其他函数</p>
-<p>| 函数                          | 说明                                                         |<br>| ——————————————- | —————————————————————————————— |<br>| create_workqueue              | 在 Linux 系统中已经有了现成的 <code>system_wq</code> 等工作队列， 你当然也可以自己调用 create_workqueue 创建工作队列； 对于 SMP 系统，这个工作队列会有多个内核线程与它对应，创建工作队列时，内核会帮这个工作队列创建多个内核线程 |<br>| create_singlethread_workqueue | 如果想只有一个内核线程与工作队列对应， 可以用本函数创建工作队列， 创建工作队列时，内核会帮这个工作队列创建一个内核线程 |<br>| destroy_workqueue             | 销毁工作队列                                                 |<br>| schedule_work                 | 调度执行一个具体的 work，执行的 work 将会被挂入 Linux 系统提供的工作队列 |<br>| schedule_delayed_work         | 延迟一定时间去执行一个具体的任务，功能与 schedule_work 类似，多了一个延迟时间 |<br>| queue_work                    | 跟 schedule_work 类似，schedule_work 是在系统默认的工作队列上执行一个 work， queue_work 需要自己指定工作队列 |<br>| queue_delayed_work            | 跟 schedule_delayed_work 类似，schedule_delayed_work 是在系统默认的工作队列上执行一个 work，queue_delayed_work 需要自己指定工作队列 |<br>| flush_work                    | 等待一个 work 执行完毕，如果这个 work 已经被放入队列，那么本函数等它执行完毕，并且返回 true； 如果这个 work 已经执行完毕才调用本函数，那么直接返回 false |<br>| flush_delayed_work            | 等待一个 delayed_work 执行完毕，如果这个 delayed_work 已经被放入队列，那么本函数等它执行完毕，并且返回 true； 如果这个 delayed_work 已经执行完毕才调用本函数，那 么直接返回 false |</p>
+<table>
+<thead>
+<tr>
+<th>函数</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>create_workqueue</td>
+<td>在 Linux 系统中已经有了现成的 <code>system_wq</code> 等工作队列， 你当然也可以自己调用 create_workqueue 创建工作队列； 对于 SMP 系统，这个工作队列会有多个内核线程与它对应，创建工作队列时，内核会帮这个工作队列创建多个内核线程</td>
+</tr>
+<tr>
+<td>create_singlethread_workqueue</td>
+<td>如果想只有一个内核线程与工作队列对应， 可以用本函数创建工作队列， 创建工作队列时，内核会帮这个工作队列创建一个内核线程</td>
+</tr>
+<tr>
+<td>destroy_workqueue</td>
+<td>销毁工作队列</td>
+</tr>
+<tr>
+<td>schedule_work</td>
+<td>调度执行一个具体的 work，执行的 work 将会被挂入 Linux 系统提供的工作队列</td>
+</tr>
+<tr>
+<td>schedule_delayed_work</td>
+<td>延迟一定时间去执行一个具体的任务，功能与 schedule_work 类似，多了一个延迟时间</td>
+</tr>
+<tr>
+<td>queue_work</td>
+<td>跟 schedule_work 类似，schedule_work 是在系统默认的工作队列上执行一个 work， queue_work 需要自己指定工作队列</td>
+</tr>
+<tr>
+<td>queue_delayed_work</td>
+<td>跟 schedule_delayed_work 类似，schedule_delayed_work 是在系统默认的工作队列上执行一个 work，queue_delayed_work 需要自己指定工作队列</td>
+</tr>
+<tr>
+<td>flush_work</td>
+<td>等待一个 work 执行完毕，如果这个 work 已经被放入队列，那么本函数等它执行完毕，并且返回 true； 如果这个 work 已经执行完毕才调用本函数，那么直接返回 false</td>
+</tr>
+<tr>
+<td>flush_delayed_work</td>
+<td>等待一个 delayed_work 执行完毕，如果这个 delayed_work 已经被放入队列，那么本函数等它执行完毕，并且返回 true； 如果这个 delayed_work 已经执行完毕才调用本函数，那 么直接返回 false</td>
+</tr>
+</tbody></table>
 </li>
 </ol>
 <h3 id="7-2-为驱动程序添加工作队列"><a href="#7-2-为驱动程序添加工作队列" class="headerlink" title="7.2 为驱动程序添加工作队列"></a>7.2 为驱动程序添加工作队列</h3><p>在按键驱动中，并没有多少复杂耗时的操作，不过我们可以象征性的将一些操作放入到工作队列的处理函数中。</p>
 <p>在 probe 函数中初始化每一个按键的 work_struct 结构体：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">INIT_WORK(&amp;gpio_keys_100ask[i].work, key_work_func);</span><br></pre></td></tr></table></figure>
+
 <p>在按键中断结束时，调度 work：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">irqreturn_t</span> <span class="title function_">gpio_key_isr</span><span class="params">(<span class="type">int</span> irq, <span class="type">void</span> *dev_id)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">gpio_key</span> *<span class="title">gpio_key</span> =</span> dev_id;</span><br><span class="line">	tasklet_schedule(&amp;gpio_key-&gt;tasklet);</span><br><span class="line">	mod_timer(&amp;gpio_key-&gt;key_timer, jiffies + HZ/<span class="number">100</span>);</span><br><span class="line">    schedule_work(&amp;gpio_key-&gt;work);</span><br><span class="line">    <span class="keyword">return</span> IRQ_HANDLED;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>work 的处理函数：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;asm/current.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">key_work_func</span><span class="params">(<span class="keyword">struct</span> work_struct *work)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 调用宏 container_of，由 work 的指针反推出 gpio_key 结构体的指针</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">gpio_key</span> *<span class="title">gpio_key</span> =</span> container_of(work, <span class="keyword">struct</span> gpio_key, work);</span><br><span class="line">	<span class="type">int</span> val;</span><br><span class="line"></span><br><span class="line">	val = gpiod_get_value(gpio_key-&gt;gpiod);</span><br><span class="line">    <span class="comment">// 打印进程的名称和pid号</span></span><br><span class="line">	printk(<span class="string">&quot;key_work_func: the process is %s pid %d\n&quot;</span>,current-&gt;comm, current-&gt;pid);</span><br><span class="line">	printk(<span class="string">&quot;key_work_func key %d %d\n&quot;</span>, gpio_key-&gt;gpio, val);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
 <h2 id="8-中断的线程化处理"><a href="#8-中断的线程化处理" class="headerlink" title="8.中断的线程化处理"></a>8.中断的线程化处理</h2><p>复杂、耗时的事情，尽量使用内核线程来处理。中断的处理仍然可以认为分为上半部、下半部。上半部用来处理紧急的事情，下半部用一个内核线程来处理。</p>
 <h3 id="8-1-使用内核线程实现中断下半部"><a href="#8-1-使用内核线程实现中断下半部" class="headerlink" title="8.1 使用内核线程实现中断下半部"></a>8.1 使用内核线程实现中断下半部</h3><p>在按键驱动中，并没有多少复杂耗时的操作，不过我们可以象征性的将一些操作放入到工作队列的处理函数中。</p>
 <p>在 probe 函数中注册使用内核线程实现下半部的中断，并在 remove 函数中释放：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">err = request_threaded_irq(gpio_keys_100ask[i].irq, gpio_key_isr, gpio_key_thread_func, IRQF_TRIGGER_RISING | IRQF_TRIGGER_FALLING, <span class="string">&quot;100ask_gpio_key&quot;</span>, &amp;gpio_keys_100ask[i]);</span><br><span class="line"></span><br><span class="line">free_irq(gpio_keys_100ask[i].irq, &amp;gpio_keys_100ask[i]);</span><br></pre></td></tr></table></figure>
+
 <p>中断上半部和下半部的代码：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">irqreturn_t</span> <span class="title function_">gpio_key_isr</span><span class="params">(<span class="type">int</span> irq, <span class="type">void</span> *dev_id)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">gpio_key</span> *<span class="title">gpio_key</span> =</span> dev_id;</span><br><span class="line">	tasklet_schedule(&amp;gpio_key-&gt;tasklet);</span><br><span class="line">	mod_timer(&amp;gpio_key-&gt;key_timer, jiffies + HZ/<span class="number">50</span>);</span><br><span class="line">	schedule_work(&amp;gpio_key-&gt;work);</span><br><span class="line">	<span class="keyword">return</span> IRQ_WAKE_THREAD;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">irqreturn_t</span> <span class="title function_">gpio_key_thread_func</span><span class="params">(<span class="type">int</span> irq, <span class="type">void</span> *data)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">gpio_key</span> *<span class="title">gpio_key</span> =</span> data;</span><br><span class="line">	<span class="type">int</span> val;</span><br><span class="line">	val = gpiod_get_value(gpio_key-&gt;gpiod);</span><br><span class="line">	printk(<span class="string">&quot;gpio_key_thread_func: the process is %s pid %d\n&quot;</span>,current-&gt;comm, current-&gt;pid);	</span><br><span class="line">	printk(<span class="string">&quot;gpio_key_thread_func key %d %d\n&quot;</span>, gpio_key-&gt;gpio, val);</span><br><span class="line">	<span class="keyword">return</span> IRQ_HANDLED;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
 <h3 id="8-2-内核线程的机制"><a href="#8-2-内核线程的机制" class="headerlink" title="8.2 内核线程的机制"></a>8.2 内核线程的机制</h3><p>在 request_threaded_irq 函数中，肯定会创建一个内核线程，以下为关键代码：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">request_threaded_irq</span><span class="params">(<span class="type">unsigned</span> <span class="type">int</span> irq, <span class="type">irq_handler_t</span> handler,</span></span><br><span class="line"><span class="params">			 <span class="type">irq_handler_t</span> thread_fn, <span class="type">unsigned</span> <span class="type">long</span> irqflags,</span></span><br><span class="line"><span class="params">			 <span class="type">const</span> <span class="type">char</span> *devname, <span class="type">void</span> *dev_id)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="comment">// 分配、设置一个 irqaction 结构体</span></span><br><span class="line">	action = kzalloc(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> irqaction), GFP_KERNEL);</span><br><span class="line">	<span class="keyword">if</span> (!action)</span><br><span class="line">		<span class="keyword">return</span> -ENOMEM;</span><br><span class="line"></span><br><span class="line">	action-&gt;handler = handler;</span><br><span class="line">	action-&gt;thread_fn = thread_fn;</span><br><span class="line">	action-&gt;flags = irqflags;</span><br><span class="line">	action-&gt;name = devname;</span><br><span class="line">	action-&gt;dev_id = dev_id;</span><br><span class="line"></span><br><span class="line">	retval = __setup_irq(irq, desc, action); <span class="comment">// 进一步处理</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>在该函数中分配了一个 irqaction 结构体，并在 __setup_irq 函数中进一步处理，截取重要代码如下：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span></span><br><span class="line">__setup_irq(<span class="type">unsigned</span> <span class="type">int</span> irq, <span class="keyword">struct</span> irq_desc *desc, <span class="keyword">struct</span> irqaction *new)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (new-&gt;thread_fn &amp;&amp; !nested) &#123; 		</span><br><span class="line">        ret = setup_irq_thread(new, irq, <span class="literal">false</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>如果 thread_fn 不为空，则调用 setup_irq_thread 函数来创建一个内核线程，截取代码如下：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span></span><br><span class="line"><span class="title function_">setup_irq_thread</span><span class="params">(<span class="keyword">struct</span> irqaction *new, <span class="type">unsigned</span> <span class="type">int</span> irq, <span class="type">bool</span> secondary)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (!secondary) &#123;</span><br><span class="line">        t = kthread_create(irq_thread, new, <span class="string">&quot;irq/%d-%s&quot;</span>, irq,</span><br><span class="line">                           new-&gt;name);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        t = kthread_create(irq_thread, new, <span class="string">&quot;irq/%d-s-%s&quot;</span>, irq,</span><br><span class="line">                           new-&gt;name);</span><br><span class="line">        param.sched_priority -= <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    new-&gt;thread = t;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>最后将创建的内核线程付给 thread 成员</p>
 <hr>
 <p>再来分析中断的执行中是如何唤醒上面创建的内核线程的，并执行 thread_fn 函数的。</p>
 <p>在 <code>kernel\irq\handle.c</code> 中，截取部分代码如下：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">irqreturn_t</span> __handle_irq_event_percpu(<span class="keyword">struct</span> irq_desc *desc, <span class="type">unsigned</span> <span class="type">int</span> *flags)</span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">irqreturn_t</span> retval = IRQ_NONE;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span> irq = desc-&gt;irq_data.irq;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">irqaction</span> *<span class="title">action</span>;</span></span><br><span class="line"></span><br><span class="line">	for_each_action_of_desc(desc, action) &#123;</span><br><span class="line">		<span class="type">irqreturn_t</span> res;</span><br><span class="line"></span><br><span class="line">		trace_irq_handler_entry(irq, action);</span><br><span class="line">		res = action-&gt;handler(irq, action-&gt;dev_id);   <span class="comment">// 调用中断上半部分的处理函数</span></span><br><span class="line">		trace_irq_handler_exit(irq, action, res);</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (WARN_ONCE(!irqs_disabled(),<span class="string">&quot;irq %u handler %pF enabled interrupts\n&quot;</span>,</span><br><span class="line">			      irq, action-&gt;handler))</span><br><span class="line">			local_irq_disable();</span><br><span class="line"></span><br><span class="line">		<span class="keyword">switch</span> (res) &#123;</span><br><span class="line">		<span class="keyword">case</span> IRQ_WAKE_THREAD:     <span class="comment">// 需要唤醒 thread 线程的返回值</span></span><br><span class="line">			<span class="comment">/*</span></span><br><span class="line"><span class="comment">			 * Catch drivers which return WAKE_THREAD but</span></span><br><span class="line"><span class="comment">			 * did not set up a thread function</span></span><br><span class="line"><span class="comment">			 */</span></span><br><span class="line">			<span class="keyword">if</span> (unlikely(!action-&gt;thread_fn)) &#123;</span><br><span class="line">				warn_no_thread(irq, action);</span><br><span class="line">				<span class="keyword">break</span>;</span><br><span class="line">			&#125;</span><br><span class="line"></span><br><span class="line">			__irq_wake_thread(desc, action);   <span class="comment">// 唤醒 action-&gt;thread </span></span><br><span class="line"></span><br><span class="line">			<span class="comment">/* Fall through to add to randomness */</span></span><br><span class="line">		<span class="keyword">case</span> IRQ_HANDLED:       <span class="comment">// 中断正常处理的返回值</span></span><br><span class="line">			*flags |= action-&gt;flags;</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">default</span>:</span><br><span class="line">			<span class="keyword">break</span>;</span><br><span class="line">		&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>thread 线程的处理函数为 irq_thread，在 <code>kernel\irq\handle.c</code> 中：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">irq_thread</span><span class="params">(<span class="type">void</span> *data)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">while</span> (!irq_wait_for_interrupt(action)) &#123;   <span class="comment">// 1. 休眠等待中断</span></span><br><span class="line">		<span class="type">irqreturn_t</span> action_ret;</span><br><span class="line"></span><br><span class="line">		irq_thread_check_affinity(desc, action);</span><br><span class="line"></span><br><span class="line">		action_ret = handler_fn(desc, action);   <span class="comment">// 2. 执行 thread_fn</span></span><br><span class="line">		<span class="keyword">if</span> (action_ret == IRQ_HANDLED)</span><br><span class="line">			<span class="type">atomic_inc</span>(&amp;desc-&gt;threads_handled);</span><br><span class="line">		<span class="keyword">if</span> (action_ret == IRQ_WAKE_THREAD)</span><br><span class="line">			irq_wake_secondary(desc, action);</span><br><span class="line"></span><br><span class="line">		wake_threads_waitq(desc);                <span class="comment">// 3. 唤醒等待 thread_fn 的线程</span></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>整体流程如下图：</p>
-<p><img src="../images/驱动程序的必要基础/image-20240111201435120.png" alt="image-20240111201435120"></p>
+<p><img src="/../images/%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F%E7%9A%84%E5%BF%85%E8%A6%81%E5%9F%BA%E7%A1%80/image-20240111201435120.png" alt="image-20240111201435120"></p>
 <p>可能由程序在等待 thread_fn 函数被执行，irq_thread 函数最后会调用 wake_threads_waitq 唤醒：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">wake_threads_waitq</span><span class="params">(<span class="keyword">struct</span> irq_desc *desc)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">if</span> (atomic_dec_and_test(&amp;desc-&gt;threads_active))</span><br><span class="line">		wake_up(&amp;desc-&gt;wait_for_threads);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>wait_for_threads 是 <code>wait_queue_head_t</code> 类型，等待队列头内都是休眠的线程。</p>
 <p>可以调用 synchronize_irq 来等待 thread_fn 被执行，synchronize_irq 的定义如下：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> *	synchronize_irq - wait for pending IRQ handlers (on other CPUs)</span></span><br><span class="line"><span class="comment"> *	@irq: interrupt number to wait for</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *	This function waits for any pending IRQ handlers for this interrupt</span></span><br><span class="line"><span class="comment"> *	to complete before returning. If you use this function while</span></span><br><span class="line"><span class="comment"> *	holding a resource the IRQ handler may need you will deadlock.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> *	This function may be called - with care - from IRQ context.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">synchronize_irq</span><span class="params">(<span class="type">unsigned</span> <span class="type">int</span> irq)</span></span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     </div>
 

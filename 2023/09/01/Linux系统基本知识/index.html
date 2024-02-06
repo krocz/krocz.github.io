@@ -20,14 +20,14 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="1.根目录结构（FSH标准） &#x2F;bin：所有用户都可以使用的、基本的命令 &#x2F;boot：启动文件，比如内核等 &#x2F;dev：以文件的形式保存 Linux 所有的设备及接口设备 &#x2F;etc：配置文件 &#x2F;home：家目录 &#x2F;root：root用户的家目录 &#x2F;lib：主要放置系统开机使用的、&#x2F;bin 和 &#x2F;sbin 目录下的命令使用的库函数 &#x2F;media：插上U盘等外设会挂在到该目录上 &#x2F;mnt：用来挂载其他文">
+  <meta name="description" content="1.根目录结构（FSH标准） &#x2F;bin：所有用户都可以使用的、基本的命令  &#x2F;boot：启动文件，比如内核等  &#x2F;dev：以文件的形式保存 Linux 所有的设备及接口设备  &#x2F;etc：配置文件  &#x2F;home：家目录  &#x2F;root：root用户的家目录  &#x2F;lib：主要放置系统开机使用的、&#x2F;bin 和 &#x2F;sb">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Linux系统基本知识">
 <meta property="og:url" content="http://example.com/2023/09/01/Linux%E7%B3%BB%E7%BB%9F%E5%9F%BA%E6%9C%AC%E7%9F%A5%E8%AF%86/index.html">
 <meta property="og:site_name" content="Krocz&#39;s Blog">
-<meta property="og:description" content="1.根目录结构（FSH标准） &#x2F;bin：所有用户都可以使用的、基本的命令 &#x2F;boot：启动文件，比如内核等 &#x2F;dev：以文件的形式保存 Linux 所有的设备及接口设备 &#x2F;etc：配置文件 &#x2F;home：家目录 &#x2F;root：root用户的家目录 &#x2F;lib：主要放置系统开机使用的、&#x2F;bin 和 &#x2F;sbin 目录下的命令使用的库函数 &#x2F;media：插上U盘等外设会挂在到该目录上 &#x2F;mnt：用来挂载其他文">
+<meta property="og:description" content="1.根目录结构（FSH标准） &#x2F;bin：所有用户都可以使用的、基本的命令  &#x2F;boot：启动文件，比如内核等  &#x2F;dev：以文件的形式保存 Linux 所有的设备及接口设备  &#x2F;etc：配置文件  &#x2F;home：家目录  &#x2F;root：root用户的家目录  &#x2F;lib：主要放置系统开机使用的、&#x2F;bin 和 &#x2F;sb">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/2023/09/01/images/Linux%E7%B3%BB%E7%BB%9F%E5%9F%BA%E6%9C%AC%E7%9F%A5%E8%AF%86/image-20230905211714592.png">
+<meta property="og:image" content="http://example.com/images/Linux%E7%B3%BB%E7%BB%9F%E5%9F%BA%E6%9C%AC%E7%9F%A5%E8%AF%86/image-20230905211714592.png">
 <meta property="article:published_time" content="2023-09-01T11:43:29.000Z">
 <meta property="article:modified_time" content="2024-01-12T11:14:35.733Z">
 <meta property="article:author" content="Krocz">
@@ -35,7 +35,7 @@
 <meta property="article:tag" content="Linux">
 <meta property="article:tag" content="C&#x2F;C++">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://example.com/2023/09/01/images/Linux%E7%B3%BB%E7%BB%9F%E5%9F%BA%E6%9C%AC%E7%9F%A5%E8%AF%86/image-20230905211714592.png">
+<meta name="twitter:image" content="http://example.com/images/Linux%E7%B3%BB%E7%BB%9F%E5%9F%BA%E6%9C%AC%E7%9F%A5%E8%AF%86/image-20230905211714592.png">
 
 <link rel="canonical" href="http://example.com/2023/09/01/Linux%E7%B3%BB%E7%BB%9F%E5%9F%BA%E6%9C%AC%E7%9F%A5%E8%AF%86/">
 
@@ -253,7 +253,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>8.3k</span>
+              <span>8.5k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -273,31 +273,45 @@
 
       
         <h2 id="1-根目录结构（FSH标准）"><a href="#1-根目录结构（FSH标准）" class="headerlink" title="1.根目录结构（FSH标准）"></a>1.根目录结构（FSH标准）</h2><ul>
-<li>/bin：<strong>所有用户</strong>都可以使用的、<strong>基本的</strong>命令</li>
-<li>/boot：启动文件，比如内核等</li>
-<li>/dev：以文件的形式保存 Linux 所有的设备及接口设备</li>
-<li>/etc：配置文件</li>
-<li>/home：家目录</li>
-<li>/root：root用户的家目录</li>
-<li>/lib：主要放置系统开机使用的、/bin 和 /sbin 目录下的命令使用的库函数</li>
-<li>/media：插上U盘等外设会挂在到该目录上</li>
-<li>/mnt：用来挂载其他文件系统</li>
-<li><p>/opt：第三方软件放置的目录</p>
+<li><p>&#x2F;bin：<strong>所有用户</strong>都可以使用的、<strong>基本的</strong>命令</p>
 </li>
-<li><p>/proc：这个目录是一个虚拟文件系统，它放置的数据都是在内存当中，例如进程、外部设备状态、网络状态等</p>
+<li><p>&#x2F;boot：启动文件，比如内核等</p>
 </li>
-<li>/sbin：该目录下放置开机过程中需要的命令，包括开机、修复、还原系统等</li>
-<li>/sys：用来挂载虛拟的sys文件系统，可以查看系统信息:比如设备信息</li>
-<li>/tmp：置文件的地方</li>
-<li>/var：放置常态化变动的文件，例如缓存、登录日志文件、软件运行产生的文件等</li>
-<li>/usr：<code>Unix Software Resource</code>，存放可分享的与<strong>不可变动</strong>的数据<ul>
-<li>/bin：绝大部分的用户可使用指令都放在这里(与开机无关)，/bin中的命令跟开机有关</li>
-<li>/include：C/C++的头文件和包含文件</li>
-<li>/lib：库</li>
-<li>/local：系统管理员在本机自行下载的软件</li>
-<li>/usr/src/：源码放置的地方</li>
-<li>/usr/share/：放置共享文件的地方</li>
-<li>/usr/sbin/：非系统正常运行需要的系统命令</li>
+<li><p>&#x2F;dev：以文件的形式保存 Linux 所有的设备及接口设备</p>
+</li>
+<li><p>&#x2F;etc：配置文件</p>
+</li>
+<li><p>&#x2F;home：家目录</p>
+</li>
+<li><p>&#x2F;root：root用户的家目录</p>
+</li>
+<li><p>&#x2F;lib：主要放置系统开机使用的、&#x2F;bin 和 &#x2F;sbin 目录下的命令使用的库函数</p>
+</li>
+<li><p>&#x2F;media：插上U盘等外设会挂在到该目录上</p>
+</li>
+<li><p>&#x2F;mnt：用来挂载其他文件系统</p>
+</li>
+<li><p>&#x2F;opt：第三方软件放置的目录</p>
+</li>
+<li><p>&#x2F;proc：这个目录是一个虚拟文件系统，它放置的数据都是在内存当中，例如进程、外部设备状态、网络状态等</p>
+</li>
+<li><p>&#x2F;sbin：该目录下放置开机过程中需要的命令，包括开机、修复、还原系统等</p>
+</li>
+<li><p>&#x2F;sys：用来挂载虛拟的sys文件系统，可以查看系统信息:比如设备信息</p>
+</li>
+<li><p>&#x2F;tmp：置文件的地方</p>
+</li>
+<li><p>&#x2F;var：放置常态化变动的文件，例如缓存、登录日志文件、软件运行产生的文件等</p>
+</li>
+<li><p>&#x2F;usr：<code>Unix Software Resource</code>，存放可分享的与<strong>不可变动</strong>的数据</p>
+<ul>
+<li>&#x2F;bin：绝大部分的用户可使用指令都放在这里(与开机无关)，&#x2F;bin中的命令跟开机有关</li>
+<li>&#x2F;include：C&#x2F;C++的头文件和包含文件</li>
+<li>&#x2F;lib：库</li>
+<li>&#x2F;local：系统管理员在本机自行下载的软件</li>
+<li>&#x2F;usr&#x2F;src&#x2F;：源码放置的地方</li>
+<li>&#x2F;usr&#x2F;share&#x2F;：放置共享文件的地方</li>
+<li>&#x2F;usr&#x2F;sbin&#x2F;：非系统正常运行需要的系统命令</li>
 </ul>
 </li>
 </ul>
@@ -309,42 +323,36 @@
 <ul>
 <li><p>举例：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//hello.c</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> ac, <span class="type">char</span>*av[])</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">if</span>(ac &gt;= <span class="number">2</span>)</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;Hello %s\n&quot;</span>, av[<span class="number">1</span>]);</span><br><span class="line">	<span class="keyword">else</span></span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;Hello wrold\n&quot;</span>);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>使用如下命令编译并执行，则在当前目录下寻找可执行文件hello：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">gcc hello.c -o hello</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">./hello Krocz</span></span><br></pre></td></tr></table></figure>
+
 <p>如果使用如下命令执行，则会在环境变量保存的所有路径中寻找可执行文件hello：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">hello Krocz</span></span><br></pre></td></tr></table></figure>
+
 <p>可以选择将文件hello放到PATH保存的某个路径中，例如<code>/usr/bin</code>；也可以为环境变量PATH添加新路径</p>
 </li>
 </ul>
 <h3 id="1-2-为环境变量PATH添加新路径"><a href="#1-2-为环境变量PATH添加新路径" class="headerlink" title="1.2 为环境变量PATH添加新路径"></a>1.2 为环境变量PATH添加新路径</h3><h4 id="1-2-1-查看PATH"><a href="#1-2-1-查看PATH" class="headerlink" title="1.2.1 查看PATH"></a>1.2.1 查看PATH</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo $PATH</span><br></pre></td></tr></table></figure>
-<h4 id="1-2-2-设置"><a href="#1-2-2-设置" class="headerlink" title="1.2.2 设置"></a>1.2.2 设置</h4><p>以在PATH添加/home/book目录为例：</p>
+
+<h4 id="1-2-2-设置"><a href="#1-2-2-设置" class="headerlink" title="1.2.2 设置"></a>1.2.2 设置</h4><p>以在PATH添加&#x2F;home&#x2F;book目录为例：</p>
 <ul>
 <li><p>永久设置(对所有用户有效)：方法1</p>
-<p>修改/etc/environment，添加/home/book路径</p>
+<p>修改&#x2F;etc&#x2F;environment，添加&#x2F;home&#x2F;book路径</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PATH=&quot;/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/home/book&quot;</span><br></pre></td></tr></table></figure>
 </li>
 <li><p>永久设置(只对当前用户有效)：方法2</p>
-<p>修改~/.bashrc，在行尾添加：</p>
+<p>修改~&#x2F;.bashrc，在行尾添加：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">export PATH=$PATH:/home/book</span><br></pre></td></tr></table></figure>
 </li>
 <li><p>临时设置</p>
 <p>在终端执行如下命令，只对当前终端有效：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">export PATH=$PATH:/home/book</span><br></pre></td></tr></table></figure>
-</li>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">export PATH=$PATH:/home/book</span><br></pre></td></tr></table></figure></li>
 </ul>
 <h2 id="2-文件的目录属性"><a href="#2-文件的目录属性" class="headerlink" title="2.文件的目录属性"></a>2.文件的目录属性</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">-rw-rw-r-- 1 zhaoyan zhaoyan 1497 11月 12 14:08 a.txt</span><br><span class="line">drwxrwxr-x 3 zhaoyan zhaoyan 4096 10月  9 18:39 C</span><br></pre></td></tr></table></figure>
+
 <ul>
-<li>模式(mode):首位表示文件类型<ul>
-<li><code>-</code>：普通文件</li>
-<li><code>d</code>：目录</li>
-<li><code>c</code>：字符设备文件</li>
-<li><code>b</code>：块设备文件</li>
-<li><code>l</code>：链接文件</li>
-<li><code>s</code>：套接字文件</li>
-<li><code>p</code>：管道文件</li>
-<li></li>
-</ul>
-</li>
+<li><h2 id="模式-mode-首位表示文件类型-：普通文件-d：目录-c：字符设备文件-b：块设备文件-l：链接文件-s：套接字文件-p：管道文件"><a href="#模式-mode-首位表示文件类型-：普通文件-d：目录-c：字符设备文件-b：块设备文件-l：链接文件-s：套接字文件-p：管道文件" class="headerlink" title="模式(mode):首位表示文件类型  - -：普通文件  - d：目录  - c：字符设备文件  - b：块设备文件  - l：链接文件  - s：套接字文件  - p：管道文件"></a>模式(mode):首位表示文件类型<br>  - <code>-</code>：普通文件<br>  - <code>d</code>：目录<br>  - <code>c</code>：字符设备文件<br>  - <code>b</code>：块设备文件<br>  - <code>l</code>：链接文件<br>  - <code>s</code>：套接字文件<br>  - <code>p</code>：管道文件</h2></li>
 <li>链接数(links):指该文件被引用的次数</li>
 <li>文件所有者(owner):</li>
 <li>组(group):文件所有者所在的组</li>
@@ -363,8 +371,8 @@
 </li>
 <li>ls：蓝色的是文件夹，白色的是普通文件，绿色的是可执行文件</li>
 </ul>
-<h3 id="3-1-压缩-解压缩命令"><a href="#3-1-压缩-解压缩命令" class="headerlink" title="3.1 压缩/解压缩命令"></a>3.1 压缩/解压缩命令</h3><h4 id="3-1-1-gzip-bzip2"><a href="#3-1-1-gzip-bzip2" class="headerlink" title="3.1.1 gzip/bzip2"></a>3.1.1 gzip/bzip2</h4><ul>
-<li><p>gzip/bzip2常用选项：</p>
+<h3 id="3-1-压缩-解压缩命令"><a href="#3-1-压缩-解压缩命令" class="headerlink" title="3.1 压缩&#x2F;解压缩命令"></a>3.1 压缩&#x2F;解压缩命令</h3><h4 id="3-1-1-gzip-bzip2"><a href="#3-1-1-gzip-bzip2" class="headerlink" title="3.1.1 gzip&#x2F;bzip2"></a>3.1.1 gzip&#x2F;bzip2</h4><ul>
+<li><p>gzip&#x2F;bzip2常用选项：</p>
 <ul>
 <li>-l（list）：列出压缩文件的内容</li>
 <li>-k（keep）：在压缩或解压时，保留输入文件</li>
@@ -376,7 +384,7 @@
 </li>
 <li><p>注意：</p>
 <ul>
-<li>gzip/bzip2仅能压缩单个文件，<strong>不能压缩目录</strong></li>
+<li>gzip&#x2F;bzip2仅能压缩单个文件，<strong>不能压缩目录</strong></li>
 <li>一般情况下，小文件使用gzip来压缩，大文件使用bzip2来压缩。bzip2的压缩率更高</li>
 <li>gzip压缩的后缀是<code>.gz</code>，bzip2的压缩后缀是<code>.bz2</code></li>
 </ul>
@@ -396,13 +404,11 @@
 </ul>
 </li>
 <li><p>举例：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">tar czvf dira.tar.gz dira            //把目录 dira 压缩、打包为 dira.tar.gz 文件</span><br><span class="line">tar tvf dira.tar.gz                  //查看压缩文件</span><br><span class="line">tar xzvf diar.tar.gz -C /home/book   //解压到/home/book</span><br></pre></td></tr></table></figure>
-</li>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">tar czvf dira.tar.gz dira            //把目录 dira 压缩、打包为 dira.tar.gz 文件</span><br><span class="line">tar tvf dira.tar.gz                  //查看压缩文件</span><br><span class="line">tar xzvf diar.tar.gz -C /home/book   //解压到/home/book</span><br></pre></td></tr></table></figure></li>
 </ul>
-<h3 id="3-2-查找-搜索命令"><a href="#3-2-查找-搜索命令" class="headerlink" title="3.2 查找/搜索命令"></a>3.2 查找/搜索命令</h3><h4 id="3-2-1-查找文件-find"><a href="#3-2-1-查找文件-find" class="headerlink" title="3.2.1 查找文件-find"></a>3.2.1 查找文件-find</h4><ul>
+<h3 id="3-2-查找-搜索命令"><a href="#3-2-查找-搜索命令" class="headerlink" title="3.2 查找&#x2F;搜索命令"></a>3.2 查找&#x2F;搜索命令</h3><h4 id="3-2-1-查找文件-find"><a href="#3-2-1-查找文件-find" class="headerlink" title="3.2.1 查找文件-find"></a>3.2.1 查找文件-find</h4><ul>
 <li><p>举例：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /home/book/dira/ -name &quot;dir or file name&quot;  // 在指定目录下按名称查找</span><br></pre></td></tr></table></figure>
-</li>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find /home/book/dira/ -name &quot;dir or file name&quot;  // 在指定目录下按名称查找</span><br></pre></td></tr></table></figure></li>
 </ul>
 <h4 id="3-2-2-搜索文件内容-grep"><a href="#3-2-2-搜索文件内容-grep" class="headerlink" title="3.2.2 搜索文件内容-grep"></a>3.2.2 搜索文件内容-grep</h4><ul>
 <li><p>grep常用选项：</p>
@@ -413,24 +419,25 @@
 </ul>
 </li>
 <li><p>举例：</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">grep -nw &quot;abc&quot; test1.txt        //在文件test1.txt中查找并完全匹配字符串&quot;abc&quot;</span><br><span class="line">grep -rn &quot;abc&quot; * | grep &quot;\.h&quot;  //在当前文件夹下查找字符串&quot;abc&quot;，并通过管道将查找结果传给第2个命令 </span><br></pre></td></tr></table></figure>
-</li>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">grep -nw &quot;abc&quot; test1.txt        //在文件test1.txt中查找并完全匹配字符串&quot;abc&quot;</span><br><span class="line">grep -rn &quot;abc&quot; * | grep &quot;\.h&quot;  //在当前文件夹下查找字符串&quot;abc&quot;，并通过管道将查找结果传给第2个命令 </span><br></pre></td></tr></table></figure></li>
 </ul>
 <h3 id="3-3-改变文件权限-chmod"><a href="#3-3-改变文件权限-chmod" class="headerlink" title="3.3 改变文件权限-chmod"></a>3.3 改变文件权限-chmod</h3><ul>
-<li><p>权限对应数字：<code>r:4   w:2   x:1</code></p>
+<li><p>权限对应数字：<code>r:4   w:2   x:1 </code></p>
 </li>
 <li><p>用户组对应字母：<code>user:u   group:g    others:o</code>，<code>a</code>表示all，即所有组</p>
 </li>
 <li><p>举例：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">chmod 777 .bashrc</span><br><span class="line">chmod -r u=rwx,go=rx dir</span><br><span class="line">chmod a-x .bashrc         </span><br><span class="line">chmod a+w .bashrc</span><br></pre></td></tr></table></figure>
-</li>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">chmod 777 .bashrc</span><br><span class="line">chmod -r u=rwx,go=rx dir</span><br><span class="line">chmod a-x .bashrc         </span><br><span class="line">chmod a+w .bashrc</span><br></pre></td></tr></table></figure></li>
 </ul>
-<h3 id="3-4-文件传输-scp"><a href="#3-4-文件传输-scp" class="headerlink" title="3.4 文件传输-scp"></a>3.4 文件传输-scp</h3><h4 id="3-4-1-基本用法"><a href="#3-4-1-基本用法" class="headerlink" title="3.4.1 基本用法"></a>3.4.1 基本用法</h4><p>命令格式：<br><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scp source destination</span><br></pre></td></tr></table></figure><br>将<code>source</code>路径下的文件复制到<code>destination</code>中<br>**注意服务器的地址应该写为：<code>user@ip:XXX</code></p>
+<h3 id="3-4-文件传输-scp"><a href="#3-4-文件传输-scp" class="headerlink" title="3.4 文件传输-scp"></a>3.4 文件传输-scp</h3><h4 id="3-4-1-基本用法"><a href="#3-4-1-基本用法" class="headerlink" title="3.4.1 基本用法"></a>3.4.1 基本用法</h4><p>命令格式：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scp source destination</span><br></pre></td></tr></table></figure>
+<p>将<code>source</code>路径下的文件复制到<code>destination</code>中<br>**注意服务器的地址应该写为：<code>user@ip:XXX</code></p>
 <h4 id="3-4-2-举例"><a href="#3-4-2-举例" class="headerlink" title="3.4.2 举例"></a>3.4.2 举例</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scp -r ~/tmp user@ip:/home/acs/</span><br></pre></td></tr></table></figure>
 <ul>
 <li>将本地家目录中的<code>tmp</code>文件夹复制到<code>user@ip</code>服务器中的<code>/home/acs/</code>目录下。</li>
 </ul>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">scp -r user@ip:homework . </span><br></pre></td></tr></table></figure>
+
 <ul>
 <li>将<code>user@ip</code>服务器中的<code>~/homework/</code>文件夹复制到本地的当前路径下。</li>
 </ul>
@@ -448,9 +455,9 @@
 <li>分页显示所有进程</li>
 </ul>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ps -ef | more</span><br></pre></td></tr></table></figure>
-<p><img src="../images/Linux系统基本知识/image-20230905211714592.png" alt="image-20230905211714592"></p>
+
+<p><img src="/../images/Linux%E7%B3%BB%E7%BB%9F%E5%9F%BA%E6%9C%AC%E7%9F%A5%E8%AF%86/image-20230905211714592.png" alt="image-20230905211714592"></p>
 <p>列出信息每字段的含义：</p>
-<div class="table-container">
 <table>
 <thead>
 <tr>
@@ -458,8 +465,7 @@
 <th>描述</th>
 </tr>
 </thead>
-<tbody>
-<tr>
+<tbody><tr>
 <td>UID</td>
 <td>用户的ID ，但输出的是用户名</td>
 </tr>
@@ -481,7 +487,7 @@
 </tr>
 <tr>
 <td>TTY</td>
-<td>该进程在哪个终端上运行，若与终端无关，则显示？，若为pts/0等，则表示由网络连接主机进程</td>
+<td>该进程在哪个终端上运行，若与终端无关，则显示？，若为pts&#x2F;0等，则表示由网络连接主机进程</td>
 </tr>
 <tr>
 <td>TIME</td>
@@ -491,13 +497,14 @@
 <td>CMD</td>
 <td>命令的名称和参数</td>
 </tr>
-</tbody>
-</table>
-</div>
+</tbody></table>
 <ul>
 <li>显示指定用户的进程，通过grep命令筛选</li>
 </ul>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ps -u root | grep nfs</span><br></pre></td></tr></table></figure>
+
+
+
 <h3 id="3-6-终止进程命令-kill"><a href="#3-6-终止进程命令-kill" class="headerlink" title="3.6 终止进程命令-kill"></a>3.6 终止进程命令-kill</h3><p><code>kill -n</code>：n表示信号编号</p>
 <ul>
 <li><p><code>kill pid</code>、<code>kill -15 pid</code></p>
@@ -515,13 +522,37 @@
 </ul>
 <h3 id="3-7-编译命令-make"><a href="#3-7-编译命令-make" class="headerlink" title="3.7 编译命令-make"></a>3.7 编译命令-make</h3><ul>
 <li><p>常见参数</p>
-<p>| 参数                          | 描述                                                  |<br>| ——————————————- | ——————————————————————————- |<br>| <code>-c DIR</code> or <code>--directory=DIR</code> | 在读取 Makefile 之前，进入到目录 DIR，然后执行 make。 |<br>| <code>-f FILE</code> or <code>--file=FILE</code>    | 指定文件 “FILE” 为 make 执行的 Makefile 文件          |<br>|                               |                                                       |</p>
+<table>
+<thead>
+<tr>
+<th>参数</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>-c DIR</code> or <code>--directory=DIR</code></td>
+<td>在读取 Makefile 之前，进入到目录 DIR，然后执行 make。</td>
+</tr>
+<tr>
+<td><code>-f FILE</code> or <code>--file=FILE</code></td>
+<td>指定文件 “FILE” 为 make 执行的 Makefile 文件</td>
+</tr>
+<tr>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
 </li>
 </ul>
 <h3 id="3-8-内核模块命令"><a href="#3-8-内核模块命令" class="headerlink" title="3.8 内核模块命令"></a>3.8 内核模块命令</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">insmod hello_drv.ko    //安装内核驱动模块</span><br><span class="line">cat /proc/devices     // 查看/proc/devices文件,该文件列出字符和块设备的主设备号,以及分配到这些设备号的设备名称</span><br><span class="line">lsmod                // 列出所有已安装的内核模块</span><br><span class="line">ls /dev/hello -l     // 查看设备节点是否存在</span><br><span class="line">rmmod hello_drv      // 卸载内核驱动模块</span><br><span class="line">dmesg                // 查看内核输出的打印信息</span><br></pre></td></tr></table></figure>
+
+
+
 <h3 id="3-9-查看进程的内存映射区域"><a href="#3-9-查看进程的内存映射区域" class="headerlink" title="3.9 查看进程的内存映射区域"></a>3.9 查看进程的内存映射区域</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat /proc/&lt;进程PID&gt;/maps</span><br></pre></td></tr></table></figure>
+
 <p>每行的格式如下：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">address  perms offset  dev   inode   pathname</span><br></pre></td></tr></table></figure>
+
 <ul>
 <li><strong>address（地址范围）：</strong> 表示映射的虚拟地址范围。这是一个区间，以十六进制表示，包括起始地址和结束地址。例如，<code>08048000-08056000</code> 表示一个从 <code>0x08048000</code> 到 <code>0x08056000</code> 的地址范围。</li>
 <li><strong>perms（权限标志）：</strong> 表示对该内存区域的访问权限。常见的权限标志包括：<ul>
@@ -544,9 +575,11 @@
 <ol>
 <li><p>板级支持包-Board Support Package：构建嵌入式操作系统所需的引导程序(Bootloader)、内核(Kernel)、根文件系统(Rootfs)和工具链(Toolchain) 提供完整的软件资源包。</p>
 </li>
-<li><p>```shell<br>~/100ask_imx6ull_mini-sdk$ ../repo/repo init -u <a target="_blank" rel="noopener" href="https://gitee.com/weidongshan/manifests.git">https://gitee.com/weidongshan/manifests.git</a> -b linux-sdk -m imx6ull/100ask_imx6ull_mini_linux4.9.88_release.xml —no-repo-verify</p>
-<p>~/100ask_imx6ull_mini-sdk$ ../repo/repo sync -j4</p>
+<li><pre><code class="shell">~/100ask_imx6ull_mini-sdk$ ../repo/repo init -u https://gitee.com/weidongshan/manifests.git -b linux-sdk -m imx6ull/100ask_imx6ull_mini_linux4.9.88_release.xml --no-repo-verify
+
+~/100ask_imx6ull_mini-sdk$ ../repo/repo sync -j4
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">   3. `../repo/repo init`: 这是命令本身，指示系统执行repo工具进行初始化操作。</span><br><span class="line"></span><br><span class="line">   4. `-u https://gitee.com/weidongshan/manifests.git`: `-u`选项指定了远程仓库的URL。在这个命令中，远程仓库的URL是`https://gitee.com/weidongshan/manifests.git`，即来自Gitee平台的`manifests.git`仓库。</span><br><span class="line"></span><br><span class="line">   5. `-b linux-sdk`: `-b`选项指定了要下载的分支。在这个命令中，分支是`linux-sdk`。</span><br><span class="line"></span><br><span class="line">   6. `-m imx6ull/100ask_imx6ull_mini_linux4.9.88_release.xml`: `-m`选项指定了清单文件的路径。在这个命令中，清单文件的路径是`imx6ull/100ask_imx6ull_mini_linux4.9.88_release.xml`。</span><br><span class="line"></span><br><span class="line">   7. `--no-repo-verify`: 这是一个额外的选项，用于跳过对repo的验证。如果仓库包含了repo和.git/ repo目录已经被修改或破坏，这个选项可以防止运行`repo init`时出现错误。</span><br><span class="line"></span><br><span class="line">   8. `./repo/repo sync`: 这是命令本身，指示系统执行repo工具进行代码仓库的同步操作。</span><br><span class="line"></span><br><span class="line">   9. `-j4`: `-j`选项用于指定并行任务的数量，后面的数字4表示同时执行4个任务。这个选项可以根据系统性能和网络环境进行调整，以加快代码同步的速度。</span><br><span class="line"></span><br><span class="line">3. 配置交叉编译工具链(仅对当前用户有效)：</span><br><span class="line"></span><br><span class="line">   1. ```shell</span><br><span class="line">      1.在 ~/.bashrc中添加：</span><br><span class="line">      export ARCH=arm </span><br><span class="line">      export CROSS_COMPILE=arm-buildroot-linux-gnueabihf-</span><br><span class="line">      export PATH=$PATH:/home/book/100ask_imx6ull_mini-sdk/ToolChain/arm-buildroot-linux-gnueabihf_sdk-buildroot/bin</span><br><span class="line">      </span><br><span class="line">      2.设置完成之后执行 source ~/.bashrc</span><br></pre></td></tr></table></figure>
+</code></pre>
 </li>
 <li><p>执行了<code>source ~/.bashrc</code>命令，它会重新加载你对<code>~/.bashrc</code>文件的修改，使得刚才添加的环境变量生效。</p>
 </li>
@@ -562,6 +595,7 @@
 </li>
 <li><p>编译内核：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash"><span class="built_in">cd</span> /home/book/100ask_imx6ull-sdk/Linux-4.9.88</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">make 100ask_imx6ull_defconfig</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">bear make zImage -j4</span></span><br></pre></td></tr></table></figure>
+
 <ul>
 <li>100ask_imx6ull_defconfig是Linux内核提供的一个配置文件，用于设置编译选项和配置信息，从而能够编译出与开发板相对应的配置</li>
 <li>使用 make 工具执行 <code>zImage</code> 目标，该目标用于编译 Linux 内核。</li>
@@ -572,6 +606,7 @@
 </ol>
 <h2 id="5-Linux系统的环境变量"><a href="#5-Linux系统的环境变量" class="headerlink" title="5. Linux系统的环境变量"></a>5. Linux系统的环境变量</h2><p>在配置和使用交叉编译器时，我使用了如下命令：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">配置：</span><br><span class="line">export ARCH=arm </span><br><span class="line">export CROSS_COMPILE=arm-buildroot-linux-gnueabihf-</span><br><span class="line">export PATH=$PATH:/home/book/100ask_imx6ull_mini-sdk/ToolChain/arm-buildroot-linux-gnueabihf_sdk-buildroot/bin</span><br><span class="line">使用：</span><br><span class="line">arm-buildroot-linux-gnueabihf-gcc -o hello hello.c</span><br></pre></td></tr></table></figure>
+
 <h3 id="5-1-配置命令解读"><a href="#5-1-配置命令解读" class="headerlink" title="5.1 配置命令解读"></a>5.1 配置命令解读</h3><p><code>ARCH</code>,<code>CROSS_COMPILE</code>,<code>PATH</code>是Linux系统中被广泛使用的特定环境变量。</p>
 <ol>
 <li><code>ARCH=arm</code>：指定编译的目标架构为ARM，这是为了告诉系统你将使用ARM架构的交叉编译工具链。</li>
@@ -584,7 +619,8 @@
 </li>
 <li><p>例如，”arm-buildroot-linux-gnueabihf-“前缀表示编译器适用于ARM架构，并且在Linux环境下使用GNUEABI的标准。<code>eabi</code>表示嵌入式应用二进制接口，<code>hf</code>表示硬浮点支持，<code>buildroot</code>表示交叉编译器是基于<strong>Buildroot嵌入式Linux构建系统</strong>生成的。</p>
 </li>
-<li>常见的交叉编译器前缀示例：<ul>
+<li><p>常见的交叉编译器前缀示例：</p>
+<ul>
 <li>arm-linux-gnueabi-：用于ARM架构的Linux环境下的GNUEABI标准。</li>
 <li>arm-linux-gnueabihf-：用于ARM架构的Linux环境下的GNUEABIHF标准，支持硬浮点运算。</li>
 <li>arm-none-linux-gnueabi-：用于ARM架构的无操作系统或裸机环境下的GNUEABI标准。</li>
@@ -606,10 +642,10 @@
 </ol>
 <ul>
 <li>环境变量配置文件的位置：<ul>
-<li>~/.bash_profile：用于个人用户的bash登录 shell的配置文件。</li>
-<li>~/.bashrc：用于个人用户的bash非登录 shell的配置文件。</li>
-<li>/etc/profile：用于全局系统范围的bash登录 shell的配置文件。</li>
-<li>/etc/environment：用于整个系统的全局环境变量配置文件。</li>
+<li>~&#x2F;.bash_profile：用于个人用户的bash登录 shell的配置文件。</li>
+<li>~&#x2F;.bashrc：用于个人用户的bash非登录 shell的配置文件。</li>
+<li>&#x2F;etc&#x2F;profile：用于全局系统范围的bash登录 shell的配置文件。</li>
+<li>&#x2F;etc&#x2F;environment：用于整个系统的全局环境变量配置文件。</li>
 </ul>
 </li>
 </ul>
@@ -698,7 +734,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E6%A0%B9%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84%EF%BC%88FSH%E6%A0%87%E5%87%86%EF%BC%89"><span class="nav-number">1.</span> <span class="nav-text">1.根目录结构（FSH标准）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-Shell%E7%9A%84%E6%89%A7%E8%A1%8C"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 Shell的执行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-%E4%B8%BA%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8FPATH%E6%B7%BB%E5%8A%A0%E6%96%B0%E8%B7%AF%E5%BE%84"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 为环境变量PATH添加新路径</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-1-%E6%9F%A5%E7%9C%8BPATH"><span class="nav-number">1.2.1.</span> <span class="nav-text">1.2.1 查看PATH</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-2-%E8%AE%BE%E7%BD%AE"><span class="nav-number">1.2.2.</span> <span class="nav-text">1.2.2 设置</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E6%96%87%E4%BB%B6%E7%9A%84%E7%9B%AE%E5%BD%95%E5%B1%9E%E6%80%A7"><span class="nav-number">2.</span> <span class="nav-text">2.文件的目录属性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4"><span class="nav-number">3.</span> <span class="nav-text">3.常用命令</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-%E5%8E%8B%E7%BC%A9-%E8%A7%A3%E5%8E%8B%E7%BC%A9%E5%91%BD%E4%BB%A4"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 压缩&#x2F;解压缩命令</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-1-gzip-bzip2"><span class="nav-number">3.1.1.</span> <span class="nav-text">3.1.1 gzip&#x2F;bzip2</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-2-tar"><span class="nav-number">3.1.2.</span> <span class="nav-text">3.1.2 tar</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-%E6%9F%A5%E6%89%BE-%E6%90%9C%E7%B4%A2%E5%91%BD%E4%BB%A4"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 查找&#x2F;搜索命令</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-1-%E6%9F%A5%E6%89%BE%E6%96%87%E4%BB%B6-find"><span class="nav-number">3.2.1.</span> <span class="nav-text">3.2.1 查找文件-find</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-2-%E6%90%9C%E7%B4%A2%E6%96%87%E4%BB%B6%E5%86%85%E5%AE%B9-grep"><span class="nav-number">3.2.2.</span> <span class="nav-text">3.2.2 搜索文件内容-grep</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-%E6%94%B9%E5%8F%98%E6%96%87%E4%BB%B6%E6%9D%83%E9%99%90-chmod"><span class="nav-number">3.3.</span> <span class="nav-text">3.3 改变文件权限-chmod</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-%E6%96%87%E4%BB%B6%E4%BC%A0%E8%BE%93-scp"><span class="nav-number">3.4.</span> <span class="nav-text">3.4 文件传输-scp</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-4-1-%E5%9F%BA%E6%9C%AC%E7%94%A8%E6%B3%95"><span class="nav-number">3.4.1.</span> <span class="nav-text">3.4.1 基本用法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-4-2-%E4%B8%BE%E4%BE%8B"><span class="nav-number">3.4.2.</span> <span class="nav-text">3.4.2 举例</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-5-%E8%BF%9B%E7%A8%8B%E7%8A%B6%E6%80%81-ps"><span class="nav-number">3.5.</span> <span class="nav-text">3.5 进程状态-ps</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-5-1-%E4%B8%BE%E4%BE%8B"><span class="nav-number">3.5.1.</span> <span class="nav-text">3.5.1 举例</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-6-%E7%BB%88%E6%AD%A2%E8%BF%9B%E7%A8%8B%E5%91%BD%E4%BB%A4-kill"><span class="nav-number">3.6.</span> <span class="nav-text">3.6 终止进程命令-kill</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-7-%E7%BC%96%E8%AF%91%E5%91%BD%E4%BB%A4-make"><span class="nav-number">3.7.</span> <span class="nav-text">3.7 编译命令-make</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-8-%E5%86%85%E6%A0%B8%E6%A8%A1%E5%9D%97%E5%91%BD%E4%BB%A4"><span class="nav-number">3.8.</span> <span class="nav-text">3.8 内核模块命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-9-%E6%9F%A5%E7%9C%8B%E8%BF%9B%E7%A8%8B%E7%9A%84%E5%86%85%E5%AD%98%E6%98%A0%E5%B0%84%E5%8C%BA%E5%9F%9F"><span class="nav-number">3.9.</span> <span class="nav-text">3.9 查看进程的内存映射区域</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E8%AE%B0%E5%BD%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E8%BF%87%E7%A8%8B"><span class="nav-number">4.</span> <span class="nav-text">4. 记录环境搭建过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-Linux%E7%B3%BB%E7%BB%9F%E7%9A%84%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F"><span class="nav-number">5.</span> <span class="nav-text">5. Linux系统的环境变量</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-%E9%85%8D%E7%BD%AE%E5%91%BD%E4%BB%A4%E8%A7%A3%E8%AF%BB"><span class="nav-number">5.1.</span> <span class="nav-text">5.1 配置命令解读</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-%E4%BA%A4%E5%8F%89%E7%BC%96%E8%AF%91%E5%B7%A5%E5%85%B7%E9%93%BE"><span class="nav-number">5.2.</span> <span class="nav-text">5.2 交叉编译工具链</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-3-Linux%E4%B8%AD%E5%B8%B8%E7%94%A8%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F"><span class="nav-number">5.3.</span> <span class="nav-text">5.3 Linux中常用环境变量</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E6%A0%B9%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84%EF%BC%88FSH%E6%A0%87%E5%87%86%EF%BC%89"><span class="nav-number">1.</span> <span class="nav-text">1.根目录结构（FSH标准）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-Shell%E7%9A%84%E6%89%A7%E8%A1%8C"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 Shell的执行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-%E4%B8%BA%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8FPATH%E6%B7%BB%E5%8A%A0%E6%96%B0%E8%B7%AF%E5%BE%84"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 为环境变量PATH添加新路径</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-1-%E6%9F%A5%E7%9C%8BPATH"><span class="nav-number">1.2.1.</span> <span class="nav-text">1.2.1 查看PATH</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-2-%E8%AE%BE%E7%BD%AE"><span class="nav-number">1.2.2.</span> <span class="nav-text">1.2.2 设置</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E6%96%87%E4%BB%B6%E7%9A%84%E7%9B%AE%E5%BD%95%E5%B1%9E%E6%80%A7"><span class="nav-number">2.</span> <span class="nav-text">2.文件的目录属性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E5%BC%8F-mode-%E9%A6%96%E4%BD%8D%E8%A1%A8%E7%A4%BA%E6%96%87%E4%BB%B6%E7%B1%BB%E5%9E%8B-%EF%BC%9A%E6%99%AE%E9%80%9A%E6%96%87%E4%BB%B6-d%EF%BC%9A%E7%9B%AE%E5%BD%95-c%EF%BC%9A%E5%AD%97%E7%AC%A6%E8%AE%BE%E5%A4%87%E6%96%87%E4%BB%B6-b%EF%BC%9A%E5%9D%97%E8%AE%BE%E5%A4%87%E6%96%87%E4%BB%B6-l%EF%BC%9A%E9%93%BE%E6%8E%A5%E6%96%87%E4%BB%B6-s%EF%BC%9A%E5%A5%97%E6%8E%A5%E5%AD%97%E6%96%87%E4%BB%B6-p%EF%BC%9A%E7%AE%A1%E9%81%93%E6%96%87%E4%BB%B6"><span class="nav-number">3.</span> <span class="nav-text">模式(mode):首位表示文件类型  - -：普通文件  - d：目录  - c：字符设备文件  - b：块设备文件  - l：链接文件  - s：套接字文件  - p：管道文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4"><span class="nav-number">4.</span> <span class="nav-text">3.常用命令</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-%E5%8E%8B%E7%BC%A9-%E8%A7%A3%E5%8E%8B%E7%BC%A9%E5%91%BD%E4%BB%A4"><span class="nav-number">4.1.</span> <span class="nav-text">3.1 压缩&#x2F;解压缩命令</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-1-gzip-bzip2"><span class="nav-number">4.1.1.</span> <span class="nav-text">3.1.1 gzip&#x2F;bzip2</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-2-tar"><span class="nav-number">4.1.2.</span> <span class="nav-text">3.1.2 tar</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-%E6%9F%A5%E6%89%BE-%E6%90%9C%E7%B4%A2%E5%91%BD%E4%BB%A4"><span class="nav-number">4.2.</span> <span class="nav-text">3.2 查找&#x2F;搜索命令</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-1-%E6%9F%A5%E6%89%BE%E6%96%87%E4%BB%B6-find"><span class="nav-number">4.2.1.</span> <span class="nav-text">3.2.1 查找文件-find</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-2-%E6%90%9C%E7%B4%A2%E6%96%87%E4%BB%B6%E5%86%85%E5%AE%B9-grep"><span class="nav-number">4.2.2.</span> <span class="nav-text">3.2.2 搜索文件内容-grep</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-%E6%94%B9%E5%8F%98%E6%96%87%E4%BB%B6%E6%9D%83%E9%99%90-chmod"><span class="nav-number">4.3.</span> <span class="nav-text">3.3 改变文件权限-chmod</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-%E6%96%87%E4%BB%B6%E4%BC%A0%E8%BE%93-scp"><span class="nav-number">4.4.</span> <span class="nav-text">3.4 文件传输-scp</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-4-1-%E5%9F%BA%E6%9C%AC%E7%94%A8%E6%B3%95"><span class="nav-number">4.4.1.</span> <span class="nav-text">3.4.1 基本用法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-4-2-%E4%B8%BE%E4%BE%8B"><span class="nav-number">4.4.2.</span> <span class="nav-text">3.4.2 举例</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-5-%E8%BF%9B%E7%A8%8B%E7%8A%B6%E6%80%81-ps"><span class="nav-number">4.5.</span> <span class="nav-text">3.5 进程状态-ps</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-5-1-%E4%B8%BE%E4%BE%8B"><span class="nav-number">4.5.1.</span> <span class="nav-text">3.5.1 举例</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-6-%E7%BB%88%E6%AD%A2%E8%BF%9B%E7%A8%8B%E5%91%BD%E4%BB%A4-kill"><span class="nav-number">4.6.</span> <span class="nav-text">3.6 终止进程命令-kill</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-7-%E7%BC%96%E8%AF%91%E5%91%BD%E4%BB%A4-make"><span class="nav-number">4.7.</span> <span class="nav-text">3.7 编译命令-make</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-8-%E5%86%85%E6%A0%B8%E6%A8%A1%E5%9D%97%E5%91%BD%E4%BB%A4"><span class="nav-number">4.8.</span> <span class="nav-text">3.8 内核模块命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-9-%E6%9F%A5%E7%9C%8B%E8%BF%9B%E7%A8%8B%E7%9A%84%E5%86%85%E5%AD%98%E6%98%A0%E5%B0%84%E5%8C%BA%E5%9F%9F"><span class="nav-number">4.9.</span> <span class="nav-text">3.9 查看进程的内存映射区域</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E8%AE%B0%E5%BD%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E8%BF%87%E7%A8%8B"><span class="nav-number">5.</span> <span class="nav-text">4. 记录环境搭建过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-Linux%E7%B3%BB%E7%BB%9F%E7%9A%84%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F"><span class="nav-number">6.</span> <span class="nav-text">5. Linux系统的环境变量</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-%E9%85%8D%E7%BD%AE%E5%91%BD%E4%BB%A4%E8%A7%A3%E8%AF%BB"><span class="nav-number">6.1.</span> <span class="nav-text">5.1 配置命令解读</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-%E4%BA%A4%E5%8F%89%E7%BC%96%E8%AF%91%E5%B7%A5%E5%85%B7%E9%93%BE"><span class="nav-number">6.2.</span> <span class="nav-text">5.2 交叉编译工具链</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-3-Linux%E4%B8%AD%E5%B8%B8%E7%94%A8%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F"><span class="nav-number">6.3.</span> <span class="nav-text">5.3 Linux中常用环境变量</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
