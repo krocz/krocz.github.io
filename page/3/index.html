@@ -271,7 +271,6 @@
 
       
           <h2 id="more"><a href="#more" class="headerlink" title="more"></a>more</h2><h3 id="more的三种用法"><a href="#more的三种用法" class="headerlink" title="more的三种用法"></a>more的三种用法</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">more filename      //分页显示文件内容</span><br><span class="line">command | more     //将command命令的输出分页显示</span><br><span class="line">more &lt; filename    //more从标准输入中获取要分页显示的内容，而标准输入被从重定向到filename</span><br></pre></td></tr></table></figure>
-
 <ul>
 <li><code>enter</code>显示下一行，<code>space</code>显示下一页，<code>q</code>退出</li>
 <li>管道命令<code>|</code>将command的输出重定向到more的输入</li>
@@ -371,21 +370,23 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="1-GCC编译器的使用"><a href="#1-GCC编译器的使用" class="headerlink" title="1.GCC编译器的使用"></a>1.GCC编译器的使用</h2><p> <img src="/../images/makefile%E5%AD%A6%E4%B9%A0/image-20230910100317585.png" alt="image-20230910100317585"></p>
+          <h2 id="1-GCC编译器的使用"><a href="#1-GCC编译器的使用" class="headerlink" title="1.GCC编译器的使用"></a>1.GCC编译器的使用</h2><p> <img src="../images/makefile学习/image-20230910100317585.png" alt="image-20230910100317585"></p>
 <ul>
 <li>预处理：预处理阶段会根据指令对源代码进行<strong>替换、宏展开</strong>等操作。在这个阶段，编译器会根据#include指令查找头文件，并<strong>将头文件的内容插入到main.c文件中</strong>。预处理后的文件通常以.i或.ii为扩展名。</li>
 <li>编译：编译阶段将预处理后的文件翻译成汇编语言文件（通常使用. s扩展名）。编译器将C代码转换为汇编代码，将高级语言代码转换成底层机器语言的表示形式，同时<strong>进行语法检查和优化</strong>。</li>
 <li>汇编：汇编阶段将汇编语言代码转换成机器码指令。汇编器将每条汇编指令转换为可执行的机器码，并生成目标文件（通常使用.o扩展名）。目标文件包含机器码指令和一些附加信息，如符号表等。</li>
 <li>链接：链接阶段将目标文件与其他库文件进行组装，生成最终的可执行程序。在这个阶段，链接器会解析代码中的符号引用，并将其与库函数的定义进行关联。如果找不到某个符号的定义，链接将会失败，并报出”<strong>undefined reference</strong>“的错误。</li>
 </ul>
-<h3 id="1-1-常用编译选项"><a href="#1-1-常用编译选项" class="headerlink" title="1.1 常用编译选项"></a>1.1 常用编译选项</h3><table>
+<h3 id="1-1-常用编译选项"><a href="#1-1-常用编译选项" class="headerlink" title="1.1 常用编译选项"></a>1.1 常用编译选项</h3><div class="table-container">
+<table>
 <thead>
 <tr>
 <th>常用选项</th>
 <th>描述</th>
 </tr>
 </thead>
-<tbody><tr>
+<tbody>
+<tr>
 <td>-E</td>
 <td>预处理</td>
 </tr>
@@ -417,7 +418,9 @@
 <td>-v</td>
 <td>输出详细编译信息（比如说库文件查找路径）</td>
 </tr>
-</tbody></table>
+</tbody>
+</table>
+</div>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2023/09/10/makefile%E5%AD%A6%E4%B9%A0/#more" rel="contents">
@@ -493,7 +496,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>416</span>
+              <span>411</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -512,9 +515,9 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="1-硬件资源简介"><a href="#1-硬件资源简介" class="headerlink" title="1.硬件资源简介"></a>1.硬件资源简介</h2><p><img src="/../images/%E5%BC%80%E5%8F%91%E6%9D%BF/image-20230905203618081.png" alt="image-20230905203618081"></p>
-<p><img src="/../images/%E5%BC%80%E5%8F%91%E6%9D%BF/image-20230905204358901.png" alt="image-20230905204358901"></p>
-<h2 id="2-启动方式"><a href="#2-启动方式" class="headerlink" title="2. 启动方式"></a>2. 启动方式</h2><p><img src="/../images/%E5%BC%80%E5%8F%91%E6%9D%BF/image-20230905204619465.png" alt="image-20230905204619465"></p>
+          <h2 id="1-硬件资源简介"><a href="#1-硬件资源简介" class="headerlink" title="1.硬件资源简介"></a>1.硬件资源简介</h2><p><img src="../images/开发板/image-20230905203618081.png" alt="image-20230905203618081"></p>
+<p><img src="../images/开发板/image-20230905204358901.png" alt="image-20230905204358901"></p>
+<h2 id="2-启动方式"><a href="#2-启动方式" class="headerlink" title="2. 启动方式"></a>2. 启动方式</h2><p><img src="../images/开发板/image-20230905204619465.png" alt="image-20230905204619465"></p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2023/09/05/%E5%BC%80%E5%8F%91%E6%9D%BF/#more" rel="contents">
@@ -590,7 +593,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>8.5k</span>
+              <span>8.3k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -610,45 +613,31 @@
 
       
           <h2 id="1-根目录结构（FSH标准）"><a href="#1-根目录结构（FSH标准）" class="headerlink" title="1.根目录结构（FSH标准）"></a>1.根目录结构（FSH标准）</h2><ul>
-<li><p>&#x2F;bin：<strong>所有用户</strong>都可以使用的、<strong>基本的</strong>命令</p>
+<li>/bin：<strong>所有用户</strong>都可以使用的、<strong>基本的</strong>命令</li>
+<li>/boot：启动文件，比如内核等</li>
+<li>/dev：以文件的形式保存 Linux 所有的设备及接口设备</li>
+<li>/etc：配置文件</li>
+<li>/home：家目录</li>
+<li>/root：root用户的家目录</li>
+<li>/lib：主要放置系统开机使用的、/bin 和 /sbin 目录下的命令使用的库函数</li>
+<li>/media：插上U盘等外设会挂在到该目录上</li>
+<li>/mnt：用来挂载其他文件系统</li>
+<li><p>/opt：第三方软件放置的目录</p>
 </li>
-<li><p>&#x2F;boot：启动文件，比如内核等</p>
+<li><p>/proc：这个目录是一个虚拟文件系统，它放置的数据都是在内存当中，例如进程、外部设备状态、网络状态等</p>
 </li>
-<li><p>&#x2F;dev：以文件的形式保存 Linux 所有的设备及接口设备</p>
-</li>
-<li><p>&#x2F;etc：配置文件</p>
-</li>
-<li><p>&#x2F;home：家目录</p>
-</li>
-<li><p>&#x2F;root：root用户的家目录</p>
-</li>
-<li><p>&#x2F;lib：主要放置系统开机使用的、&#x2F;bin 和 &#x2F;sbin 目录下的命令使用的库函数</p>
-</li>
-<li><p>&#x2F;media：插上U盘等外设会挂在到该目录上</p>
-</li>
-<li><p>&#x2F;mnt：用来挂载其他文件系统</p>
-</li>
-<li><p>&#x2F;opt：第三方软件放置的目录</p>
-</li>
-<li><p>&#x2F;proc：这个目录是一个虚拟文件系统，它放置的数据都是在内存当中，例如进程、外部设备状态、网络状态等</p>
-</li>
-<li><p>&#x2F;sbin：该目录下放置开机过程中需要的命令，包括开机、修复、还原系统等</p>
-</li>
-<li><p>&#x2F;sys：用来挂载虛拟的sys文件系统，可以查看系统信息:比如设备信息</p>
-</li>
-<li><p>&#x2F;tmp：置文件的地方</p>
-</li>
-<li><p>&#x2F;var：放置常态化变动的文件，例如缓存、登录日志文件、软件运行产生的文件等</p>
-</li>
-<li><p>&#x2F;usr：<code>Unix Software Resource</code>，存放可分享的与<strong>不可变动</strong>的数据</p>
-<ul>
-<li>&#x2F;bin：绝大部分的用户可使用指令都放在这里(与开机无关)，&#x2F;bin中的命令跟开机有关</li>
-<li>&#x2F;include：C&#x2F;C++的头文件和包含文件</li>
-<li>&#x2F;lib：库</li>
-<li>&#x2F;local：系统管理员在本机自行下载的软件</li>
-<li>&#x2F;usr&#x2F;src&#x2F;：源码放置的地方</li>
-<li>&#x2F;usr&#x2F;share&#x2F;：放置共享文件的地方</li>
-<li>&#x2F;usr&#x2F;sbin&#x2F;：非系统正常运行需要的系统命令</li>
+<li>/sbin：该目录下放置开机过程中需要的命令，包括开机、修复、还原系统等</li>
+<li>/sys：用来挂载虛拟的sys文件系统，可以查看系统信息:比如设备信息</li>
+<li>/tmp：置文件的地方</li>
+<li>/var：放置常态化变动的文件，例如缓存、登录日志文件、软件运行产生的文件等</li>
+<li>/usr：<code>Unix Software Resource</code>，存放可分享的与<strong>不可变动</strong>的数据<ul>
+<li>/bin：绝大部分的用户可使用指令都放在这里(与开机无关)，/bin中的命令跟开机有关</li>
+<li>/include：C/C++的头文件和包含文件</li>
+<li>/lib：库</li>
+<li>/local：系统管理员在本机自行下载的软件</li>
+<li>/usr/src/：源码放置的地方</li>
+<li>/usr/share/：放置共享文件的地方</li>
+<li>/usr/sbin/：非系统正常运行需要的系统命令</li>
 </ul>
 </li>
 </ul>
@@ -660,13 +649,10 @@
 <ul>
 <li><p>举例：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//hello.c</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> ac, <span class="type">char</span>*av[])</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">if</span>(ac &gt;= <span class="number">2</span>)</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;Hello %s\n&quot;</span>, av[<span class="number">1</span>]);</span><br><span class="line">	<span class="keyword">else</span></span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;Hello wrold\n&quot;</span>);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <p>使用如下命令编译并执行，则在当前目录下寻找可执行文件hello：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">gcc hello.c -o hello</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">./hello Krocz</span></span><br></pre></td></tr></table></figure>
-
 <p>如果使用如下命令执行，则会在环境变量保存的所有路径中寻找可执行文件hello：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">hello Krocz</span></span><br></pre></td></tr></table></figure>
-
 <p>可以选择将文件hello放到PATH保存的某个路径中，例如<code>/usr/bin</code>；也可以为环境变量PATH添加新路径</p>
 </li>
 </ul>
@@ -727,7 +713,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2024-01-27 12:44:21" itemprop="dateModified" datetime="2024-01-27T12:44:21+08:00">2024-01-27</time>
+                <time title="修改时间：2024-02-06 10:45:05" itemprop="dateModified" datetime="2024-02-06T10:45:05+08:00">2024-02-06</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -764,9 +750,9 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <p><img src="/../images/DIY%E8%BE%89%E5%85%89%E7%AE%A1%E6%97%B6%E9%92%9F%E8%AE%B0%E5%BD%95/QQ%E5%9B%BE%E7%89%8720240127103711.jpg"></p>
+          <p><img src="../images/DIY辉光管时钟记录/QQ图片20240127103711.jpg" alt></p>
 <h2 id="1-功能"><a href="#1-功能" class="headerlink" title="1.功能"></a>1.功能</h2><ul>
-<li>4位时间&#x2F;日期显示</li>
+<li>4位时间/日期显示</li>
 <li>4位温湿度显示</li>
 <li>蜂鸣器播放歌曲</li>
 <li>WiFi联网时间校正</li>
@@ -981,6 +967,8 @@
 
 
 
+
+  
 
   
 

@@ -20,12 +20,12 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="moremore的三种用法123more filename      &#x2F;&#x2F;分页显示文件内容command | more     &#x2F;&#x2F;将command命令的输出分页显示more &lt; filename    &#x2F;&#x2F;more从标准输入中获取要分页显示的内容，而标准输入被从重定向到filename   enter显示下一行，space显示下一页，q退出 管道命令|将command的输出重定向到more">
+  <meta name="description" content="moremore的三种用法123more filename      &#x2F;&#x2F;分页显示文件内容command | more     &#x2F;&#x2F;将command命令的输出分页显示more &lt; filename    &#x2F;&#x2F;more从标准输入中获取要分页显示的内容，而标准输入被从重定向到filename  enter显示下一行，space显示下一页，q退出 管道命令|将command的输出重定向到more的">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Unix-Linux编程实践教程-章节1笔记">
 <meta property="og:url" content="http://example.com/2023/09/12/Unix-Linux%E7%BC%96%E7%A8%8B%E5%AE%9E%E8%B7%B5%E6%95%99%E7%A8%8B-%E7%AB%A0%E8%8A%821%E7%AC%94%E8%AE%B0/index.html">
 <meta property="og:site_name" content="Krocz&#39;s Blog">
-<meta property="og:description" content="moremore的三种用法123more filename      &#x2F;&#x2F;分页显示文件内容command | more     &#x2F;&#x2F;将command命令的输出分页显示more &lt; filename    &#x2F;&#x2F;more从标准输入中获取要分页显示的内容，而标准输入被从重定向到filename   enter显示下一行，space显示下一页，q退出 管道命令|将command的输出重定向到more">
+<meta property="og:description" content="moremore的三种用法123more filename      &#x2F;&#x2F;分页显示文件内容command | more     &#x2F;&#x2F;将command命令的输出分页显示more &lt; filename    &#x2F;&#x2F;more从标准输入中获取要分页显示的内容，而标准输入被从重定向到filename  enter显示下一行，space显示下一页，q退出 管道命令|将command的输出重定向到more的">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2023-09-12T07:18:52.000Z">
 <meta property="article:modified_time" content="2023-10-23T12:42:31.772Z">
@@ -274,26 +274,23 @@
 
       
         <h2 id="more"><a href="#more" class="headerlink" title="more"></a>more</h2><h3 id="more的三种用法"><a href="#more的三种用法" class="headerlink" title="more的三种用法"></a>more的三种用法</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">more filename      //分页显示文件内容</span><br><span class="line">command | more     //将command命令的输出分页显示</span><br><span class="line">more &lt; filename    //more从标准输入中获取要分页显示的内容，而标准输入被从重定向到filename</span><br></pre></td></tr></table></figure>
-
 <ul>
 <li><code>enter</code>显示下一行，<code>space</code>显示下一页，<code>q</code>退出</li>
 <li>管道命令<code>|</code>将command的输出重定向到more的输入</li>
 </ul>
 <p>例如命令<code>ls /bin | more</code>，ls命令的标准输出重定向到more的标准输入，如果还是使用<code>getchar()</code>来读取用户的输入，那么就会从ls的输出中读取，这显然不行，所以需要其他方式</p>
-<h3 id="dev-tty"><a href="#dev-tty" class="headerlink" title="&#x2F;dev&#x2F;tty"></a>&#x2F;dev&#x2F;tty</h3><p>通过在more命令中打开<code>/dev/tty</code>文件进行读取的方式，使得more可以从其他途径中获取到用户输入</p>
+<h3 id="dev-tty"><a href="#dev-tty" class="headerlink" title="/dev/tty"></a>/dev/tty</h3><p>通过在more命令中打开<code>/dev/tty</code>文件进行读取的方式，使得more可以从其他途径中获取到用户输入</p>
 <ul>
 <li>键盘和显示器的设备描述文件</li>
 <li>向这个文件写相当于显示在用户的屏幕上，读相当于从键盘获得用户的输入</li>
 </ul>
 <h2 id="C函数"><a href="#C函数" class="headerlink" title="C函数"></a>C函数</h2><h3 id="gets"><a href="#gets" class="headerlink" title="gets"></a>gets</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">char</span> *<span class="title function_">gets</span><span class="params">(<span class="type">char</span> *s)</span>;</span><br></pre></td></tr></table></figure>
-
 <ul>
 <li>将读取到内容保存在s中，遇到换行符、文件结尾时读取结束，不会检查输入会溢出s的大小</li>
 <li>该函数于C11已经废弃</li>
 <li>返回值：读取正确返回s,发生错误返回NULL，溢出则什么可能都会发生</li>
 </ul>
 <h3 id="fgets"><a href="#fgets" class="headerlink" title="fgets"></a>fgets</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">fgetc</span><span class="params">(FILE *stream)</span>;</span><br><span class="line"><span class="type">char</span> *<span class="title function_">fgets</span><span class="params">(<span class="type">char</span> *s, <span class="type">int</span> size, FILE *stream)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">getc</span><span class="params">(FILE *stream)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">getchar</span><span class="params">(<span class="type">void</span>)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">ungetc</span><span class="params">(<span class="type">int</span> c, FILE *stream)</span>;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
 <ul>
 <li>fgets:读取到size-1个字符(最后一个位置会填上<code>\0</code>)，遇到换行符，文件结尾时结束</li>
 <li>返回值：<ul>
@@ -303,12 +300,10 @@
 </li>
 </ul>
 <h3 id="fputs"><a href="#fputs" class="headerlink" title="fputs"></a>fputs</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">fputs</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *str, FILE *stream)</span>;</span><br></pre></td></tr></table></figure>
-
 <ul>
 <li>返回值：该函数返回一个非负值，如果发生错误则返回 EOF(-1)。</li>
 </ul>
 <h3 id="fgetc"><a href="#fgetc" class="headerlink" title="fgetc"></a>fgetc</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">fgetc</span><span class="params">(FILE *stream)</span>;</span><br></pre></td></tr></table></figure>
-
 <ul>
 <li>功能是从文件指针指定的文件中读入一个字符，该字符的ASCII值作为函数的返回值。</li>
 <li>若返回值为EOF，说明文件结束。如果发生错误也返回 EOF(-1)</li>
@@ -318,11 +313,7 @@
 <li>参数：string是同时显示的描述信息，例如对于文件操作的代码，可以把文件名作为描述信息传进去</li>
 </ul>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="type">void</span> <span class="title function_">perror</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *s)</span>;</span><br></pre></td></tr></table></figure>
-
-
-
 <h3 id="strtoul"><a href="#strtoul" class="headerlink" title="strtoul"></a>strtoul</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="type">unsigned</span> <span class="type">long</span> <span class="type">int</span> <span class="title function_">strtoul</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *nptr, <span class="type">char</span> **endptr, <span class="type">int</span> base)</span>; </span><br></pre></td></tr></table></figure>
-
 <ul>
 <li><p>该函数尝试将字符串转换为一个无符号长整型</p>
 </li>
@@ -340,15 +331,14 @@
 </li>
 <li><p>示例：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> </span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">const</span> <span class="type">char</span> *str = <span class="string">&quot;12345abcd&quot;</span>;  <span class="comment">// 输入字符串</span></span><br><span class="line">    <span class="type">char</span> *end;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">long</span> <span class="type">int</span> value;</span><br><span class="line">    value = strtoul(str, &amp;end, <span class="number">10</span>);  <span class="comment">// 转换为十进制的无符号长整型</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;转换结果: %lu\n&quot;</span>, value);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;未转换的部分: %s\n&quot;</span>, end);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
 <p>输出：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">转换结果: 12345</span><br><span class="line">未转换的部分: abcd</span><br></pre></td></tr></table></figure></li>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">转换结果: 12345</span><br><span class="line">未转换的部分: abcd</span><br></pre></td></tr></table></figure>
+</li>
 </ul>
 <h2 id="C语言知识复习"><a href="#C语言知识复习" class="headerlink" title="C语言知识复习"></a>C语言知识复习</h2><ul>
 <li>sizeof(string):会计入’\0’</li>
 </ul>
 <h3 id="声明字符串的两种方式"><a href="#声明字符串的两种方式" class="headerlink" title="声明字符串的两种方式"></a>声明字符串的两种方式</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">char</span> *str = <span class="string">&quot;hello wrold&quot;</span>;</span><br><span class="line"><span class="type">char</span> str[] = <span class="string">&quot;hello wrold&quot;</span>;</span><br></pre></td></tr></table></figure>
-
 <ul>
 <li><code>char *str</code>里的str是指针变量,指向一个字符串常量<ul>
 <li><code>sizeof(str)</code>:返回的是指针变量的大小，而不是字符串的长度</li>
@@ -363,8 +353,7 @@
 </ul>
 <h3 id="C语言的内存分配方式"><a href="#C语言的内存分配方式" class="headerlink" title="C语言的内存分配方式"></a>C语言的内存分配方式</h3><p>内存分配可分为三种：<code>静态存储区、栈区、堆区</code>。</p>
 <p>1、静态存储区：该内存在程序编译的时候就已经分配好，这块内存在程序的整个运行期间都存在，它主要存放<code>静态数据、全局数据和常量</code>。<br>2、栈区：它的用途是完成函数的调用。在执行函数时，函数内局部变量及函数参数的存储单元在栈上创建，函数调用结束时这些存储单元自动被释放。<br>3、堆区：程序在运行时使用库函数为变量申请内存，在变量使用结束后再调用库函数释放内存。动态内存的生存期是由我们决定的，如果我们不释放内存，就会导致内存泄漏。</p>
-<h3 id=""><a href="#" class="headerlink" title=""></a></h3><h2 id="linux系统调用"><a href="#linux系统调用" class="headerlink" title="linux系统调用"></a>linux系统调用</h2><h3 id="read"><a href="#read" class="headerlink" title="read"></a>read</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="type">ssize_t</span> <span class="title function_">read</span><span class="params">(<span class="type">int</span> fd, <span class="type">void</span> *buf, <span class="type">size_t</span> count)</span>;</span><br></pre></td></tr></table></figure>
-
+<h3 id=""><a href="#" class="headerlink" title=" "></a> </h3><h2 id="linux系统调用"><a href="#linux系统调用" class="headerlink" title="linux系统调用"></a>linux系统调用</h2><h3 id="read"><a href="#read" class="headerlink" title="read"></a>read</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="type">ssize_t</span> <span class="title function_">read</span><span class="params">(<span class="type">int</span> fd, <span class="type">void</span> *buf, <span class="type">size_t</span> count)</span>;</span><br></pre></td></tr></table></figure>
 <ul>
 <li>返回值：成功则返回读取数量，遇到错误返回-1</li>
 </ul>
@@ -372,12 +361,9 @@
 <li>open()已经逐渐取代了creat()的使用</li>
 </ul>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;fcntl.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">open</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pathname, <span class="type">int</span> flags, <span class="type">mode_t</span> mode)</span>;</span><br></pre></td></tr></table></figure>
-
 <ul>
-<li><p>参数：</p>
-</li>
-<li><p>flags:</p>
-<ul>
+<li>参数：</li>
+<li>flags:<ul>
 <li><code>O_RDONLY</code>, <code>O_WRONLY</code>, <code>O_RDWR</code>，分别对应只读，只写，读写三种；这三个参数应指定其中一个，然后或上可选参数：</li>
 <li><code>O_CREAT</code>若文件不存在则创建它。使用此选项时，<strong>需要同时说明第三个参数mode</strong>，用其说明该新文件的存取许可权限</li>
 <li><code>O_EXCL</code>如果同时指定了<code>O_CREAT</code>，<strong>而文件已经存在，则出错</strong></li>
@@ -389,33 +375,28 @@
 </li>
 <li><p>返回值：成功则返回文件描述符，遇到错误返回-1</p>
 </li>
-<li><p>打开文件可能出错的原因多种多样，具体请查看文档</p>
-</li>
+<li>打开文件可能出错的原因多种多样，具体请查看文档</li>
 </ul>
 <h3 id="close"><a href="#close" class="headerlink" title="close"></a>close</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">close</span><span class="params">(<span class="type">int</span> fd)</span>;</span><br></pre></td></tr></table></figure>
-
 <ul>
 <li>返回值：0表示成功关闭，-1表示出现错误</li>
 </ul>
 <h3 id="ctime"><a href="#ctime" class="headerlink" title="ctime"></a>ctime</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;time.h&gt;</span></span></span><br><span class="line"><span class="type">char</span> *<span class="title function_">ctime</span><span class="params">(<span class="type">const</span> <span class="type">time_t</span> *timep)</span>;</span><br></pre></td></tr></table></figure>
-
 <ul>
 <li>返回值：格式为<code>&quot;Wed Jun 30 21:49:08 1993\n&quot;</code>的字符串</li>
 <li><code>time_t</code>为<code>long int</code>类型</li>
 <li>utmp文件中的<code>ut-&gt;time</code>表示用户从登录时间到初始时间所经过的秒数</li>
 </ul>
 <h3 id="creat"><a href="#creat" class="headerlink" title="creat"></a>creat</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;fcntl.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">creat</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pathname, <span class="type">mode_t</span> mode)</span>;</span><br></pre></td></tr></table></figure>
-
 <ul>
 <li>参数：<ul>
-<li>mode:访问模式,传入三个用户组的权限对于该文件的权限(mode_t应该是unsigned int类型)</li>
+<li>mode:访问模式,传入三个用户组的权限对于该文件的权限(mode_t应该是unsigned int类型) </li>
 </ul>
 </li>
 <li>返回值：成功返回文件描述符，失败返回-1</li>
 <li>没有则创建文件，如果文件存在则它的内容会被清空。</li>
 </ul>
 <h3 id="write"><a href="#write" class="headerlink" title="write"></a>write</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="type">ssize_t</span> <span class="title function_">write</span><span class="params">(<span class="type">int</span> fd, <span class="type">const</span> <span class="type">void</span> *buf, <span class="type">size_t</span> count)</span>;</span><br></pre></td></tr></table></figure>
-
 <ul>
 <li>返回值：成功则返回写入的字节数，失败则返回-1</li>
 <li>为什么写入字节数会少于指定数量：<ul>
@@ -425,7 +406,6 @@
 </li>
 </ul>
 <h3 id="lseek-函数"><a href="#lseek-函数" class="headerlink" title="lseek()函数"></a>lseek()函数</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/type.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="type">off_t</span> oldpos = lseek(<span class="type">int</span> fd , <span class="type">off_t</span> dist , <span class="type">int</span> base)</span><br></pre></td></tr></table></figure>
-
 <ul>
 <li>参数：<ul>
 <li>dist:移动的距离</li>
@@ -436,13 +416,11 @@
 </ul>
 <h3 id="stat-函数"><a href="#stat-函数" class="headerlink" title="stat()函数"></a>stat()函数</h3><p>该函数返回关于一个文件的信息</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/stat.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">stat</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pathname, <span class="keyword">struct</span> stat *statbuf)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">fstat</span><span class="params">(<span class="type">int</span> fd, <span class="keyword">struct</span> stat *statbuf)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">lstat</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *pathname, <span class="keyword">struct</span> stat *statbuf)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 文件属性</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">stat</span> &#123;</span></span><br><span class="line">    <span class="type">dev_t</span>     st_dev;         <span class="comment">/* ID of device containing file */</span></span><br><span class="line">    <span class="type">ino_t</span>     st_ino;         <span class="comment">/* Inode number */</span> 索引编号</span><br><span class="line">    <span class="type">mode_t</span>    st_mode;        <span class="comment">/* File type and mode */</span></span><br><span class="line">    <span class="type">nlink_t</span>   st_nlink;       <span class="comment">/* Number of hard links */</span></span><br><span class="line">    <span class="type">uid_t</span>     st_uid;         <span class="comment">/* User ID of owner */</span></span><br><span class="line">    <span class="type">gid_t</span>     st_gid;         <span class="comment">/* Group ID of owner */</span></span><br><span class="line">    <span class="type">dev_t</span>     st_rdev;        <span class="comment">/* Device ID (if special file) */</span></span><br><span class="line">    <span class="type">off_t</span>     st_size;        <span class="comment">/* Total size, in bytes */</span></span><br><span class="line">    <span class="type">blksize_t</span> st_blksize;     <span class="comment">/* Block size for filesystem I/O */</span></span><br><span class="line">    <span class="type">blkcnt_t</span>  st_blocks;      <span class="comment">/* Number of 512B blocks allocated */</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">/* Since Linux 2.6, the kernel supports nanosecond</span></span><br><span class="line"><span class="comment">        precision for the following timestamp fields.</span></span><br><span class="line"><span class="comment">        For the details before Linux 2.6, see NOTES. */</span></span><br><span class="line"></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">timespec</span> <span class="title">st_atim</span>;</span>  <span class="comment">/* Time of last access */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">timespec</span> <span class="title">st_mtim</span>;</span>  <span class="comment">/* Time of last modification */</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">timespec</span> <span class="title">st_ctim</span>;</span>  <span class="comment">/* Time of last status change */</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> st_atime st_atim.tv_sec      <span class="comment">/* Backward compatibility */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> st_mtime st_mtim.tv_sec</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> st_ctime st_ctim.tv_sec</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">//检查文件类型</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span>	__S_ISTYPE(mode, mask)	(((mode) &amp; __S_IFMT) == (mask))</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span>	S_ISDIR(mode)	 __S_ISTYPE((mode), __S_IFDIR)  <span class="comment">//目录</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span>	S_ISCHR(mode)	 __S_ISTYPE((mode), __S_IFCHR)  <span class="comment">//字符特殊设备</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span>	S_ISBLK(mode)	 __S_ISTYPE((mode), __S_IFBLK)  <span class="comment">//块特殊设备</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span>	S_ISREG(mode)	 __S_ISTYPE((mode), __S_IFREG)  <span class="comment">//普通文件</span></span></span><br></pre></td></tr></table></figure>
-
 <ul>
 <li>返回值：如果成功返回0，否则返回-1，并且<code>error</code>会设置为相应的错误类型</li>
 </ul>
 <h3 id="ioctl"><a href="#ioctl" class="headerlink" title="ioctl()"></a>ioctl()</h3><p>用来操作<strong>底层设备文件的参数</strong>的系统调用。ioctl 的作用非常强大、灵活。不同的驱动程序内部会实现不同的 ioctl，应用可以使用各种 ioctl 跟驱动程序交互：可以传数据给驱动程序，也可以从驱动程序中读出数据。</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/ioctl.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">ioctl</span><span class="params">(<span class="type">int</span> fd, <span class="type">unsigned</span> <span class="type">long</span> request, ...)</span>;</span><br></pre></td></tr></table></figure>
-
 <ul>
 <li>参数：<ul>
 <li>fd 表示文件描述符； </li>
@@ -456,7 +434,6 @@
 </li>
 </ul>
 <h3 id="mmap"><a href="#mmap" class="headerlink" title="mmap()"></a>mmap()</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/mman.h&gt;</span></span></span><br><span class="line"><span class="type">void</span> *<span class="title function_">mmap</span><span class="params">(<span class="type">void</span> *addr, <span class="type">size_t</span> length, <span class="type">int</span> prot, <span class="type">int</span> flags,<span class="type">int</span> fd, <span class="type">off_t</span> offset)</span>;</span><br></pre></td></tr></table></figure>
-
 <ul>
 <li>参数：<ul>
 <li>addr：表示指定映射的內存起始地址，通常设为 NULL 表示让系统自动选定地址，并在成功映射后返回该地址； </li>
@@ -566,7 +543,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#more"><span class="nav-number">1.</span> <span class="nav-text">more</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#more%E7%9A%84%E4%B8%89%E7%A7%8D%E7%94%A8%E6%B3%95"><span class="nav-number">1.1.</span> <span class="nav-text">more的三种用法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#dev-tty"><span class="nav-number">1.2.</span> <span class="nav-text">&#x2F;dev&#x2F;tty</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C%E5%87%BD%E6%95%B0"><span class="nav-number">2.</span> <span class="nav-text">C函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#gets"><span class="nav-number">2.1.</span> <span class="nav-text">gets</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#fgets"><span class="nav-number">2.2.</span> <span class="nav-text">fgets</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#fputs"><span class="nav-number">2.3.</span> <span class="nav-text">fputs</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#fgetc"><span class="nav-number">2.4.</span> <span class="nav-text">fgetc</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#perror"><span class="nav-number">2.5.</span> <span class="nav-text">perror</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#strtoul"><span class="nav-number">2.6.</span> <span class="nav-text">strtoul</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C%E8%AF%AD%E8%A8%80%E7%9F%A5%E8%AF%86%E5%A4%8D%E4%B9%A0"><span class="nav-number">3.</span> <span class="nav-text">C语言知识复习</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A3%B0%E6%98%8E%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9A%84%E4%B8%A4%E7%A7%8D%E6%96%B9%E5%BC%8F"><span class="nav-number">3.1.</span> <span class="nav-text">声明字符串的两种方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#C%E8%AF%AD%E8%A8%80%E7%9A%84%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E6%96%B9%E5%BC%8F"><span class="nav-number">3.2.</span> <span class="nav-text">C语言的内存分配方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.3.</span> <span class="nav-text"></span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8"><span class="nav-number">4.</span> <span class="nav-text">linux系统调用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#read"><span class="nav-number">4.1.</span> <span class="nav-text">read</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#open"><span class="nav-number">4.2.</span> <span class="nav-text">open</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#close"><span class="nav-number">4.3.</span> <span class="nav-text">close</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ctime"><span class="nav-number">4.4.</span> <span class="nav-text">ctime</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#creat"><span class="nav-number">4.5.</span> <span class="nav-text">creat</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#write"><span class="nav-number">4.6.</span> <span class="nav-text">write</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#lseek-%E5%87%BD%E6%95%B0"><span class="nav-number">4.7.</span> <span class="nav-text">lseek()函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#stat-%E5%87%BD%E6%95%B0"><span class="nav-number">4.8.</span> <span class="nav-text">stat()函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ioctl"><span class="nav-number">4.9.</span> <span class="nav-text">ioctl()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#mmap"><span class="nav-number">4.10.</span> <span class="nav-text">mmap()</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#more"><span class="nav-number">1.</span> <span class="nav-text">more</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#more%E7%9A%84%E4%B8%89%E7%A7%8D%E7%94%A8%E6%B3%95"><span class="nav-number">1.1.</span> <span class="nav-text">more的三种用法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#dev-tty"><span class="nav-number">1.2.</span> <span class="nav-text">&#x2F;dev&#x2F;tty</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C%E5%87%BD%E6%95%B0"><span class="nav-number">2.</span> <span class="nav-text">C函数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#gets"><span class="nav-number">2.1.</span> <span class="nav-text">gets</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#fgets"><span class="nav-number">2.2.</span> <span class="nav-text">fgets</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#fputs"><span class="nav-number">2.3.</span> <span class="nav-text">fputs</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#fgetc"><span class="nav-number">2.4.</span> <span class="nav-text">fgetc</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#perror"><span class="nav-number">2.5.</span> <span class="nav-text">perror</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#strtoul"><span class="nav-number">2.6.</span> <span class="nav-text">strtoul</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#C%E8%AF%AD%E8%A8%80%E7%9F%A5%E8%AF%86%E5%A4%8D%E4%B9%A0"><span class="nav-number">3.</span> <span class="nav-text">C语言知识复习</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A3%B0%E6%98%8E%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9A%84%E4%B8%A4%E7%A7%8D%E6%96%B9%E5%BC%8F"><span class="nav-number">3.1.</span> <span class="nav-text">声明字符串的两种方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#C%E8%AF%AD%E8%A8%80%E7%9A%84%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D%E6%96%B9%E5%BC%8F"><span class="nav-number">3.2.</span> <span class="nav-text">C语言的内存分配方式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">3.3.</span> <span class="nav-text"> </span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#linux%E7%B3%BB%E7%BB%9F%E8%B0%83%E7%94%A8"><span class="nav-number">4.</span> <span class="nav-text">linux系统调用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#read"><span class="nav-number">4.1.</span> <span class="nav-text">read</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#open"><span class="nav-number">4.2.</span> <span class="nav-text">open</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#close"><span class="nav-number">4.3.</span> <span class="nav-text">close</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ctime"><span class="nav-number">4.4.</span> <span class="nav-text">ctime</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#creat"><span class="nav-number">4.5.</span> <span class="nav-text">creat</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#write"><span class="nav-number">4.6.</span> <span class="nav-text">write</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#lseek-%E5%87%BD%E6%95%B0"><span class="nav-number">4.7.</span> <span class="nav-text">lseek()函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#stat-%E5%87%BD%E6%95%B0"><span class="nav-number">4.8.</span> <span class="nav-text">stat()函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ioctl"><span class="nav-number">4.9.</span> <span class="nav-text">ioctl()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#mmap"><span class="nav-number">4.10.</span> <span class="nav-text">mmap()</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -688,6 +665,8 @@
 
 
 
+
+  
 
   
 
