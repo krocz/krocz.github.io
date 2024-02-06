@@ -1,56 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>APP读取按键的几种方式</title>
-    <url>/2024/01/07/APP%E8%AF%BB%E5%8F%96%E6%8C%89%E9%94%AE%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F/</url>
-    <content><![CDATA[<h2 id="1app读取按键值"><a class="markdownIt-Anchor" href="#1app读取按键值"></a> 1.APP读取按键值</h2>
-<h3 id="11-app读取按键的-4-种方法"><a class="markdownIt-Anchor" href="#11-app读取按键的-4-种方法"></a> 1.1 APP读取按键的 4 种方法</h3>
-<h4 id="111-查询方式"><a class="markdownIt-Anchor" href="#111-查询方式"></a> 1.1.1 查询方式</h4>
-<p><img src="../images/APP%E8%AF%BB%E5%8F%96%E6%8C%89%E9%94%AE%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F/image-20240102195020502.png" alt="image-20240102195020502" /></p>
-<p>驱动程序中构造、注册一个 file_operations 结构体，里面提供有对应的 open,read 函数。</p>
-<p>APP 调用 open 时，导致驱动中对应的 open 函数被调用，在里面配置 GPIO 为输入引脚。</p>
-<p>APP 调用 read 时，导致驱动中对应的 read 函数被 调用，它读取寄存器，把读取时刻的引脚状态直接返回给 APP。</p>
-<h4 id="112-休眠-唤醒方式"><a class="markdownIt-Anchor" href="#112-休眠-唤醒方式"></a> 1.1.2 休眠-唤醒方式</h4>
-<p><img src="../images/APP%E8%AF%BB%E5%8F%96%E6%8C%89%E9%94%AE%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F/image-20240102195113570.png" alt="image-20240102195113570" /></p>
-<p>驱动程序中构造、注册一个 file_operations 结构体，里面提供有对应的 open,read 函数。</p>
-<ol>
-<li>APP 调用 open 时，导致驱动中对应的 open 函数被调用，在里面配置 GPIO 为输入引脚；并且注册 GPIO 的中断处理函数。</li>
-<li>APP 调用 read 时，导致驱动中对应的 read 函数被调用，如果有按键数据则直接返回给 APP；否则 APP 在内核态休眠。</li>
-</ol>
-<p>当用户按下按键时，GPIO 中断被触发，导致驱动程序之前注册的中断服务程序被执行。它会记录按键数据，并唤醒休眠中的 APP。APP 被唤醒后继续在内核态运行，即继续执行驱动代码，把按键数据返回给 APP(的用户空间)。</p>
-<h4 id="113-poll-方式"><a class="markdownIt-Anchor" href="#113-poll-方式"></a> 1.1.3 poll 方式</h4>
-<p><img src="../images/APP%E8%AF%BB%E5%8F%96%E6%8C%89%E9%94%AE%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F/image-20240102195621091.png" alt="image-20240102195621091" /></p>
-<p>驱动程序中构造、注册一个 file_operations 结构体，里面提供有对应的 open,read,poll 函数。</p>
-<ol>
-<li>APP 调用 open 时，导致驱动中对应的 open 函数被调用，在里面配置 GPIO 为输入引脚；并且注册 GPIO 的中断处理函数。</li>
-<li>APP 调用 poll 或 select 函数，意图是“查询”是否有数据，这 2 个函数都可以指定一个超时时间，即在这段时间内没有数据的话就返回错误。这会导致驱动中对应的 poll 函数被调用，如果有按键数据则直接返回给 APP；否则 APP 在内核态休眠一段时间。</li>
-</ol>
-<p>当用户按下按键时，GPIO 中断被触发，导致驱动程序之前注册的中断服务 程序被执行。它会记录按键数据，并唤醒休眠中的 APP；如果用户没按下按键，但是超时时间到了，内核也会唤醒 APP。被唤醒的 APP 在内核态继续运行，即继续执行驱动代码，把“状态”返回给 APP(的用户空间)。</p>
-<p>APP 得到 poll/select 函数的返回结果后，如果确认是有数据的，则再调 用 read 函数，这会导致驱动中的 read 函数被调用，这时驱动程序中含有数据， 会直接返回数据。</p>
-<h4 id="114-异步通知方式"><a class="markdownIt-Anchor" href="#114-异步通知方式"></a> 1.1.4 异步通知方式</h4>
-<p><img src="../images/APP%E8%AF%BB%E5%8F%96%E6%8C%89%E9%94%AE%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F/image-20240102200346995.png" alt="image-20240102200346995" /></p>
-<p>异步通知的实现原理是：内核给 APP 发信号。信号有很多种，这里发的是 SIGIO。 驱动程序中构造、注册一个 file_operations 结构体，里面提供有对应的 open,read,fasync 函数。</p>
-<ol>
-<li>APP 调用 open 时，导致驱动中对应的 open 函数被调用，在里面配置 GPIO 为输入引脚；并且注册 GPIO 的中断处理函数。</li>
-<li>APP 给信号 SIGIO 注册自己的处理函数：my_signal_fun。</li>
-<li>APP 调用 fcntl 函数，把驱动程序的 flag 改为 FASYNC，这会导致驱动程序的 fasync 函数被调用，它只是简单记录进程 PID。</li>
-<li>当用户按下按键时，GPIO 中断被触发，导致驱动程序之前注册的中断服务程序被执行。它会记录按键数据，然后给进程 PID 发送 SIGIO 信号。</li>
-<li><strong>APP 收到信号后会被打断，先执行信号处理函数：在信号处理函数中可以去调用 read 函数读取按键值。</strong></li>
-<li>信号处理函数返回后，APP 会继续执行原先被打断的代码。</li>
-</ol>
-<h4 id="114-驱动程序提供能力不提供策略"><a class="markdownIt-Anchor" href="#114-驱动程序提供能力不提供策略"></a> 1.1.4 驱动程序提供能力，不提供策略</h4>
-<p>我们的驱动程序可以实现上述 4 种提供按键的方法，但是驱动程序不应该限制 APP 使用哪种方法。</p>
-]]></content>
-      <categories>
-        <category>Linux应用开发</category>
-      </categories>
-      <tags>
-        <tag>嵌入式</tag>
-        <tag>Linux</tag>
-        <tag>C/C++</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>DIY辉光管时钟记录</title>
     <url>/2023/08/31/DIY%E8%BE%89%E5%85%89%E7%AE%A1%E6%97%B6%E9%92%9F%E8%AE%B0%E5%BD%95/</url>
     <content><![CDATA[<p><img src="../images/DIY%E8%BE%89%E5%85%89%E7%AE%A1%E6%97%B6%E9%92%9F%E8%AE%B0%E5%BD%95/QQ%E5%9B%BE%E7%89%8720240127103711.jpg" alt="" /></p>
@@ -447,6 +397,56 @@
 <p>传感器在采集时需要时间,主机发出测量指令（0xAC） 后,延时75毫秒以上再读取转换后的数据并判断返回的状 态位是否正常。若状态比特位[Bit7]为0代表数据可正常读取,为1时传感器为忙状态,主机需要等待数据处理完成。</p>
 <h5 id="代码"><a class="markdownIt-Anchor" href="#代码"></a> 代码</h5>
 <figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;i2cbusses.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;errno.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;i2c/smbus.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/i2c-dev.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/i2c.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/ioctl.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;time.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdint.h&gt;</span></span></span><br><span class="line"><span class="type">const</span> <span class="type">uint32_t</span> N = <span class="number">1</span> &lt;&lt; <span class="number">20</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> **argv)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">char</span> read_buffer[<span class="number">6</span>], dev_addr = <span class="number">0x38</span>;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">i2c_rdwr_ioctl_data</span> <span class="title">rdwr</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">i2c_msg</span> <span class="title">msg</span>;</span></span><br><span class="line">    <span class="type">char</span> filename[<span class="number">20</span>];</span><br><span class="line">    <span class="type">int</span> fd, ret;</span><br><span class="line">    <span class="type">float</span> temper, humid;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> t, h;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (argc != <span class="number">2</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;Usage:\n&quot;</span>);</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;read AHT10: %s &lt;i2c_bus_number&gt; string\n&quot;</span>, argv[<span class="number">0</span>]);</span><br><span class="line">		<span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">	&#125;    </span><br><span class="line">    <span class="comment">// 打开I2C Controller</span></span><br><span class="line">    fd = open_i2c_dev(argv[<span class="number">1</span>][<span class="number">0</span>] - <span class="string">&#x27;0&#x27;</span>, filename, <span class="keyword">sizeof</span>(filename), <span class="number">0</span>);</span><br><span class="line">    <span class="keyword">if</span> (fd &lt; <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;can&#x27;t open %s\n&quot;</span>, filename);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 设置从机地址</span></span><br><span class="line">    <span class="keyword">if</span> (set_slave_addr(fd, dev_addr, <span class="number">0</span>))</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;can&#x27;t set slave address\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//写入传感器触发测量的命令</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">3</span>; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//写入字：先写低8位,再写高8位</span></span><br><span class="line">        ret = i2c_smbus_write_word_data(fd, <span class="number">0xAC</span>, <span class="number">0x33</span>); </span><br><span class="line">        <span class="keyword">if</span> (ret)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;i2c_smbus_write_word_data error\n&quot;</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 循环监测传感器设备是否忙</span></span><br><span class="line">    <span class="keyword">do</span></span><br><span class="line">    &#123;</span><br><span class="line">        ret = i2c_smbus_read_byte(fd);</span><br><span class="line">        <span class="keyword">if</span> (ret &lt; <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;i2c_smbus_read_byte error\n&quot;</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">        &#125; </span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;ret = %d\n&quot;</span>, ret);</span><br><span class="line">    &#125; <span class="keyword">while</span> (ret &amp; <span class="number">0x80</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//通过ioctl函数读取I2C设备文件</span></span><br><span class="line">    msg.addr = dev_addr;</span><br><span class="line">    msg.flags = I2C_M_RD;</span><br><span class="line">    msg.len = <span class="number">6</span>;</span><br><span class="line">    <span class="built_in">memset</span>(read_buffer, <span class="number">0</span>, <span class="keyword">sizeof</span>(read_buffer));</span><br><span class="line">    msg.buf = read_buffer;</span><br><span class="line">    rdwr.msgs = &amp;msg;</span><br><span class="line">    rdwr.nmsgs = <span class="number">1</span>;</span><br><span class="line">    ret = ioctl(fd, I2C_RDWR, &amp;rdwr);</span><br><span class="line">    <span class="keyword">if</span>(ret == <span class="number">-1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        perror(<span class="string">&quot;ioctl_read_error&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//将数据转换为实际温湿度</span></span><br><span class="line">	h = ((<span class="type">uint32_t</span>)read_buffer[<span class="number">1</span>] &lt;&lt; <span class="number">12</span>) | ((<span class="type">uint32_t</span>)read_buffer[<span class="number">2</span>] &lt;&lt; <span class="number">4</span>) | (read_buffer[<span class="number">3</span>] &gt;&gt; <span class="number">4</span>);</span><br><span class="line">	t = ((<span class="type">uint32_t</span>)(read_buffer[<span class="number">3</span>] &amp; <span class="number">0x0f</span>) &lt;&lt; <span class="number">16</span>) | ((<span class="type">uint32_t</span>)read_buffer[<span class="number">4</span>] &lt;&lt; <span class="number">8</span>) | read_buffer[<span class="number">5</span>];</span><br><span class="line">	temper = <span class="number">-50.0</span> + <span class="number">200.0</span> * (<span class="type">float</span>)t / N;</span><br><span class="line">	humid = <span class="number">100.0</span> * h / N;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;temper=%f, humid=%f \n&quot;</span>, temper, humid);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>Linux应用开发</category>
+      </categories>
+      <tags>
+        <tag>嵌入式</tag>
+        <tag>Linux</tag>
+        <tag>C/C++</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>APP读取按键的几种方式</title>
+    <url>/2024/01/07/APP%E8%AF%BB%E5%8F%96%E6%8C%89%E9%94%AE%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F/</url>
+    <content><![CDATA[<h2 id="1app读取按键值"><a class="markdownIt-Anchor" href="#1app读取按键值"></a> 1.APP读取按键值</h2>
+<h3 id="11-app读取按键的-4-种方法"><a class="markdownIt-Anchor" href="#11-app读取按键的-4-种方法"></a> 1.1 APP读取按键的 4 种方法</h3>
+<h4 id="111-查询方式"><a class="markdownIt-Anchor" href="#111-查询方式"></a> 1.1.1 查询方式</h4>
+<p><img src="../images/APP%E8%AF%BB%E5%8F%96%E6%8C%89%E9%94%AE%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F/image-20240102195020502.png" alt="image-20240102195020502" /></p>
+<p>驱动程序中构造、注册一个 file_operations 结构体，里面提供有对应的 open,read 函数。</p>
+<p>APP 调用 open 时，导致驱动中对应的 open 函数被调用，在里面配置 GPIO 为输入引脚。</p>
+<p>APP 调用 read 时，导致驱动中对应的 read 函数被 调用，它读取寄存器，把读取时刻的引脚状态直接返回给 APP。</p>
+<h4 id="112-休眠-唤醒方式"><a class="markdownIt-Anchor" href="#112-休眠-唤醒方式"></a> 1.1.2 休眠-唤醒方式</h4>
+<p><img src="../images/APP%E8%AF%BB%E5%8F%96%E6%8C%89%E9%94%AE%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F/image-20240102195113570.png" alt="image-20240102195113570" /></p>
+<p>驱动程序中构造、注册一个 file_operations 结构体，里面提供有对应的 open,read 函数。</p>
+<ol>
+<li>APP 调用 open 时，导致驱动中对应的 open 函数被调用，在里面配置 GPIO 为输入引脚；并且注册 GPIO 的中断处理函数。</li>
+<li>APP 调用 read 时，导致驱动中对应的 read 函数被调用，如果有按键数据则直接返回给 APP；否则 APP 在内核态休眠。</li>
+</ol>
+<p>当用户按下按键时，GPIO 中断被触发，导致驱动程序之前注册的中断服务程序被执行。它会记录按键数据，并唤醒休眠中的 APP。APP 被唤醒后继续在内核态运行，即继续执行驱动代码，把按键数据返回给 APP(的用户空间)。</p>
+<h4 id="113-poll-方式"><a class="markdownIt-Anchor" href="#113-poll-方式"></a> 1.1.3 poll 方式</h4>
+<p><img src="../images/APP%E8%AF%BB%E5%8F%96%E6%8C%89%E9%94%AE%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F/image-20240102195621091.png" alt="image-20240102195621091" /></p>
+<p>驱动程序中构造、注册一个 file_operations 结构体，里面提供有对应的 open,read,poll 函数。</p>
+<ol>
+<li>APP 调用 open 时，导致驱动中对应的 open 函数被调用，在里面配置 GPIO 为输入引脚；并且注册 GPIO 的中断处理函数。</li>
+<li>APP 调用 poll 或 select 函数，意图是“查询”是否有数据，这 2 个函数都可以指定一个超时时间，即在这段时间内没有数据的话就返回错误。这会导致驱动中对应的 poll 函数被调用，如果有按键数据则直接返回给 APP；否则 APP 在内核态休眠一段时间。</li>
+</ol>
+<p>当用户按下按键时，GPIO 中断被触发，导致驱动程序之前注册的中断服务 程序被执行。它会记录按键数据，并唤醒休眠中的 APP；如果用户没按下按键，但是超时时间到了，内核也会唤醒 APP。被唤醒的 APP 在内核态继续运行，即继续执行驱动代码，把“状态”返回给 APP(的用户空间)。</p>
+<p>APP 得到 poll/select 函数的返回结果后，如果确认是有数据的，则再调 用 read 函数，这会导致驱动中的 read 函数被调用，这时驱动程序中含有数据， 会直接返回数据。</p>
+<h4 id="114-异步通知方式"><a class="markdownIt-Anchor" href="#114-异步通知方式"></a> 1.1.4 异步通知方式</h4>
+<p><img src="../images/APP%E8%AF%BB%E5%8F%96%E6%8C%89%E9%94%AE%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F/image-20240102200346995.png" alt="image-20240102200346995" /></p>
+<p>异步通知的实现原理是：内核给 APP 发信号。信号有很多种，这里发的是 SIGIO。 驱动程序中构造、注册一个 file_operations 结构体，里面提供有对应的 open,read,fasync 函数。</p>
+<ol>
+<li>APP 调用 open 时，导致驱动中对应的 open 函数被调用，在里面配置 GPIO 为输入引脚；并且注册 GPIO 的中断处理函数。</li>
+<li>APP 给信号 SIGIO 注册自己的处理函数：my_signal_fun。</li>
+<li>APP 调用 fcntl 函数，把驱动程序的 flag 改为 FASYNC，这会导致驱动程序的 fasync 函数被调用，它只是简单记录进程 PID。</li>
+<li>当用户按下按键时，GPIO 中断被触发，导致驱动程序之前注册的中断服务程序被执行。它会记录按键数据，然后给进程 PID 发送 SIGIO 信号。</li>
+<li><strong>APP 收到信号后会被打断，先执行信号处理函数：在信号处理函数中可以去调用 read 函数读取按键值。</strong></li>
+<li>信号处理函数返回后，APP 会继续执行原先被打断的代码。</li>
+</ol>
+<h4 id="114-驱动程序提供能力不提供策略"><a class="markdownIt-Anchor" href="#114-驱动程序提供能力不提供策略"></a> 1.1.4 驱动程序提供能力，不提供策略</h4>
+<p>我们的驱动程序可以实现上述 4 种提供按键的方法，但是驱动程序不应该限制 APP 使用哪种方法。</p>
 ]]></content>
       <categories>
         <category>Linux应用开发</category>
@@ -1212,6 +1212,154 @@
       </tags>
   </entry>
   <entry>
+    <title>Pinctrl和GPIO子系统</title>
+    <url>/2024/01/02/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/</url>
+    <content><![CDATA[<h2 id="1-gpio-和-pinctrl-子系统的使用"><a class="markdownIt-Anchor" href="#1-gpio-和-pinctrl-子系统的使用"></a> 1.  GPIO 和 Pinctrl 子系统的使用</h2>
+<p>在 LED 驱动程序中，我们使用寄存器操作的方式来配置硬件，这种方式是非常低效的，对于具有大量寄存器的芯片肯定需要将寄存器操作，可以由芯片厂的BSP工程师来封装成库，然后来让驱动开发人员进行调用，这就是今天引入的 GPIO 和 Pinctrl 子系统。</p>
+<h3 id="11-pinctrl-子系统"><a class="markdownIt-Anchor" href="#11-pinctrl-子系统"></a> 1.1 Pinctrl 子系统</h3>
+<blockquote>
+<p>参考文档：内核目录\Documentation\devicetree\bindings\pinctrl\pinctrl-bindings.txt</p>
+</blockquote>
+<p>Pinctrl 子系统涉及 2 个对象：pin controller、client device。</p>
+<ul>
+<li>pin controller 提供服务，可以用它来复用引脚、配置引脚。</li>
+<li>client device 使用服务，声明自己要使用哪些引脚的哪些功能，怎么配置它们。</li>
+</ul>
+<h4 id="111-pin-controller"><a class="markdownIt-Anchor" href="#111-pin-controller"></a> 1.1.1 pin controller</h4>
+<p>pin controller 是一个软件上的概念，用来复用引脚，还可以配置引脚(比如上下拉电阻等)。</p>
+<blockquote>
+<p>pin controller 和后面讲到的 GPIO Controller 不是一回事，前者控制的引脚可用于 GPIO 功能、I2C 功能；后者只是把引脚配置为输入、输出等简单的功能。</p>
+</blockquote>
+<h4 id="112-client-device"><a class="markdownIt-Anchor" href="#112-client-device"></a> 1.1.2 client device</h4>
+<p>Pinctrl 系统的客户，就是使用引脚的设备，<strong>它在设备树里会被定义为一个节点，在节点里声明要用哪些引脚</strong>。例如：</p>
+<p><img src="../images/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/image-20240102204442724.png" alt="image-20240102204442724" /></p>
+<p>上图中，左边是 pin controller 节点，右边是 client device 节点.</p>
+<h5 id="1-pin-state"><a class="markdownIt-Anchor" href="#1-pin-state"></a> (1) pin state</h5>
+<p>比如对于一个 UART 设备，它有多个“状态”：default、sleep 等，那对应的引脚在设备处于不同状态时也需要配置为不同的模式。例如UART默认状态两个引脚需要配置为输出+输入模式，在休眠模式下节约功耗则可以配置为均输出高电平。</p>
+<h5 id="2-groups-和-function"><a class="markdownIt-Anchor" href="#2-groups-和-function"></a> (2) groups 和 function</h5>
+<p>一个设备会用到一个或多个引脚，这些引脚就可以归为一组(group)；</p>
+<p>这些引脚可以复用为某个功能：function。</p>
+<p>当然：一个设备可以用到多组引脚，比如 A1、A2 两组引脚，A1 组复用为 F1 功能，A2 组复用为 F2 功能。</p>
+<h5 id="3-generic-pin-multiplexing-node-和-generic-pin-configuration-node"><a class="markdownIt-Anchor" href="#3-generic-pin-multiplexing-node-和-generic-pin-configuration-node"></a> (3) Generic pin multiplexing node 和 Generic pin configuration node</h5>
+<p>在上图左边的 pin controller 节点中，一些其他属性可以描述不同的引脚信息，例如，哪组 (group) 引脚配置为哪 个设置功能 (setting)，比如上拉、下拉等。</p>
+<blockquote>
+<p>pin controller 节点的格式，没有统一的标准。每家芯片都不一样。 甚至上面的 group、function 关键字也不一定有，但是概念是有的。</p>
+</blockquote>
+<p>Pinctrl 子系统举例：</p>
+<p><img src="../images/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/image-20240102210056127.png" alt="image-20240102210056127" /></p>
+<h4 id="113-代码中怎么引用-pinctrl"><a class="markdownIt-Anchor" href="#113-代码中怎么引用-pinctrl"></a> 1.1.3 代码中怎么引用 pinctrl</h4>
+<p>基本上驱动程序不用管，当设备切换状态时，对应的 pinctrl 就会被自动调用来切换引脚状态。</p>
+<p>非要调用，也有函数：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">devm_pinctrl_get_select_default(<span class="keyword">struct</span> device *dev); <span class="comment">// 使用&quot;default&quot;状态的引脚</span></span><br><span class="line">pinctrl_get_select(<span class="keyword">struct</span> device *dev, <span class="type">const</span> <span class="type">char</span> *name); <span class="comment">// 根据 name 选择某种状态的引脚</span></span><br></pre></td></tr></table></figure>
+<h3 id="12-gpio-子系统"><a class="markdownIt-Anchor" href="#12-gpio-子系统"></a> 1.2 GPIO 子系统</h3>
+<p>要操作 GPIO 引脚，先把所用引脚配置为 GPIO 功能，这通过 Pinctrl 子系统来实现。</p>
+<p>然后就可以根据设置引脚方向(输入还是输出)，获取引脚电平(读)，设置引脚电平(写)，这通过 GPIO 子系统来实现。</p>
+<h4 id="121-在设备树中指定引脚"><a class="markdownIt-Anchor" href="#121-在设备树中指定引脚"></a> 1.2.1 在设备树中指定引脚</h4>
+<p>几乎所有 ARM 芯片中，GPIO 都分为几组，每组中有若干个引脚。</p>
+<p>所以在使用 GPIO 子系统之前，就要先确定引脚的组别和组内序号</p>
+<p><strong>在设备树中，“GPIO组”就是一个 GPIO Controller</strong>，这通常都由芯片厂家设置好。我们要做的是找到它名字，比如“gpio1”，然后指定要用它里面的哪个引脚，比如&lt;&amp;gpio1 0&gt;。</p>
+<p>下图是一些芯片的 GPIO 控制器节点，它们一般都是厂家定义好，在 xxx.dtsi 文件中：</p>
+<p><img src="../images/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/image-20240102211315432.png" alt="image-20240102211315432" /></p>
+<p>暂时只需要关心里面的这 2 个属性：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">gpio-controller; </span><br><span class="line">#gpio-cells = &lt;2&gt;;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>gpio-controller 表示这个节点是一个 GPIO Controller，它下面有很多引脚。</li>
+<li>#gpio-cells = &lt;2&gt; 表示这个控制器下每一个引脚要用 2 个 32 位的数 (cell)来描述。具体用几个数以及如何表示都可以自己决定；<strong>普遍的用法是，用第 1 个 cell 来表示哪一个引脚，用第 2 个 cell 来表示有效电平</strong>：</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">GPIO_ACTIVE_HIGH: 高电平有效 </span><br><span class="line">GPIO_ACTIVE_LOW : 低电平有效</span><br></pre></td></tr></table></figure>
+<p>片厂来定义 GPIO Controller ，我们如果需要修改设备树文件，只需要引用他们规定的引脚即可：</p>
+<p><img src="../images/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/image-20240102212214670.png" alt="image-20240102212214670" /></p>
+<p>例如上图中，在设备树文件，我们定义的设备节点中直接引用 “gpios” 或者 “xxx-gpios” 属性即可</p>
+<h4 id="122-在驱动代码中调用-gpio-子系统"><a class="markdownIt-Anchor" href="#122-在驱动代码中调用-gpio-子系统"></a> 1.2.2 在驱动代码中调用 GPIO 子系统</h4>
+<p>GPIO 子系统有两套接口：</p>
+<ol>
+<li>基于描述符 - descriptor-based。函数都有前缀 <code>gpiod_</code>，它使用 gpio_desc 结构体来表示 一个引脚；</li>
+<li>过时的接口 - legacy。函数都有前缀 <code>gpio_</code>，它使用一个整数来表示一个引脚。</li>
+</ol>
+<p>要操作一个引脚，首先要 get 引脚，然后设置方向，读值、写值。</p>
+<h5 id="1-常用函数"><a class="markdownIt-Anchor" href="#1-常用函数"></a> (1) 常用函数</h5>
+<p>需包含头文件：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/gpio/consumer.h&gt;</span> <span class="comment">// descriptor-based</span></span></span><br><span class="line">or</span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/gpio.h&gt;</span> <span class="comment">// legacy</span></span></span><br></pre></td></tr></table></figure>
+<p><img src="../images/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/image-20240102213415783.png" alt="image-20240102213415783" /></p>
+<p>有前缀 <code>devm_</code> 的含义是“设备资源管理”(Managed Device Resource)， 这是一种自动释放资源的机制。它的思想是“<strong>资源是属于设备的，设备不存在时资源就可以自动释放</strong>”。</p>
+<p>比如在 Linux 开发过程中，先申请了 GPIO，再申请内存；如果内存申请失败，那么在返回之前就需要先释放 GPIO 资源。如果使用 devm 的相关函数，在内存申请失败时可以直接返回：设备的销毁函数会自动地释放已经申请了的 GPIO 资源。<strong>建议使用<code>devm_</code>版本的相关函数。</strong></p>
+<h5 id="2-使用-descriptor-based-方式获得引脚"><a class="markdownIt-Anchor" href="#2-使用-descriptor-based-方式获得引脚"></a> (2) 使用 descriptor-based 方式获得引脚</h5>
+<p>假设备在设备树中有如下节点：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">foo_device</span><br><span class="line">&#123;</span><br><span class="line">    compatible = &quot;acme,foo&quot;;</span><br><span class="line">    ... </span><br><span class="line">    led-gpios   = &lt;&amp;gpio 15 GPIO_ACTIVE_HIGH&gt;, /* red */</span><br><span class="line">    			  &lt;&amp;gpio 16 GPIO_ACTIVE_HIGH&gt;, /* green */</span><br><span class="line">    			  &lt;&amp;gpio 17 GPIO_ACTIVE_HIGH&gt;; /* blue */</span><br><span class="line">    power-gpios = &lt;&amp;gpio 1 GPIO_ACTIVE_LOW&gt;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>那么可以使用下面的函数获得引脚：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">gpio_desc</span> *<span class="title">red</span>, *<span class="title">green</span>, *<span class="title">blue</span>, *<span class="title">power</span>;</span></span><br><span class="line">red = gpiod_get_index(dev, <span class="string">&quot;led&quot;</span>, <span class="number">0</span>, GPIOD_OUT_HIGH);</span><br><span class="line">green = gpiod_get_index(dev, <span class="string">&quot;led&quot;</span>, <span class="number">1</span>, GPIOD_OUT_HIGH);</span><br><span class="line">blue = gpiod_get_index(dev, <span class="string">&quot;led&quot;</span>, <span class="number">2</span>, GPIOD_OUT_HIGH);</span><br><span class="line">power = gpiod_get(dev, <span class="string">&quot;power&quot;</span>, GPIOD_OUT_HIGH);</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>gpiod_set_value 设置的值是“逻辑值”，不一定等于物理值。之所以使用逻辑值，是为了保持功能代码不变。以LED不同的驱动电路为例，见下图：</p>
+</blockquote>
+<p><img src="../images/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/image-20240103114637359.png" alt="image-20240103114637359" /></p>
+<h5 id="3-使用老的方式获得引脚"><a class="markdownIt-Anchor" href="#3-使用老的方式获得引脚"></a> (3) 使用老的方式获得引脚</h5>
+<p>旧的 <code>gpio_</code> 函数没办法根据设备树信息获得引脚，它需要先知道引脚号。</p>
+<p>在 GPIO 子系统中，每注册一个 GPIO Controller 时会确定它的“base number”，那么这个控制器里的第 n 号引脚的号码就是：base number + n。 但是<strong>如果硬件有变化、设备树有变化，这个 base number 并不能保证是固定的，应该查看 sysfs 来确定 base number。</strong></p>
+<ol>
+<li>
+<p>先在开发板的/sys/class/gpio 目录下，找到各个 gpiochipxxx 目录：</p>
+</li>
+<li>
+<p>然后进入某个 gpiochip 目录，查看文件 label 的内容</p>
+</li>
+<li>
+<p>根据 label 的内容对比设备树。label 内容来自设备树，比如它的寄存器基地址。用来跟设备树(dtsi 文件) 比较，就可以知道这对应哪一个 GPIO Controller。</p>
+<p><img src="../images/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/image-20240103104344564.png" alt="image-20240103104344564" />、</p>
+<p>从图中可以知道 GPIO Controller (gpio4) 对应的基准引脚号是 96，则对于引脚 &quot;GPIO4_IO14&quot;的引脚号为 96 + 14 = 110，可以按照如下操作读取引脚的值：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">echo 110 &gt; /sys/class/gpio/export</span><br><span class="line">echo in &gt; /sys/class/gpio/gpio110/direction</span><br><span class="line">cat /sys/class/gpio/gpio110/value</span><br><span class="line">echo 110 &gt; /sys/class/gpio/unexport</span><br></pre></td></tr></table></figure>
+<p>按照如下操作设置引脚的值：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">echo 110 &gt; /sys/class/gpio/export</span><br><span class="line">echo out &gt; /sys/class/gpio/gpio110/direction</span><br><span class="line">echo 1 &gt; /sys/class/gpio/gpio110/value</span><br><span class="line">echo 110 &gt; /sys/class/gpio/unexport</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<blockquote>
+<p>如果驱动程序已经使用了该引脚，那么将会 export 失败，会提示：write error: Device orr resource busy</p>
+</blockquote>
+<h2 id="2-基于-pinctrl-和-gpio-子系统编写led驱动"><a class="markdownIt-Anchor" href="#2-基于-pinctrl-和-gpio-子系统编写led驱动"></a> 2. 基于 Pinctrl 和 GPIO 子系统编写LED驱动</h2>
+<p>通过使用 Pinctrl 和 GPIO 子系统封装了硬件操作中大量的寄存器设备，使得驱动代码和芯片种类解绑，大大简化了驱动代码的编写。</p>
+<h3 id="21-基于-pinctrl-子系统修改设备树"><a class="markdownIt-Anchor" href="#21-基于-pinctrl-子系统修改设备树"></a> 2.1 基于 Pinctrl 子系统修改设备树</h3>
+<ol>
+<li>有些芯片提供了设备树生成工具，在 GUI 界面中选择引脚功能和配置信息， 就可以自动生成 Pinctrl 子结点。把它复制到你的设备树文件中，再在 client device 结点中引用就可以。</li>
+<li>有些芯片只提供文档，那就去阅读文档，一般在内核源码目录 Documentation\devicetree\bindings\pinctrl 下面，保存有该厂家的文档。</li>
+<li>如果连文档都没有，那只能参考内核源码中的设备树文件，在内核源码目录 arch/arm/boot/dts 目录下。</li>
+</ol>
+<p>IMX6ULL提供了GUI工具，可以在GUI工具中配置引脚的复用和焊盘的相关参数：</p>
+<p><img src="../images/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/image-20240103202925506.png" alt="image-20240103202925506" /></p>
+<p>将生成的 Pinctrl 子节点添加到 dts 文件中：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&amp;iomuxc_snvs &#123;</span><br><span class="line">    pinctrl-names = &quot;default_snvs&quot;;</span><br><span class="line">    pinctrl-0 = &lt;&amp;pinctrl_hog_2&gt;;</span><br><span class="line">    </span><br><span class="line">    imx6ull-board &#123;</span><br><span class="line">    pinctrl-0 = &lt;&amp;pinctrl_krocz_led&gt;;</span><br><span class="line">        pinctrl_krocz_led: krocz_ledgrp &#123;    </span><br><span class="line">            fsl,pins = &lt;</span><br><span class="line">                MX6ULL_PAD_SNVS_TAMPER3__GPIO5_IO03        0x000110E0</span><br><span class="line">            &gt;;</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;;</span><br><span class="line">    </span><br><span class="line">    imx6ul-evk &#123;</span><br><span class="line">        pinctrl_hog_2: hoggrp-2 &#123;</span><br><span class="line">            fsl,pins = &lt;</span><br><span class="line">                MX6ULL_PAD_SNVS_TAMPER9__GPIO5_IO09     0x1b0b0 /* enet1 reset */</span><br><span class="line">                MX6ULL_PAD_SNVS_TAMPER6__GPIO5_IO06     0x1b0b0 /* enet2 reset */</span><br><span class="line">                MX6ULL_PAD_SNVS_TAMPER1__GPIO5_IO01     0x000110A0 /*key 1*/</span><br><span class="line">            &gt;;</span><br><span class="line">        &#125;;</span><br><span class="line">        ...</span><br><span class="line">   &#125;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>PS：我尝试将 pinctrl_krocz_led 节点直接放置在 &amp;iomuxc_snvs 节点下，但是重启开发板之后发现网络连接不上；通过串口连上开发板之后，装载内核驱动模块时报错找不着引脚，不过感觉语法上应该没有问题。之后，将 pinctrl_krocz_led 放置在原有的 imx6ul-evk 或者像GUI生成的那样放在 imx6ull-board 下是可以的，没有问题。</p>
+</blockquote>
+<p>在 dts 中新加入一个设备节点：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">krocz_led &#123;</span><br><span class="line">    compatible = &quot;krocz,leddrv&quot;;               // 和 platform_driver 进行匹配</span><br><span class="line">    pinctrl-names = &quot;default&quot;;                 // 该设备节点可能的状态</span><br><span class="line">    pinctrl-0 = &lt;&amp;pinctrl_krocz_led&gt;;          // 第一种状态使用的 Pinctrl 配置</span><br><span class="line">    myled-gpios = &lt;&amp;gpio5 3 GPIO_ACTIVE_LOW&gt;;  // 设备节点所使用的引脚</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>通过上述代码，我们基于 Pinctrl 子系统设置了 LED 引脚，以及引脚复用功能为 GPIO，并且配置了引脚的相关属性，如上拉电阻阻值，驱动能力，引脚速率等。</p>
+<p>基于 GPIO 子系统设置了 LED 引脚，以及该引脚逻辑电平和物理电平的关系，并可以通过 GPIO 子系统来设置该引脚的方向，读写引脚值等。</p>
+<h3 id="22-通用led驱动代码"><a class="markdownIt-Anchor" href="#22-通用led驱动代码"></a> 2.2 通用LED驱动代码</h3>
+<p>代码的主要部分：</p>
+<ol>
+<li>注册 file_operations</li>
+<li>内核模块的 init 和 exit</li>
+<li>platform_driver 的 probe 和 remove</li>
+</ol>
+<h4 id="221-编写-file_operations"><a class="markdownIt-Anchor" href="#221-编写-file_operations"></a> 2.2.1 编写 file_operations</h4>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">ssize_t</span> <span class="title function_">led_drv_write</span> <span class="params">(<span class="keyword">struct</span> file *file, <span class="type">const</span> <span class="type">char</span> __user *buf, <span class="type">size_t</span> size, <span class="type">loff_t</span> *offset)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">int</span> err;</span><br><span class="line">	<span class="type">char</span> status;</span><br><span class="line">	printk(<span class="string">&quot;%s %s line %d\n&quot;</span>, __FILE__, __FUNCTION__, __LINE__);</span><br><span class="line">	err = copy_from_user(&amp;status, buf, <span class="number">1</span>);</span><br><span class="line">	gpiod_set_value(led_gpio, status);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">led_drv_open</span> <span class="params">(<span class="keyword">struct</span> inode *node, <span class="keyword">struct</span> file *file)</span></span><br><span class="line">&#123;	</span><br><span class="line">	printk(<span class="string">&quot;%s %s line %d\n&quot;</span>, __FILE__, __FUNCTION__, __LINE__);</span><br><span class="line">	gpiod_direction_output(led_gpio, <span class="number">0</span>);   <span class="comment">// 默认写逻辑0，熄灭LED灯</span></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">file_operations</span> <span class="title">led_drv</span> =</span> &#123;</span><br><span class="line">	.owner	 = THIS_MODULE,</span><br><span class="line">	.open    = led_drv_open,</span><br><span class="line">	.write   = led_drv_write,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>基于 Pinctrl 和 GPIO 子系统将芯片寄存器操作封装，使得我们的驱动代码和芯片类型无关，从而使得仅这一个LED驱动代码就可以在任意芯片上通用。在不同的芯片上仅需要修改对应的设备树文件，不需要修改驱动代码文件。</p>
+<h4 id="222-内核模块注册"><a class="markdownIt-Anchor" href="#222-内核模块注册"></a> 2.2.2 内核模块注册</h4>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> __init <span class="title function_">led_init</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> err;</span><br><span class="line">	printk(<span class="string">&quot;%s %s line %d\n&quot;</span>, __FILE__, __FUNCTION__, __LINE__);</span><br><span class="line">    err = platform_driver_register(&amp;chip_demo_gpio_driver); </span><br><span class="line">	<span class="keyword">return</span> err;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> __exit <span class="title function_">led_exit</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">	printk(<span class="string">&quot;%s %s line %d\n&quot;</span>, __FILE__, __FUNCTION__, __LINE__);</span><br><span class="line">    platform_driver_unregister(&amp;chip_demo_gpio_driver);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>主要是注册 platform_driver</p>
+<h4 id="223-设备驱动的注册"><a class="markdownIt-Anchor" href="#223-设备驱动的注册"></a> 2.2.3 设备驱动的注册</h4>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">chip_demo_gpio_probe</span><span class="params">(<span class="keyword">struct</span> platform_device *pdev)</span></span><br><span class="line">&#123;</span><br><span class="line">	printk(<span class="string">&quot;%s %s line %d\n&quot;</span>, __FILE__, __FUNCTION__, __LINE__);</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* 4.1 设备树中定义  myled-gpios=&lt;...&gt;;	*/</span></span><br><span class="line">    <span class="comment">/* device结构体  char*的功能名称    用以GPIO初始化的flags，0表示高电平有效 */</span></span><br><span class="line">    led_gpio = gpiod_get(&amp;pdev-&gt;dev, <span class="string">&quot;myled&quot;</span>, <span class="number">0</span>);</span><br><span class="line">	<span class="keyword">if</span> (IS_ERR(led_gpio)) &#123;</span><br><span class="line">		dev_err(&amp;pdev-&gt;dev, <span class="string">&quot;Failed to get GPIO for led\n&quot;</span>);</span><br><span class="line">		<span class="keyword">return</span> PTR_ERR(led_gpio);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	major = register_chrdev(<span class="number">0</span>, <span class="string">&quot;krocz_led&quot;</span>, &amp;led_drv);  <span class="comment">/* /dev/led */</span></span><br><span class="line">	led_class = class_create(THIS_MODULE, <span class="string">&quot;krocz_led_class&quot;</span>);</span><br><span class="line">	<span class="keyword">if</span> (IS_ERR(led_class)) &#123;</span><br><span class="line">		printk(<span class="string">&quot;%s %s line %d\n&quot;</span>, __FILE__, __FUNCTION__, __LINE__);</span><br><span class="line">		unregister_chrdev(major, <span class="string">&quot;krocz_led&quot;</span>);</span><br><span class="line">		gpiod_put(led_gpio);</span><br><span class="line">		<span class="keyword">return</span> PTR_ERR(led_class);</span><br><span class="line">	&#125;</span><br><span class="line">	device_create(led_class, <span class="literal">NULL</span>, MKDEV(major, <span class="number">0</span>), <span class="literal">NULL</span>, <span class="string">&quot;krocz_led%d&quot;</span>, <span class="number">0</span>); </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">chip_demo_gpio_remove</span><span class="params">(<span class="keyword">struct</span> platform_device *pdev)</span></span><br><span class="line">&#123;</span><br><span class="line">	device_destroy(led_class, MKDEV(major, <span class="number">0</span>));</span><br><span class="line">	class_destroy(led_class);</span><br><span class="line">	unregister_chrdev(major, <span class="string">&quot;krocz_led&quot;</span>);</span><br><span class="line">	gpiod_put(led_gpio);</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>主要获取 GPIO 引脚，注册 file_operations 结构体，创建设备文件等。</p>
+]]></content>
+      <categories>
+        <category>Linux应用开发</category>
+      </categories>
+      <tags>
+        <tag>嵌入式</tag>
+        <tag>Linux</tag>
+        <tag>C/C++</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>UART应用编程</title>
     <url>/2023/10/06/UART%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/</url>
     <content><![CDATA[<h2 id="1tty体系的发展"><a class="markdownIt-Anchor" href="#1tty体系的发展"></a> 1.TTY体系的发展</h2>
@@ -1426,154 +1574,6 @@
 <p>当读取到度分制的经纬度之后，可以通过如下代码将度分制转化为度数浮点数：</p>
 <figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="comment">/* 纬度格式: ddmm.mmmm */</span></span><br><span class="line"><span class="built_in">sscanf</span>(Lat + <span class="number">2</span>, <span class="string">&quot;%f&quot;</span>, &amp;fLat);</span><br><span class="line">fLat = fLat / <span class="number">60</span>;</span><br><span class="line">fLat += (Lat[<span class="number">0</span>] - <span class="string">&#x27;0&#x27;</span>) * <span class="number">10</span> + (Lat[<span class="number">1</span>] - <span class="string">&#x27;0&#x27;</span>);</span><br></pre></td></tr></table></figure>
 <p>至此，完成GPS模块的数据的接收以及解析。</p>
-]]></content>
-      <categories>
-        <category>Linux应用开发</category>
-      </categories>
-      <tags>
-        <tag>嵌入式</tag>
-        <tag>Linux</tag>
-        <tag>C/C++</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Pinctrl和GPIO子系统</title>
-    <url>/2024/01/02/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/</url>
-    <content><![CDATA[<h2 id="1-gpio-和-pinctrl-子系统的使用"><a class="markdownIt-Anchor" href="#1-gpio-和-pinctrl-子系统的使用"></a> 1.  GPIO 和 Pinctrl 子系统的使用</h2>
-<p>在 LED 驱动程序中，我们使用寄存器操作的方式来配置硬件，这种方式是非常低效的，对于具有大量寄存器的芯片肯定需要将寄存器操作，可以由芯片厂的BSP工程师来封装成库，然后来让驱动开发人员进行调用，这就是今天引入的 GPIO 和 Pinctrl 子系统。</p>
-<h3 id="11-pinctrl-子系统"><a class="markdownIt-Anchor" href="#11-pinctrl-子系统"></a> 1.1 Pinctrl 子系统</h3>
-<blockquote>
-<p>参考文档：内核目录\Documentation\devicetree\bindings\pinctrl\pinctrl-bindings.txt</p>
-</blockquote>
-<p>Pinctrl 子系统涉及 2 个对象：pin controller、client device。</p>
-<ul>
-<li>pin controller 提供服务，可以用它来复用引脚、配置引脚。</li>
-<li>client device 使用服务，声明自己要使用哪些引脚的哪些功能，怎么配置它们。</li>
-</ul>
-<h4 id="111-pin-controller"><a class="markdownIt-Anchor" href="#111-pin-controller"></a> 1.1.1 pin controller</h4>
-<p>pin controller 是一个软件上的概念，用来复用引脚，还可以配置引脚(比如上下拉电阻等)。</p>
-<blockquote>
-<p>pin controller 和后面讲到的 GPIO Controller 不是一回事，前者控制的引脚可用于 GPIO 功能、I2C 功能；后者只是把引脚配置为输入、输出等简单的功能。</p>
-</blockquote>
-<h4 id="112-client-device"><a class="markdownIt-Anchor" href="#112-client-device"></a> 1.1.2 client device</h4>
-<p>Pinctrl 系统的客户，就是使用引脚的设备，<strong>它在设备树里会被定义为一个节点，在节点里声明要用哪些引脚</strong>。例如：</p>
-<p><img src="../images/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/image-20240102204442724.png" alt="image-20240102204442724" /></p>
-<p>上图中，左边是 pin controller 节点，右边是 client device 节点.</p>
-<h5 id="1-pin-state"><a class="markdownIt-Anchor" href="#1-pin-state"></a> (1) pin state</h5>
-<p>比如对于一个 UART 设备，它有多个“状态”：default、sleep 等，那对应的引脚在设备处于不同状态时也需要配置为不同的模式。例如UART默认状态两个引脚需要配置为输出+输入模式，在休眠模式下节约功耗则可以配置为均输出高电平。</p>
-<h5 id="2-groups-和-function"><a class="markdownIt-Anchor" href="#2-groups-和-function"></a> (2) groups 和 function</h5>
-<p>一个设备会用到一个或多个引脚，这些引脚就可以归为一组(group)；</p>
-<p>这些引脚可以复用为某个功能：function。</p>
-<p>当然：一个设备可以用到多组引脚，比如 A1、A2 两组引脚，A1 组复用为 F1 功能，A2 组复用为 F2 功能。</p>
-<h5 id="3-generic-pin-multiplexing-node-和-generic-pin-configuration-node"><a class="markdownIt-Anchor" href="#3-generic-pin-multiplexing-node-和-generic-pin-configuration-node"></a> (3) Generic pin multiplexing node 和 Generic pin configuration node</h5>
-<p>在上图左边的 pin controller 节点中，一些其他属性可以描述不同的引脚信息，例如，哪组 (group) 引脚配置为哪 个设置功能 (setting)，比如上拉、下拉等。</p>
-<blockquote>
-<p>pin controller 节点的格式，没有统一的标准。每家芯片都不一样。 甚至上面的 group、function 关键字也不一定有，但是概念是有的。</p>
-</blockquote>
-<p>Pinctrl 子系统举例：</p>
-<p><img src="../images/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/image-20240102210056127.png" alt="image-20240102210056127" /></p>
-<h4 id="113-代码中怎么引用-pinctrl"><a class="markdownIt-Anchor" href="#113-代码中怎么引用-pinctrl"></a> 1.1.3 代码中怎么引用 pinctrl</h4>
-<p>基本上驱动程序不用管，当设备切换状态时，对应的 pinctrl 就会被自动调用来切换引脚状态。</p>
-<p>非要调用，也有函数：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">devm_pinctrl_get_select_default(<span class="keyword">struct</span> device *dev); <span class="comment">// 使用&quot;default&quot;状态的引脚</span></span><br><span class="line">pinctrl_get_select(<span class="keyword">struct</span> device *dev, <span class="type">const</span> <span class="type">char</span> *name); <span class="comment">// 根据 name 选择某种状态的引脚</span></span><br></pre></td></tr></table></figure>
-<h3 id="12-gpio-子系统"><a class="markdownIt-Anchor" href="#12-gpio-子系统"></a> 1.2 GPIO 子系统</h3>
-<p>要操作 GPIO 引脚，先把所用引脚配置为 GPIO 功能，这通过 Pinctrl 子系统来实现。</p>
-<p>然后就可以根据设置引脚方向(输入还是输出)，获取引脚电平(读)，设置引脚电平(写)，这通过 GPIO 子系统来实现。</p>
-<h4 id="121-在设备树中指定引脚"><a class="markdownIt-Anchor" href="#121-在设备树中指定引脚"></a> 1.2.1 在设备树中指定引脚</h4>
-<p>几乎所有 ARM 芯片中，GPIO 都分为几组，每组中有若干个引脚。</p>
-<p>所以在使用 GPIO 子系统之前，就要先确定引脚的组别和组内序号</p>
-<p><strong>在设备树中，“GPIO组”就是一个 GPIO Controller</strong>，这通常都由芯片厂家设置好。我们要做的是找到它名字，比如“gpio1”，然后指定要用它里面的哪个引脚，比如&lt;&amp;gpio1 0&gt;。</p>
-<p>下图是一些芯片的 GPIO 控制器节点，它们一般都是厂家定义好，在 xxx.dtsi 文件中：</p>
-<p><img src="../images/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/image-20240102211315432.png" alt="image-20240102211315432" /></p>
-<p>暂时只需要关心里面的这 2 个属性：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">gpio-controller; </span><br><span class="line">#gpio-cells = &lt;2&gt;;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>gpio-controller 表示这个节点是一个 GPIO Controller，它下面有很多引脚。</li>
-<li>#gpio-cells = &lt;2&gt; 表示这个控制器下每一个引脚要用 2 个 32 位的数 (cell)来描述。具体用几个数以及如何表示都可以自己决定；<strong>普遍的用法是，用第 1 个 cell 来表示哪一个引脚，用第 2 个 cell 来表示有效电平</strong>：</li>
-</ul>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">GPIO_ACTIVE_HIGH: 高电平有效 </span><br><span class="line">GPIO_ACTIVE_LOW : 低电平有效</span><br></pre></td></tr></table></figure>
-<p>片厂来定义 GPIO Controller ，我们如果需要修改设备树文件，只需要引用他们规定的引脚即可：</p>
-<p><img src="../images/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/image-20240102212214670.png" alt="image-20240102212214670" /></p>
-<p>例如上图中，在设备树文件，我们定义的设备节点中直接引用 “gpios” 或者 “xxx-gpios” 属性即可</p>
-<h4 id="122-在驱动代码中调用-gpio-子系统"><a class="markdownIt-Anchor" href="#122-在驱动代码中调用-gpio-子系统"></a> 1.2.2 在驱动代码中调用 GPIO 子系统</h4>
-<p>GPIO 子系统有两套接口：</p>
-<ol>
-<li>基于描述符 - descriptor-based。函数都有前缀 <code>gpiod_</code>，它使用 gpio_desc 结构体来表示 一个引脚；</li>
-<li>过时的接口 - legacy。函数都有前缀 <code>gpio_</code>，它使用一个整数来表示一个引脚。</li>
-</ol>
-<p>要操作一个引脚，首先要 get 引脚，然后设置方向，读值、写值。</p>
-<h5 id="1-常用函数"><a class="markdownIt-Anchor" href="#1-常用函数"></a> (1) 常用函数</h5>
-<p>需包含头文件：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/gpio/consumer.h&gt;</span> <span class="comment">// descriptor-based</span></span></span><br><span class="line">or</span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/gpio.h&gt;</span> <span class="comment">// legacy</span></span></span><br></pre></td></tr></table></figure>
-<p><img src="../images/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/image-20240102213415783.png" alt="image-20240102213415783" /></p>
-<p>有前缀 <code>devm_</code> 的含义是“设备资源管理”(Managed Device Resource)， 这是一种自动释放资源的机制。它的思想是“<strong>资源是属于设备的，设备不存在时资源就可以自动释放</strong>”。</p>
-<p>比如在 Linux 开发过程中，先申请了 GPIO，再申请内存；如果内存申请失败，那么在返回之前就需要先释放 GPIO 资源。如果使用 devm 的相关函数，在内存申请失败时可以直接返回：设备的销毁函数会自动地释放已经申请了的 GPIO 资源。<strong>建议使用<code>devm_</code>版本的相关函数。</strong></p>
-<h5 id="2-使用-descriptor-based-方式获得引脚"><a class="markdownIt-Anchor" href="#2-使用-descriptor-based-方式获得引脚"></a> (2) 使用 descriptor-based 方式获得引脚</h5>
-<p>假设备在设备树中有如下节点：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">foo_device</span><br><span class="line">&#123;</span><br><span class="line">    compatible = &quot;acme,foo&quot;;</span><br><span class="line">    ... </span><br><span class="line">    led-gpios   = &lt;&amp;gpio 15 GPIO_ACTIVE_HIGH&gt;, /* red */</span><br><span class="line">    			  &lt;&amp;gpio 16 GPIO_ACTIVE_HIGH&gt;, /* green */</span><br><span class="line">    			  &lt;&amp;gpio 17 GPIO_ACTIVE_HIGH&gt;; /* blue */</span><br><span class="line">    power-gpios = &lt;&amp;gpio 1 GPIO_ACTIVE_LOW&gt;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<p>那么可以使用下面的函数获得引脚：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">gpio_desc</span> *<span class="title">red</span>, *<span class="title">green</span>, *<span class="title">blue</span>, *<span class="title">power</span>;</span></span><br><span class="line">red = gpiod_get_index(dev, <span class="string">&quot;led&quot;</span>, <span class="number">0</span>, GPIOD_OUT_HIGH);</span><br><span class="line">green = gpiod_get_index(dev, <span class="string">&quot;led&quot;</span>, <span class="number">1</span>, GPIOD_OUT_HIGH);</span><br><span class="line">blue = gpiod_get_index(dev, <span class="string">&quot;led&quot;</span>, <span class="number">2</span>, GPIOD_OUT_HIGH);</span><br><span class="line">power = gpiod_get(dev, <span class="string">&quot;power&quot;</span>, GPIOD_OUT_HIGH);</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>gpiod_set_value 设置的值是“逻辑值”，不一定等于物理值。之所以使用逻辑值，是为了保持功能代码不变。以LED不同的驱动电路为例，见下图：</p>
-</blockquote>
-<p><img src="../images/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/image-20240103114637359.png" alt="image-20240103114637359" /></p>
-<h5 id="3-使用老的方式获得引脚"><a class="markdownIt-Anchor" href="#3-使用老的方式获得引脚"></a> (3) 使用老的方式获得引脚</h5>
-<p>旧的 <code>gpio_</code> 函数没办法根据设备树信息获得引脚，它需要先知道引脚号。</p>
-<p>在 GPIO 子系统中，每注册一个 GPIO Controller 时会确定它的“base number”，那么这个控制器里的第 n 号引脚的号码就是：base number + n。 但是<strong>如果硬件有变化、设备树有变化，这个 base number 并不能保证是固定的，应该查看 sysfs 来确定 base number。</strong></p>
-<ol>
-<li>
-<p>先在开发板的/sys/class/gpio 目录下，找到各个 gpiochipxxx 目录：</p>
-</li>
-<li>
-<p>然后进入某个 gpiochip 目录，查看文件 label 的内容</p>
-</li>
-<li>
-<p>根据 label 的内容对比设备树。label 内容来自设备树，比如它的寄存器基地址。用来跟设备树(dtsi 文件) 比较，就可以知道这对应哪一个 GPIO Controller。</p>
-<p><img src="../images/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/image-20240103104344564.png" alt="image-20240103104344564" />、</p>
-<p>从图中可以知道 GPIO Controller (gpio4) 对应的基准引脚号是 96，则对于引脚 &quot;GPIO4_IO14&quot;的引脚号为 96 + 14 = 110，可以按照如下操作读取引脚的值：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">echo 110 &gt; /sys/class/gpio/export</span><br><span class="line">echo in &gt; /sys/class/gpio/gpio110/direction</span><br><span class="line">cat /sys/class/gpio/gpio110/value</span><br><span class="line">echo 110 &gt; /sys/class/gpio/unexport</span><br></pre></td></tr></table></figure>
-<p>按照如下操作设置引脚的值：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">echo 110 &gt; /sys/class/gpio/export</span><br><span class="line">echo out &gt; /sys/class/gpio/gpio110/direction</span><br><span class="line">echo 1 &gt; /sys/class/gpio/gpio110/value</span><br><span class="line">echo 110 &gt; /sys/class/gpio/unexport</span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<blockquote>
-<p>如果驱动程序已经使用了该引脚，那么将会 export 失败，会提示：write error: Device orr resource busy</p>
-</blockquote>
-<h2 id="2-基于-pinctrl-和-gpio-子系统编写led驱动"><a class="markdownIt-Anchor" href="#2-基于-pinctrl-和-gpio-子系统编写led驱动"></a> 2. 基于 Pinctrl 和 GPIO 子系统编写LED驱动</h2>
-<p>通过使用 Pinctrl 和 GPIO 子系统封装了硬件操作中大量的寄存器设备，使得驱动代码和芯片种类解绑，大大简化了驱动代码的编写。</p>
-<h3 id="21-基于-pinctrl-子系统修改设备树"><a class="markdownIt-Anchor" href="#21-基于-pinctrl-子系统修改设备树"></a> 2.1 基于 Pinctrl 子系统修改设备树</h3>
-<ol>
-<li>有些芯片提供了设备树生成工具，在 GUI 界面中选择引脚功能和配置信息， 就可以自动生成 Pinctrl 子结点。把它复制到你的设备树文件中，再在 client device 结点中引用就可以。</li>
-<li>有些芯片只提供文档，那就去阅读文档，一般在内核源码目录 Documentation\devicetree\bindings\pinctrl 下面，保存有该厂家的文档。</li>
-<li>如果连文档都没有，那只能参考内核源码中的设备树文件，在内核源码目录 arch/arm/boot/dts 目录下。</li>
-</ol>
-<p>IMX6ULL提供了GUI工具，可以在GUI工具中配置引脚的复用和焊盘的相关参数：</p>
-<p><img src="../images/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/image-20240103202925506.png" alt="image-20240103202925506" /></p>
-<p>将生成的 Pinctrl 子节点添加到 dts 文件中：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">&amp;iomuxc_snvs &#123;</span><br><span class="line">    pinctrl-names = &quot;default_snvs&quot;;</span><br><span class="line">    pinctrl-0 = &lt;&amp;pinctrl_hog_2&gt;;</span><br><span class="line">    </span><br><span class="line">    imx6ull-board &#123;</span><br><span class="line">    pinctrl-0 = &lt;&amp;pinctrl_krocz_led&gt;;</span><br><span class="line">        pinctrl_krocz_led: krocz_ledgrp &#123;    </span><br><span class="line">            fsl,pins = &lt;</span><br><span class="line">                MX6ULL_PAD_SNVS_TAMPER3__GPIO5_IO03        0x000110E0</span><br><span class="line">            &gt;;</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;;</span><br><span class="line">    </span><br><span class="line">    imx6ul-evk &#123;</span><br><span class="line">        pinctrl_hog_2: hoggrp-2 &#123;</span><br><span class="line">            fsl,pins = &lt;</span><br><span class="line">                MX6ULL_PAD_SNVS_TAMPER9__GPIO5_IO09     0x1b0b0 /* enet1 reset */</span><br><span class="line">                MX6ULL_PAD_SNVS_TAMPER6__GPIO5_IO06     0x1b0b0 /* enet2 reset */</span><br><span class="line">                MX6ULL_PAD_SNVS_TAMPER1__GPIO5_IO01     0x000110A0 /*key 1*/</span><br><span class="line">            &gt;;</span><br><span class="line">        &#125;;</span><br><span class="line">        ...</span><br><span class="line">   &#125;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<p>PS：我尝试将 pinctrl_krocz_led 节点直接放置在 &amp;iomuxc_snvs 节点下，但是重启开发板之后发现网络连接不上；通过串口连上开发板之后，装载内核驱动模块时报错找不着引脚，不过感觉语法上应该没有问题。之后，将 pinctrl_krocz_led 放置在原有的 imx6ul-evk 或者像GUI生成的那样放在 imx6ull-board 下是可以的，没有问题。</p>
-</blockquote>
-<p>在 dts 中新加入一个设备节点：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">krocz_led &#123;</span><br><span class="line">    compatible = &quot;krocz,leddrv&quot;;               // 和 platform_driver 进行匹配</span><br><span class="line">    pinctrl-names = &quot;default&quot;;                 // 该设备节点可能的状态</span><br><span class="line">    pinctrl-0 = &lt;&amp;pinctrl_krocz_led&gt;;          // 第一种状态使用的 Pinctrl 配置</span><br><span class="line">    myled-gpios = &lt;&amp;gpio5 3 GPIO_ACTIVE_LOW&gt;;  // 设备节点所使用的引脚</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<p>通过上述代码，我们基于 Pinctrl 子系统设置了 LED 引脚，以及引脚复用功能为 GPIO，并且配置了引脚的相关属性，如上拉电阻阻值，驱动能力，引脚速率等。</p>
-<p>基于 GPIO 子系统设置了 LED 引脚，以及该引脚逻辑电平和物理电平的关系，并可以通过 GPIO 子系统来设置该引脚的方向，读写引脚值等。</p>
-<h3 id="22-通用led驱动代码"><a class="markdownIt-Anchor" href="#22-通用led驱动代码"></a> 2.2 通用LED驱动代码</h3>
-<p>代码的主要部分：</p>
-<ol>
-<li>注册 file_operations</li>
-<li>内核模块的 init 和 exit</li>
-<li>platform_driver 的 probe 和 remove</li>
-</ol>
-<h4 id="221-编写-file_operations"><a class="markdownIt-Anchor" href="#221-编写-file_operations"></a> 2.2.1 编写 file_operations</h4>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">ssize_t</span> <span class="title function_">led_drv_write</span> <span class="params">(<span class="keyword">struct</span> file *file, <span class="type">const</span> <span class="type">char</span> __user *buf, <span class="type">size_t</span> size, <span class="type">loff_t</span> *offset)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">int</span> err;</span><br><span class="line">	<span class="type">char</span> status;</span><br><span class="line">	printk(<span class="string">&quot;%s %s line %d\n&quot;</span>, __FILE__, __FUNCTION__, __LINE__);</span><br><span class="line">	err = copy_from_user(&amp;status, buf, <span class="number">1</span>);</span><br><span class="line">	gpiod_set_value(led_gpio, status);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">led_drv_open</span> <span class="params">(<span class="keyword">struct</span> inode *node, <span class="keyword">struct</span> file *file)</span></span><br><span class="line">&#123;	</span><br><span class="line">	printk(<span class="string">&quot;%s %s line %d\n&quot;</span>, __FILE__, __FUNCTION__, __LINE__);</span><br><span class="line">	gpiod_direction_output(led_gpio, <span class="number">0</span>);   <span class="comment">// 默认写逻辑0，熄灭LED灯</span></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">file_operations</span> <span class="title">led_drv</span> =</span> &#123;</span><br><span class="line">	.owner	 = THIS_MODULE,</span><br><span class="line">	.open    = led_drv_open,</span><br><span class="line">	.write   = led_drv_write,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<p>基于 Pinctrl 和 GPIO 子系统将芯片寄存器操作封装，使得我们的驱动代码和芯片类型无关，从而使得仅这一个LED驱动代码就可以在任意芯片上通用。在不同的芯片上仅需要修改对应的设备树文件，不需要修改驱动代码文件。</p>
-<h4 id="222-内核模块注册"><a class="markdownIt-Anchor" href="#222-内核模块注册"></a> 2.2.2 内核模块注册</h4>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> __init <span class="title function_">led_init</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> err;</span><br><span class="line">	printk(<span class="string">&quot;%s %s line %d\n&quot;</span>, __FILE__, __FUNCTION__, __LINE__);</span><br><span class="line">    err = platform_driver_register(&amp;chip_demo_gpio_driver); </span><br><span class="line">	<span class="keyword">return</span> err;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> __exit <span class="title function_">led_exit</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">	printk(<span class="string">&quot;%s %s line %d\n&quot;</span>, __FILE__, __FUNCTION__, __LINE__);</span><br><span class="line">    platform_driver_unregister(&amp;chip_demo_gpio_driver);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>主要是注册 platform_driver</p>
-<h4 id="223-设备驱动的注册"><a class="markdownIt-Anchor" href="#223-设备驱动的注册"></a> 2.2.3 设备驱动的注册</h4>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">chip_demo_gpio_probe</span><span class="params">(<span class="keyword">struct</span> platform_device *pdev)</span></span><br><span class="line">&#123;</span><br><span class="line">	printk(<span class="string">&quot;%s %s line %d\n&quot;</span>, __FILE__, __FUNCTION__, __LINE__);</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* 4.1 设备树中定义  myled-gpios=&lt;...&gt;;	*/</span></span><br><span class="line">    <span class="comment">/* device结构体  char*的功能名称    用以GPIO初始化的flags，0表示高电平有效 */</span></span><br><span class="line">    led_gpio = gpiod_get(&amp;pdev-&gt;dev, <span class="string">&quot;myled&quot;</span>, <span class="number">0</span>);</span><br><span class="line">	<span class="keyword">if</span> (IS_ERR(led_gpio)) &#123;</span><br><span class="line">		dev_err(&amp;pdev-&gt;dev, <span class="string">&quot;Failed to get GPIO for led\n&quot;</span>);</span><br><span class="line">		<span class="keyword">return</span> PTR_ERR(led_gpio);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	major = register_chrdev(<span class="number">0</span>, <span class="string">&quot;krocz_led&quot;</span>, &amp;led_drv);  <span class="comment">/* /dev/led */</span></span><br><span class="line">	led_class = class_create(THIS_MODULE, <span class="string">&quot;krocz_led_class&quot;</span>);</span><br><span class="line">	<span class="keyword">if</span> (IS_ERR(led_class)) &#123;</span><br><span class="line">		printk(<span class="string">&quot;%s %s line %d\n&quot;</span>, __FILE__, __FUNCTION__, __LINE__);</span><br><span class="line">		unregister_chrdev(major, <span class="string">&quot;krocz_led&quot;</span>);</span><br><span class="line">		gpiod_put(led_gpio);</span><br><span class="line">		<span class="keyword">return</span> PTR_ERR(led_class);</span><br><span class="line">	&#125;</span><br><span class="line">	device_create(led_class, <span class="literal">NULL</span>, MKDEV(major, <span class="number">0</span>), <span class="literal">NULL</span>, <span class="string">&quot;krocz_led%d&quot;</span>, <span class="number">0</span>); </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">chip_demo_gpio_remove</span><span class="params">(<span class="keyword">struct</span> platform_device *pdev)</span></span><br><span class="line">&#123;</span><br><span class="line">	device_destroy(led_class, MKDEV(major, <span class="number">0</span>));</span><br><span class="line">	class_destroy(led_class);</span><br><span class="line">	unregister_chrdev(major, <span class="string">&quot;krocz_led&quot;</span>);</span><br><span class="line">	gpiod_put(led_gpio);</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>主要获取 GPIO 引脚，注册 file_operations 结构体，创建设备文件等。</p>
 ]]></content>
       <categories>
         <category>Linux应用开发</category>
@@ -3006,6 +3006,198 @@
       </tags>
   </entry>
   <entry>
+    <title>多线程编程</title>
+    <url>/2023/10/03/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%BC%96%E7%A8%8B/</url>
+    <content><![CDATA[<h2 id="1-线程的标识-pthread_t"><a class="markdownIt-Anchor" href="#1-线程的标识-pthread_t"></a> 1. 线程的标识 pthread_t</h2>
+<p>对于每一个进程都有唯一PID号与之对应，而对于线程而言，也有类似的tid号，即一个pthread_t类型的变量。线程号是表示线程的唯一标识，<strong>但是对于线程号而言，其仅仅在其所属的进程上下文中才有意义。</strong></p>
+<p>获取当前线程的线程号：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span> </span></span><br><span class="line"><span class="type">pthread_t</span> <span class="title function_">pthread_self</span><span class="params">(<span class="type">void</span>)</span>;</span><br></pre></td></tr></table></figure>
+<h2 id="2-线程的创建"><a class="markdownIt-Anchor" href="#2-线程的创建"></a> 2. 线程的创建</h2>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_create</span><span class="params">(<span class="type">pthread_t</span> *thread, <span class="type">const</span> <span class="type">pthread_attr_t</span> *attr,<span class="type">void</span> *(*start_routine) (<span class="type">void</span> *), <span class="type">void</span> *arg)</span>;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>该函数第一个参数为 pthread_t 指针，用来保存新建线程的线程号；</li>
+<li>第二个参数表示了线程的属性，一般传入 NULL 表示默认属性；</li>
+<li>第三个参数是一个函数指针，就是线程执行的函数。这个函数返回值为 void*， 形参为 void*。</li>
+<li>第四个参数则表示为向线程处理函数传入的参数，若不传入，可用 NULL 填充</li>
+</ul>
+<p>示例：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">void</span>* <span class="title function_">my_thread_func</span><span class="params">(<span class="type">void</span>* arg)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;pthread_New = %lu\n&quot;</span>,(<span class="type">unsigned</span> <span class="type">long</span>)pthread_self());<span class="comment">//打印线程的 tid 号</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">pthread_t</span> tid;</span><br><span class="line">    <span class="type">int</span> iRet;</span><br><span class="line"></span><br><span class="line">    iRet = pthread_create(&amp;tid, <span class="literal">NULL</span>, my_thread_func, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="keyword">if</span>(iRet)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;pthread_create err!\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;tid_main = %lu tid_new = %lu \n&quot;</span>,(<span class="type">unsigned</span> <span class="type">long</span>)pthread_self(),(<span class="type">unsigned</span> <span class="type">long</span>)tid);</span><br><span class="line">    sleep(<span class="number">1</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>分配资源是以进程为单位的，调度是以线程为单位的</strong>，上述代码中主线程和创建出的线程执行的顺序是随机调度的</p>
+<h3 id="21-向线程传入参数"><a class="markdownIt-Anchor" href="#21-向线程传入参数"></a> 2.1 向线程传入参数</h3>
+<h4 id="211-值传递和地址传递"><a class="markdownIt-Anchor" href="#211-值传递和地址传递"></a> 2.1.1 值传递和地址传递</h4>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span> </span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span> </span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">void</span>* <span class="title function_">func1</span><span class="params">(<span class="type">void</span>* arg)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">while</span>(<span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%s:a = %d Addr = %p \n&quot;</span>, __FUNCTION__, *(<span class="type">int</span> *)arg, arg);</span><br><span class="line">        sleep(<span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">static</span> <span class="type">void</span>* <span class="title function_">func2</span><span class="params">(<span class="type">void</span>* arg)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">while</span>(<span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%s:a = %ld Addr = %p \n&quot;</span>, __FUNCTION__, (<span class="type">long</span>)arg, arg);</span><br><span class="line">        sleep(<span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> **argv)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">pthread_t</span> tid1, tid2;</span><br><span class="line">    <span class="type">int</span> a = <span class="number">5</span>, iRet;</span><br><span class="line">    iRet = pthread_create(&amp;tid1, <span class="literal">NULL</span>, func1, (<span class="type">void</span> *)&amp;a);</span><br><span class="line">    <span class="keyword">if</span>(iRet != <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Error: pthread_create\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    iRet = pthread_create(&amp;tid2, <span class="literal">NULL</span>, func2, (<span class="type">void</span> *)(<span class="type">long</span>)a);</span><br><span class="line">    <span class="keyword">if</span>(iRet != <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Error: pthread_create\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">while</span> (<span class="number">1</span>) </span><br><span class="line">    &#123;</span><br><span class="line">        a++;</span><br><span class="line">        sleep(<span class="number">1</span>);</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%s:a = %d Addr = %p \n&quot;</span>, __FUNCTION__, a, &amp;a);</span><br><span class="line">    &#125;    </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>func1对应地址传递，比较常用好理解</li>
+<li>func2对应值传递：
+<ul>
+<li><code>pthread_create(&amp;tid2, NULL, func2, (void *)(long)a);</code>：先将a转成long类型(8byte)，则指针<code>void *arg</code>的值为<code>a=5</code>，即指针指向地址5</li>
+<li><code>printf(&quot;%s:a = %d Addr = %p \n&quot;, __FUNCTION__, (int)(long)arg, arg);</code>：指针转换为long类型，值为5。</li>
+</ul>
+</li>
+</ul>
+<p>因此，不难理解，部分输出如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">func1:a = 5 Addr = 0x7fff2dcd2eb0 </span><br><span class="line">func2:a = 5 Addr = 0x5 </span><br><span class="line">main:a = 6 Addr = 0x7fff2dcd2eb0 </span><br><span class="line">func1:a = 7 Addr = 0x7fff2dcd2eb0 </span><br><span class="line">func2:a = 5 Addr = 0x5 </span><br></pre></td></tr></table></figure>
+<h4 id="222-多参数结构体传递"><a class="markdownIt-Anchor" href="#222-多参数结构体传递"></a> 2.2.2 多参数/结构体传递</h4>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span> </span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span> </span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Stu</span>&#123;</span></span><br><span class="line">    <span class="type">int</span> iId;</span><br><span class="line">    <span class="type">char</span> cName[<span class="number">32</span>];</span><br><span class="line">    <span class="type">float</span> fMark;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="type">static</span> <span class="type">void</span>* <span class="title function_">func1</span><span class="params">(<span class="type">void</span>* arg)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">Stu</span> *<span class="title">tmp</span> =</span> (<span class="keyword">struct</span> Stu*)arg;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%s:Id = %d Name = %s Mark = %.2f\n&quot;</span>, __FUNCTION__, tmp-&gt;iId, tmp-&gt;cName, tmp-&gt;fMark);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> **argv)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">pthread_t</span> tid;</span><br><span class="line">    <span class="type">int</span> iRet;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">Stu</span> <span class="title">stu</span> =</span> &#123;<span class="number">1000</span>, <span class="string">&quot;lili&quot;</span>, <span class="number">55</span>&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    iRet = pthread_create(&amp;tid, <span class="literal">NULL</span>, func1, (<span class="type">void</span> *)&amp;stu);</span><br><span class="line">    <span class="keyword">if</span>(iRet != <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Error: pthread_create\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%s:Id = %d Name = %s Mark = %.2f\n&quot;</span>, __FUNCTION__, stu.iId, stu.cName, stu.fMark);</span><br><span class="line">    sleep(<span class="number">1</span>);   </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="3-线程的退出与回收"><a class="markdownIt-Anchor" href="#3-线程的退出与回收"></a> 3. 线程的退出与回收</h2>
+<p>线程的退出情况有三种：</p>
+<ol>
+<li>
+<p>第一种是进程结束，进程中所有的线程也会随之结束。</p>
+</li>
+<li>
+<p>第二种是通过函数 <code>pthread_exit</code> 来主动的退出线程。</p>
+</li>
+<li>
+<p>第三种被其他线程调用 <code>pthread_cancel</code> 来被动退出。</p>
+</li>
+</ol>
+<p>当线程结束后，主线程可以通过函数 <code>pthread_join/pthread_tryjoin_np</code> 来回收线程的资源，并且获得线程结束后需要返回的数据。</p>
+<h3 id="31-线程退出"><a class="markdownIt-Anchor" href="#31-线程退出"></a> 3.1 线程退出</h3>
+<h5 id="1-线程主动退出"><a class="markdownIt-Anchor" href="#1-线程主动退出"></a> (1) 线程主动退出</h5>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">pthread_exit</span><span class="params">(<span class="type">void</span> *retval)</span>;</span><br></pre></td></tr></table></figure>
+<p><code>pthread_exit</code> 函数为线程退出函数，在退出时候可以传递一个 void*类型的数据带给主线程，若选择不传出数据，可将参数填充为 NULL。</p>
+<h5 id="2-线程被动退出"><a class="markdownIt-Anchor" href="#2-线程被动退出"></a> (2) 线程被动退出</h5>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_cancel</span><span class="params">(<span class="type">pthread_t</span> thread)</span>;</span><br></pre></td></tr></table></figure>
+<p>该函数传入一个 tid 号，会强制退出该 tid 所指向的线程，若成功执行会返回 0。</p>
+<p>示例代码：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> _GNU_SOURCE</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span>* <span class="title function_">func1</span><span class="params">(<span class="type">void</span> *arg)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Pthread:1 Come !\n&quot;</span>);</span><br><span class="line">    <span class="keyword">while</span>(<span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        sleep(<span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span>* <span class="title function_">func2</span><span class="params">(<span class="type">void</span> *arg)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Pthread:2 Come !\n&quot;</span>);</span><br><span class="line">    pthread_cancel((<span class="type">pthread_t</span>)arg);</span><br><span class="line">    pthread_exit(<span class="literal">NULL</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> **argv)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">pthread_t</span> tid[<span class="number">2</span>];</span><br><span class="line">    <span class="type">int</span> i, iRet, flag = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    iRet = pthread_create(&amp;tid[<span class="number">0</span>], <span class="literal">NULL</span>, func1, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="keyword">if</span>(iRet)</span><br><span class="line">    &#123;</span><br><span class="line">        perror(<span class="string">&quot;pthread_create&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    iRet = pthread_create(&amp;tid[<span class="number">1</span>], <span class="literal">NULL</span>, func2, (<span class="type">void</span> *)tid[<span class="number">0</span>]);</span><br><span class="line">    <span class="keyword">if</span>(iRet)</span><br><span class="line">    &#123;</span><br><span class="line">        perror(<span class="string">&quot;pthread_create&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span>(<span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">for</span>(i = <span class="number">0</span>; i &lt; <span class="number">2</span>; i++)</span><br><span class="line">            <span class="keyword">if</span>(pthread_tryjoin_np(tid[i], <span class="literal">NULL</span>) == <span class="number">0</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                flag++;</span><br><span class="line">                <span class="built_in">printf</span>(<span class="string">&quot;Pthread:%d back !\n&quot;</span>, i + <span class="number">1</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        <span class="keyword">if</span>(flag == <span class="number">2</span>)  <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>第一个的线程执行死循环睡眠逻辑，理论上除非进程结束，其永远不会结束，但在第二个线程中调用了 <code>pthread_cancel</code> 函数，相当于向该线程发送一个退出的指令，导致线程被退出，最终资源被非阻塞回收掉。</p>
+<h3 id="32-线程资源回收"><a class="markdownIt-Anchor" href="#32-线程资源回收"></a> 3.2 线程资源回收</h3>
+<h5 id="1-线程资源回收阻塞方式"><a class="markdownIt-Anchor" href="#1-线程资源回收阻塞方式"></a> (1) 线程资源回收(阻塞方式)</h5>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_join</span><span class="params">(<span class="type">pthread_t</span> thread, <span class="type">void</span> **retval)</span>;</span><br></pre></td></tr></table></figure>
+<p>该函数为线程回收函数，默认状态为阻塞状态，直到成功回收线程后才返回。第一个参数为要回收线程的 tid 号，第二个参数为线程回收后接受线程传出的数据。</p>
+<h5 id="2-线程资源回收非阻塞方式"><a class="markdownIt-Anchor" href="#2-线程资源回收非阻塞方式"></a> (2) 线程资源回收(非阻塞方式)</h5>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_tryjoin_np</span><span class="params">(<span class="type">pthread_t</span> thread, <span class="type">void</span> **retval)</span>;</span><br></pre></td></tr></table></figure>
+<p>该函数为非阻塞模式回收函数，通过返回值判断是否回收掉线程，成功回收则返回 0，其余参数与 pthread_join 一致。</p>
+<h4 id="323-示例代码"><a class="markdownIt-Anchor" href="#323-示例代码"></a> 3.2.3 示例代码</h4>
+<h5 id="1-示例代码1"><a class="markdownIt-Anchor" href="#1-示例代码1"></a> (1) 示例代码1：</h5>
+<p>通过阻塞方式回收线程资源</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span>* <span class="title function_">func1</span><span class="params">(<span class="type">void</span> *arg)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">static</span> <span class="type">int</span> tmp = <span class="number">0</span>;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%s:a = %d Addr = %p \n&quot;</span>, __FUNCTION__, *(<span class="type">int</span> *)arg, arg);</span><br><span class="line">    tmp =  *(<span class="type">int</span> *) arg + <span class="number">100</span>;</span><br><span class="line">    pthread_exit((<span class="type">void</span> *) &amp;tmp);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> **argv)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">pthread_t</span> tid;</span><br><span class="line">    <span class="type">int</span> iRet, a = <span class="number">100</span>;</span><br><span class="line">    <span class="type">void</span> *vTmp = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">    iRet = pthread_create(&amp;tid, <span class="literal">NULL</span>, func1, (<span class="type">void</span> *)&amp;a);</span><br><span class="line">    <span class="keyword">if</span>(iRet)</span><br><span class="line">    &#123;</span><br><span class="line">        perror(<span class="string">&quot;pthread_create&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    pthread_join(tid, &amp;vTmp);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%s:Addr = %p Val = %d\n&quot;</span>,__FUNCTION__,vTmp,*(<span class="type">int</span> *)vTmp);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h5 id="2-示例代码2"><a class="markdownIt-Anchor" href="#2-示例代码2"></a> (2) 示例代码2：</h5>
+<p>通过非阻塞方式回收线程资源</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> _GNU_SOURCE</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span>* <span class="title function_">func1</span><span class="params">(<span class="type">void</span> *arg)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Pthread:%ld Come !\n&quot;</span>, (<span class="type">long</span>)arg);</span><br><span class="line">    pthread_exit(arg);</span><br><span class="line">   </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> **argv)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">pthread_t</span> tid[<span class="number">3</span>];</span><br><span class="line">    <span class="type">int</span> i, iRet, flag = <span class="number">0</span>;</span><br><span class="line">    <span class="type">void</span> *vTmp = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span>(i = <span class="number">1</span>; i &lt;= <span class="number">3</span>; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        iRet = pthread_create(&amp;tid[i - <span class="number">1</span>], <span class="literal">NULL</span>, func1, (<span class="type">void</span> *)(<span class="type">long</span>)i);</span><br><span class="line">        <span class="keyword">if</span>(iRet)</span><br><span class="line">        &#123;</span><br><span class="line">            perror(<span class="string">&quot;pthread_create&quot;</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">while</span>(<span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">for</span>(i = <span class="number">1</span>; i &lt;= <span class="number">3</span>; i++)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span>(pthread_tryjoin_np(tid[i - <span class="number">1</span>], &amp;vTmp) == <span class="number">0</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                flag++;</span><br><span class="line">                <span class="built_in">printf</span>(<span class="string">&quot;Pthread:%ld back !\n&quot;</span>, (<span class="type">long</span>)vTmp);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(flag == <span class="number">3</span>)</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>通过阻塞方式回收线程几乎规定了线程回收的顺序，若最先回收的线程未退出，则一直会被阻塞，导致后续先退出的线程无法及时的回收。</p>
+<p>通过函数 <code>pthread_tryjoin_np</code>，使用非阻塞回收，线程可以根据退出先后顺序及时进行资源的回收。</p>
+<h2 id="4-线程的控制"><a class="markdownIt-Anchor" href="#4-线程的控制"></a> 4. 线程的控制</h2>
+<h3 id="41-互斥锁"><a class="markdownIt-Anchor" href="#41-互斥锁"></a> 4.1 互斥锁</h3>
+<p>多个线程都要访问某个临界资源，比如某个全局变量时，需要互斥地进行访问。</p>
+<h5 id="1-初始化互斥量"><a class="markdownIt-Anchor" href="#1-初始化互斥量"></a> (1) 初始化互斥量</h5>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_mutex_init</span><span class="params">(<span class="type">phtread_mutex_t</span> *mutex, <span class="type">const</span> <span class="type">pthread_mutexattr_t</span> *<span class="keyword">restrict</span> attr)</span>;</span><br></pre></td></tr></table></figure>
+<p>第一个参数是改互斥量指针，第二个参数为控制互斥量的属性，一般为 NULL。当函数成功后会返回 0，代表初始化互斥量成功。</p>
+<p>互斥量的初始化也可以调用宏快速初始化：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">pthread_mutex_t</span> mutex = PTHREAD_MUTEX_INITALIZER;</span><br></pre></td></tr></table></figure>
+<h5 id="2-互斥量加锁解锁"><a class="markdownIt-Anchor" href="#2-互斥量加锁解锁"></a> (2) 互斥量加锁/解锁</h5>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_mutex_lock</span><span class="params">(<span class="type">pthread_mutex_t</span> *mutex)</span>;     <span class="comment">//阻塞方式</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_mutex_trylock</span><span class="params">(<span class="type">pthread_mutex_t</span> *mutex)</span>;  <span class="comment">//非阻塞方式</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_mutex_unlock</span><span class="params">(<span class="type">pthread_mutex_t</span> *mutex)</span>;</span><br></pre></td></tr></table></figure>
+<p>成功后会返回 0。当某一个线程获得了执行权后，执行 lock 函数，一旦加锁成功后，其余线程遇到 lock 函数时候会发生阻塞，直至获取资源的线程执行 unlock 函数后。 unlock 函数会唤醒其他正在等待互斥量的线程。</p>
+<h5 id="3-销毁互斥量"><a class="markdownIt-Anchor" href="#3-销毁互斥量"></a> (3) 销毁互斥量</h5>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_mutex_destory</span><span class="params">(<span class="type">pthread_mutex_t</span> *mutex)</span>;</span><br></pre></td></tr></table></figure>
+<p>成功后会返回 0。</p>
+<h4 id="411-示例"><a class="markdownIt-Anchor" href="#411-示例"></a> 4.1.1 示例</h4>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> _GNU_SOURCE</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">pthread_mutex_t</span> mutex;  <span class="comment">// 互斥量一般申请全局变量</span></span><br><span class="line"><span class="type">int</span> iNum;               <span class="comment">// 临界变量</span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span>* <span class="title function_">func1</span><span class="params">(<span class="type">void</span> *arg)</span></span><br><span class="line">&#123;</span><br><span class="line">    pthread_mutex_lock(&amp;mutex);</span><br><span class="line">    <span class="keyword">while</span>(iNum &lt; <span class="number">3</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        iNum++;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%s:iNum = %d \n&quot;</span>, __FUNCTION__, iNum);</span><br><span class="line">    &#125;</span><br><span class="line">    pthread_mutex_unlock(&amp;mutex);</span><br><span class="line">    pthread_exit(<span class="literal">NULL</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> **argv)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">pthread_t</span> tid;</span><br><span class="line">    <span class="type">int</span> i, iRet;</span><br><span class="line"></span><br><span class="line">    iRet = pthread_mutex_init(&amp;mutex, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="keyword">if</span>(iRet != <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        perror(<span class="string">&quot;pthread_mutex_init&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    iRet = pthread_create(&amp;tid, <span class="literal">NULL</span>, func1, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="keyword">if</span>(iRet)</span><br><span class="line">    &#123;</span><br><span class="line">        perror(<span class="string">&quot;pthread_create&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    pthread_mutex_lock(&amp;mutex);</span><br><span class="line">    <span class="keyword">while</span>(iNum &gt; <span class="number">-3</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        iNum--;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%s:iNum = %d \n&quot;</span>, __FUNCTION__, iNum);</span><br><span class="line">    &#125;</span><br><span class="line">    pthread_mutex_unlock(&amp;mutex);</span><br><span class="line">    pthread_join(tid, <span class="literal">NULL</span>);        <span class="comment">// 回收线程</span></span><br><span class="line">    pthread_mutex_destroy(&amp;mutex);  <span class="comment">// 销毁互斥量</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="42-信号量"><a class="markdownIt-Anchor" href="#42-信号量"></a> 4.2 信号量</h3>
+<p>信号量跟互斥量不一样，<strong>互斥量用来防止多个线程同时访问某个临界资源</strong>。<strong>信号量起通知作用</strong>，线程 A 在等待某件事，线程 B 完成了这件事后就可以给线程 A 发信号</p>
+<h5 id="1-初始化信号量"><a class="markdownIt-Anchor" href="#1-初始化信号量"></a> (1) 初始化信号量</h5>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;semaphore.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">sem_init</span><span class="params">(<span class="type">sem_t</span> *sem,<span class="type">int</span> pshared,<span class="type">unsigned</span> <span class="type">int</span> value)</span>;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>该函数可以初始化一个信号量，第一个参数传入 sem_t 类型指针；</li>
+<li>第二个参数传入 0 代表线程控制，否则为进程控制；</li>
+<li>第三个参数表示信号量的初始值，0 表示没有资源，正数表示资源的个数，不允许为负数。</li>
+<li>待初始化结束信号量后，若执行成功会返回 0。</li>
+</ul>
+<h5 id="2-信号量pv操作"><a class="markdownIt-Anchor" href="#2-信号量pv操作"></a> (2) 信号量PV操作</h5>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">sem_wait</span><span class="params">(<span class="type">sem_t</span> *sem)</span>;      <span class="comment">// 阻塞方式</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">sem_trywait</span><span class="params">(<span class="type">sem_t</span> *sem)</span>;   <span class="comment">// 非阻塞方式</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">sem_post</span><span class="params">(<span class="type">sem_t</span> *sem)</span>;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>sem_wait</code> 函数作用为检测指定信号量是否有资源可用，若无资源可用会阻塞等待，若有资源可用会自动的执行&quot;sem-1&quot;的操作。所谓的&quot;sem-1&quot;是与上述初始化函数中第三个参数值一致，成功执行会返回 0</li>
+<li><code>sem_trywait</code>：此函数是信号量申请资源的非阻塞函数，功能与 sem_wait 一致。</li>
+<li><code>sem_post</code> 函数会释放指定信号量的资源，执行&quot;sem+1&quot;操作。 通过以上 2 个函数可以完成所谓的 PV 操作，即信号量的申请与释放，完成 对线程执行顺序的控制。</li>
+</ul>
+<h5 id="3-信号量销毁"><a class="markdownIt-Anchor" href="#3-信号量销毁"></a> (3) 信号量销毁</h5>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">sem_destory</span><span class="params">(<span class="type">sem_t</span> *sem)</span>;</span><br></pre></td></tr></table></figure>
+<p>该函数为信号量销毁函数，执行过后可将信号量进行销毁。成功时返回0。</p>
+<h4 id="421-示例代码"><a class="markdownIt-Anchor" href="#421-示例代码"></a> 4.2.1 示例代码</h4>
+<p>通过加入信号量，使得线程的执行顺序变得可控。</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> _GNU_SOURCE</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;semaphore.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">sem_t</span> sem[<span class="number">3</span>];</span><br><span class="line"><span class="type">void</span>* <span class="title function_">func1</span><span class="params">(<span class="type">void</span> *arg)</span></span><br><span class="line">&#123;</span><br><span class="line">    sem_wait(&amp;sem[<span class="number">0</span>]);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%s executed\n&quot;</span>, __FUNCTION__);</span><br><span class="line">    sem_post(&amp;sem[<span class="number">1</span>]);</span><br><span class="line">    pthread_exit(<span class="literal">NULL</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span>* <span class="title function_">func2</span><span class="params">(<span class="type">void</span> *arg)</span></span><br><span class="line">&#123;</span><br><span class="line">    sem_wait(&amp;sem[<span class="number">1</span>]);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%s executed\n&quot;</span>, __FUNCTION__);</span><br><span class="line">    sem_post(&amp;sem[<span class="number">2</span>]);</span><br><span class="line">    pthread_exit(<span class="literal">NULL</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span>* <span class="title function_">func3</span><span class="params">(<span class="type">void</span> *arg)</span></span><br><span class="line">&#123;</span><br><span class="line">    sem_wait(&amp;sem[<span class="number">2</span>]);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%s executed\n&quot;</span>, __FUNCTION__);</span><br><span class="line">    pthread_exit(<span class="literal">NULL</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> **argv)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">pthread_t</span> tid[<span class="number">3</span>];</span><br><span class="line">    <span class="type">int</span> i, iRet, flag = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    sem_init(&amp;sem[<span class="number">0</span>], <span class="number">0</span>, <span class="number">1</span>);   <span class="comment">// 信号量初始化要在线程之前</span></span><br><span class="line">    sem_init(&amp;sem[<span class="number">1</span>], <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">    sem_init(&amp;sem[<span class="number">2</span>], <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">    pthread_create(&amp;tid[<span class="number">0</span>], <span class="literal">NULL</span>, func1, <span class="literal">NULL</span>);</span><br><span class="line">    pthread_create(&amp;tid[<span class="number">1</span>], <span class="literal">NULL</span>, func2, <span class="literal">NULL</span>);</span><br><span class="line">    pthread_create(&amp;tid[<span class="number">2</span>], <span class="literal">NULL</span>, func3, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; <span class="number">3</span>; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        pthread_join(tid[i], <span class="literal">NULL</span>);</span><br><span class="line">        sem_destroy(&amp;sem[i]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="43-条件变量"><a class="markdownIt-Anchor" href="#43-条件变量"></a> 4.3 条件变量</h3>
+<p>条件变量时一种<strong>同步机制</strong>，用来通知其他线程条件满足了。一般是用来通知对方<strong>共享数据</strong>的状态信息，因此条件变量时结合互斥量来使用的。</p>
+<h5 id="1-初始化"><a class="markdownIt-Anchor" href="#1-初始化"></a> (1) 初始化</h5>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_cond_init</span><span class="params">(<span class="type">pthread_cond_t</span> *cond, <span class="type">pthread_condattr_t</span> *cond_attr)</span>;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>该函数可以初始化一个条件变量，第一个参数传入 pthread_cond_t类型指针；</li>
+<li>第二个参数传入控制条件变量的属性，一般为 NULL。</li>
+<li>待初始化结束信号量后，若执行成功会返回 0。</li>
+</ul>
+<p>可以通过如下宏直接初始化条件变量：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">pthread_cond_t</span> cond = PTHREAD_COND_INITIALIZER; </span><br></pre></td></tr></table></figure>
+<h5 id="2-waitsignal"><a class="markdownIt-Anchor" href="#2-waitsignal"></a> (2) wait/signal</h5>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_cond_wait</span><span class="params">(<span class="type">pthread_cond_t</span> *cond, <span class="type">pthread_mutex_t</span> *mutex)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_cond_signal</span><span class="params">(<span class="type">pthread_cond_t</span> *cond)</span>;</span><br></pre></td></tr></table></figure>
+<p><code>pthread_cond_wait</code>函数需要结合互斥量一起使用：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">pthread_mutex_lock(&amp;g_tMutex); </span><br><span class="line"><span class="comment">// 如果条件不满足则，会 unlock g_tMutex </span></span><br><span class="line"><span class="comment">// 条件满足后被唤醒，会 lock g_tMutex </span></span><br><span class="line">pthread_cond_wait(&amp;g_tConVar, &amp;g_tMutex); </span><br><span class="line"><span class="comment">/* ----- 操作临界资源 ----- */</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* -------- End  -------- */</span></span><br><span class="line">pthread_mutex_unlock(&amp;g_tMutex);</span><br></pre></td></tr></table></figure>
+<p>如果条件满足，则继续往下执行；如果条件不满足，则会释放互斥量，阻塞直到条件满足并且可以获得互斥锁时，继续往下执行。</p>
+<h5 id="3-销毁条件变量"><a class="markdownIt-Anchor" href="#3-销毁条件变量"></a> (3) 销毁条件变量</h5>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_cond_destroy</span><span class="params">(<span class="type">pthread_cond_t</span> *cond)</span>;</span><br></pre></td></tr></table></figure>
+<p>成功时返回0。</p>
+<h4 id="431-示例代码"><a class="markdownIt-Anchor" href="#431-示例代码"></a> 4.3.1 示例代码</h4>
+<p>在主线程中从stdin中接收输入，并在创建的线程中进行打印</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;semaphore.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">char</span> g_buf[<span class="number">1000</span>];</span><br><span class="line"><span class="type">static</span> <span class="type">pthread_mutex_t</span> g_tMutex  = PTHREAD_MUTEX_INITIALIZER;</span><br><span class="line"><span class="type">static</span> <span class="type">pthread_cond_t</span>  g_tConVar = PTHREAD_COND_INITIALIZER;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> *<span class="title function_">my_thread_func</span> <span class="params">(<span class="type">void</span> *data)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">while</span> (<span class="number">1</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		pthread_mutex_lock(&amp;g_tMutex);</span><br><span class="line">		pthread_cond_wait(&amp;g_tConVar, &amp;g_tMutex);	</span><br><span class="line"></span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;recv: %s\n&quot;</span>, g_buf);</span><br><span class="line">		pthread_mutex_unlock(&amp;g_tMutex);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> **argv)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">pthread_t</span> tid;</span><br><span class="line">	<span class="type">int</span> ret;</span><br><span class="line">	<span class="type">char</span> buf[<span class="number">1000</span>];</span><br><span class="line">	</span><br><span class="line">	ret = pthread_create(&amp;tid, <span class="literal">NULL</span>, my_thread_func, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">while</span> (<span class="number">1</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		fgets(buf, <span class="number">1000</span>, <span class="built_in">stdin</span>);</span><br><span class="line">		pthread_mutex_lock(&amp;g_tMutex);</span><br><span class="line">		<span class="built_in">memcpy</span>(g_buf, buf, <span class="number">1000</span>);</span><br><span class="line">		pthread_cond_signal(&amp;g_tConVar); <span class="comment">/* 通知接收线程 */</span></span><br><span class="line">		pthread_mutex_unlock(&amp;g_tMutex);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="5总结"><a class="markdownIt-Anchor" href="#5总结"></a> 5.总结</h2>
+<h3 id="51-线程使用流程图"><a class="markdownIt-Anchor" href="#51-线程使用流程图"></a> 5.1 线程使用流程图</h3>
+<p><img src="../images/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%BC%96%E7%A8%8B/image-20231004201228798.png" alt="image-20231004201228798" /></p>
+<h3 id="52-互斥量使用流程图"><a class="markdownIt-Anchor" href="#52-互斥量使用流程图"></a> 5.2 互斥量使用流程图</h3>
+<p><img src="../images/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%BC%96%E7%A8%8B/image-20231004201303646.png" alt="image-20231004201303646" /></p>
+<h3 id="53-信号量使用流程图"><a class="markdownIt-Anchor" href="#53-信号量使用流程图"></a> 5.3 信号量使用流程图</h3>
+<p><img src="../images/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%BC%96%E7%A8%8B/image-20231004201343650.png" alt="image-20231004201343650" /></p>
+]]></content>
+      <categories>
+        <category>Linux应用开发</category>
+      </categories>
+      <tags>
+        <tag>嵌入式</tag>
+        <tag>Linux</tag>
+        <tag>C/C++</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>imx6null-mini开发板</title>
+    <url>/2023/09/05/%E5%BC%80%E5%8F%91%E6%9D%BF/</url>
+    <content><![CDATA[<h2 id="1硬件资源简介"><a class="markdownIt-Anchor" href="#1硬件资源简介"></a> 1.硬件资源简介</h2>
+<p><img src="../images/%E5%BC%80%E5%8F%91%E6%9D%BF/image-20230905203618081.png" alt="image-20230905203618081" /></p>
+<p><img src="../images/%E5%BC%80%E5%8F%91%E6%9D%BF/image-20230905204358901.png" alt="image-20230905204358901" /></p>
+<h2 id="2-启动方式"><a class="markdownIt-Anchor" href="#2-启动方式"></a> 2. 启动方式</h2>
+<p><img src="../images/%E5%BC%80%E5%8F%91%E6%9D%BF/image-20230905204619465.png" alt="image-20230905204619465" /></p>
+<h2 id="3-开发板挂载ubuntu的nfs目录"><a class="markdownIt-Anchor" href="#3-开发板挂载ubuntu的nfs目录"></a> 3. 开发板挂载Ubuntu的NFS目录</h2>
+<h3 id="31-network-file-systemnfs"><a class="markdownIt-Anchor" href="#31-network-file-systemnfs"></a> 3.1 Network File System(NFS)</h3>
+<p>NFS协议基于C/S架构，通过RPC协议进行通信。NFS的最大特点就是将服务端的文件系统目录树映射到客户端，而在客户端访问该 目录树与访问本地文件系统没有任何差别。</p>
+<p><img src="../images/%E5%BC%80%E5%8F%91%E6%9D%BF/image-20230905205227025.png" alt="image-20230905205227025" /></p>
+<h3 id="32-挂载"><a class="markdownIt-Anchor" href="#32-挂载"></a> 3.2 挂载</h3>
+<ol>
+<li>
+<p>Ubuntu开放相关目录的访问权限，即配置  <code>/etc/exports</code>文件</p>
+</li>
+<li>
+<p>Ubuntu启动NFS服务</p>
+</li>
+<li>
+<p>开发板上挂载Ubuntu上的相关目录到本地</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">mount -t nfs -o nolock,vers=3 192.168.5.11:/home/book/nfs_rootfs /mnt</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>mount</code>: 这个命令用于挂载文件系统到指定的目录上。</li>
+<li><code>-t nfs</code>: 该选项指定要挂载的文件系统类型为NFS。</li>
+<li><code>-o nolock,vers=3</code>: 这些选项是用于指定挂载NFS文件系统时的一些选项。<code>nolock</code>选项用于禁用文件锁定机制，而<code>vers=3</code>选项指定使用NFS版本3协议。</li>
+</ul>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>Linux应用开发</category>
+      </categories>
+      <tags>
+        <tag>嵌入式</tag>
+        <tag>Linux</tag>
+        <tag>C/C++</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>使用设备树的LED驱动框架</title>
     <url>/2024/01/02/%E4%BD%BF%E7%94%A8%E8%AE%BE%E5%A4%87%E6%A0%91%E7%9A%84LED%E9%A9%B1%E5%8A%A8%E6%A1%86%E6%9E%B6/</url>
     <content><![CDATA[<h2 id="1-设备树"><a class="markdownIt-Anchor" href="#1-设备树"></a> 1. 设备树</h2>
@@ -3299,198 +3491,6 @@
 <p><img src="../images/%E4%BD%BF%E7%94%A8%E8%AE%BE%E5%A4%87%E6%A0%91%E7%9A%84LED%E9%A9%B1%E5%8A%A8%E6%A1%86%E6%9E%B6/image-20240102115755062.png" alt="image-20240102115755062" /></p>
 <ol start="3">
 <li>运行APP进行测试</li>
-</ol>
-]]></content>
-      <categories>
-        <category>Linux应用开发</category>
-      </categories>
-      <tags>
-        <tag>嵌入式</tag>
-        <tag>Linux</tag>
-        <tag>C/C++</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>多线程编程</title>
-    <url>/2023/10/03/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%BC%96%E7%A8%8B/</url>
-    <content><![CDATA[<h2 id="1-线程的标识-pthread_t"><a class="markdownIt-Anchor" href="#1-线程的标识-pthread_t"></a> 1. 线程的标识 pthread_t</h2>
-<p>对于每一个进程都有唯一PID号与之对应，而对于线程而言，也有类似的tid号，即一个pthread_t类型的变量。线程号是表示线程的唯一标识，<strong>但是对于线程号而言，其仅仅在其所属的进程上下文中才有意义。</strong></p>
-<p>获取当前线程的线程号：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span> </span></span><br><span class="line"><span class="type">pthread_t</span> <span class="title function_">pthread_self</span><span class="params">(<span class="type">void</span>)</span>;</span><br></pre></td></tr></table></figure>
-<h2 id="2-线程的创建"><a class="markdownIt-Anchor" href="#2-线程的创建"></a> 2. 线程的创建</h2>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_create</span><span class="params">(<span class="type">pthread_t</span> *thread, <span class="type">const</span> <span class="type">pthread_attr_t</span> *attr,<span class="type">void</span> *(*start_routine) (<span class="type">void</span> *), <span class="type">void</span> *arg)</span>;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>该函数第一个参数为 pthread_t 指针，用来保存新建线程的线程号；</li>
-<li>第二个参数表示了线程的属性，一般传入 NULL 表示默认属性；</li>
-<li>第三个参数是一个函数指针，就是线程执行的函数。这个函数返回值为 void*， 形参为 void*。</li>
-<li>第四个参数则表示为向线程处理函数传入的参数，若不传入，可用 NULL 填充</li>
-</ul>
-<p>示例：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">void</span>* <span class="title function_">my_thread_func</span><span class="params">(<span class="type">void</span>* arg)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;pthread_New = %lu\n&quot;</span>,(<span class="type">unsigned</span> <span class="type">long</span>)pthread_self());<span class="comment">//打印线程的 tid 号</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">pthread_t</span> tid;</span><br><span class="line">    <span class="type">int</span> iRet;</span><br><span class="line"></span><br><span class="line">    iRet = pthread_create(&amp;tid, <span class="literal">NULL</span>, my_thread_func, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="keyword">if</span>(iRet)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;pthread_create err!\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;tid_main = %lu tid_new = %lu \n&quot;</span>,(<span class="type">unsigned</span> <span class="type">long</span>)pthread_self(),(<span class="type">unsigned</span> <span class="type">long</span>)tid);</span><br><span class="line">    sleep(<span class="number">1</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong>分配资源是以进程为单位的，调度是以线程为单位的</strong>，上述代码中主线程和创建出的线程执行的顺序是随机调度的</p>
-<h3 id="21-向线程传入参数"><a class="markdownIt-Anchor" href="#21-向线程传入参数"></a> 2.1 向线程传入参数</h3>
-<h4 id="211-值传递和地址传递"><a class="markdownIt-Anchor" href="#211-值传递和地址传递"></a> 2.1.1 值传递和地址传递</h4>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span> </span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span> </span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">void</span>* <span class="title function_">func1</span><span class="params">(<span class="type">void</span>* arg)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">while</span>(<span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%s:a = %d Addr = %p \n&quot;</span>, __FUNCTION__, *(<span class="type">int</span> *)arg, arg);</span><br><span class="line">        sleep(<span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">static</span> <span class="type">void</span>* <span class="title function_">func2</span><span class="params">(<span class="type">void</span>* arg)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">while</span>(<span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%s:a = %ld Addr = %p \n&quot;</span>, __FUNCTION__, (<span class="type">long</span>)arg, arg);</span><br><span class="line">        sleep(<span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> **argv)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">pthread_t</span> tid1, tid2;</span><br><span class="line">    <span class="type">int</span> a = <span class="number">5</span>, iRet;</span><br><span class="line">    iRet = pthread_create(&amp;tid1, <span class="literal">NULL</span>, func1, (<span class="type">void</span> *)&amp;a);</span><br><span class="line">    <span class="keyword">if</span>(iRet != <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Error: pthread_create\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    iRet = pthread_create(&amp;tid2, <span class="literal">NULL</span>, func2, (<span class="type">void</span> *)(<span class="type">long</span>)a);</span><br><span class="line">    <span class="keyword">if</span>(iRet != <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Error: pthread_create\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">while</span> (<span class="number">1</span>) </span><br><span class="line">    &#123;</span><br><span class="line">        a++;</span><br><span class="line">        sleep(<span class="number">1</span>);</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%s:a = %d Addr = %p \n&quot;</span>, __FUNCTION__, a, &amp;a);</span><br><span class="line">    &#125;    </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>func1对应地址传递，比较常用好理解</li>
-<li>func2对应值传递：
-<ul>
-<li><code>pthread_create(&amp;tid2, NULL, func2, (void *)(long)a);</code>：先将a转成long类型(8byte)，则指针<code>void *arg</code>的值为<code>a=5</code>，即指针指向地址5</li>
-<li><code>printf(&quot;%s:a = %d Addr = %p \n&quot;, __FUNCTION__, (int)(long)arg, arg);</code>：指针转换为long类型，值为5。</li>
-</ul>
-</li>
-</ul>
-<p>因此，不难理解，部分输出如下：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">func1:a = 5 Addr = 0x7fff2dcd2eb0 </span><br><span class="line">func2:a = 5 Addr = 0x5 </span><br><span class="line">main:a = 6 Addr = 0x7fff2dcd2eb0 </span><br><span class="line">func1:a = 7 Addr = 0x7fff2dcd2eb0 </span><br><span class="line">func2:a = 5 Addr = 0x5 </span><br></pre></td></tr></table></figure>
-<h4 id="222-多参数结构体传递"><a class="markdownIt-Anchor" href="#222-多参数结构体传递"></a> 2.2.2 多参数/结构体传递</h4>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span> </span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span> </span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">Stu</span>&#123;</span></span><br><span class="line">    <span class="type">int</span> iId;</span><br><span class="line">    <span class="type">char</span> cName[<span class="number">32</span>];</span><br><span class="line">    <span class="type">float</span> fMark;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="type">static</span> <span class="type">void</span>* <span class="title function_">func1</span><span class="params">(<span class="type">void</span>* arg)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">Stu</span> *<span class="title">tmp</span> =</span> (<span class="keyword">struct</span> Stu*)arg;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%s:Id = %d Name = %s Mark = %.2f\n&quot;</span>, __FUNCTION__, tmp-&gt;iId, tmp-&gt;cName, tmp-&gt;fMark);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> **argv)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">pthread_t</span> tid;</span><br><span class="line">    <span class="type">int</span> iRet;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">Stu</span> <span class="title">stu</span> =</span> &#123;<span class="number">1000</span>, <span class="string">&quot;lili&quot;</span>, <span class="number">55</span>&#125;;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    iRet = pthread_create(&amp;tid, <span class="literal">NULL</span>, func1, (<span class="type">void</span> *)&amp;stu);</span><br><span class="line">    <span class="keyword">if</span>(iRet != <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;Error: pthread_create\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%s:Id = %d Name = %s Mark = %.2f\n&quot;</span>, __FUNCTION__, stu.iId, stu.cName, stu.fMark);</span><br><span class="line">    sleep(<span class="number">1</span>);   </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="3-线程的退出与回收"><a class="markdownIt-Anchor" href="#3-线程的退出与回收"></a> 3. 线程的退出与回收</h2>
-<p>线程的退出情况有三种：</p>
-<ol>
-<li>
-<p>第一种是进程结束，进程中所有的线程也会随之结束。</p>
-</li>
-<li>
-<p>第二种是通过函数 <code>pthread_exit</code> 来主动的退出线程。</p>
-</li>
-<li>
-<p>第三种被其他线程调用 <code>pthread_cancel</code> 来被动退出。</p>
-</li>
-</ol>
-<p>当线程结束后，主线程可以通过函数 <code>pthread_join/pthread_tryjoin_np</code> 来回收线程的资源，并且获得线程结束后需要返回的数据。</p>
-<h3 id="31-线程退出"><a class="markdownIt-Anchor" href="#31-线程退出"></a> 3.1 线程退出</h3>
-<h5 id="1-线程主动退出"><a class="markdownIt-Anchor" href="#1-线程主动退出"></a> (1) 线程主动退出</h5>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">pthread_exit</span><span class="params">(<span class="type">void</span> *retval)</span>;</span><br></pre></td></tr></table></figure>
-<p><code>pthread_exit</code> 函数为线程退出函数，在退出时候可以传递一个 void*类型的数据带给主线程，若选择不传出数据，可将参数填充为 NULL。</p>
-<h5 id="2-线程被动退出"><a class="markdownIt-Anchor" href="#2-线程被动退出"></a> (2) 线程被动退出</h5>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_cancel</span><span class="params">(<span class="type">pthread_t</span> thread)</span>;</span><br></pre></td></tr></table></figure>
-<p>该函数传入一个 tid 号，会强制退出该 tid 所指向的线程，若成功执行会返回 0。</p>
-<p>示例代码：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> _GNU_SOURCE</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span>* <span class="title function_">func1</span><span class="params">(<span class="type">void</span> *arg)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Pthread:1 Come !\n&quot;</span>);</span><br><span class="line">    <span class="keyword">while</span>(<span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        sleep(<span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span>* <span class="title function_">func2</span><span class="params">(<span class="type">void</span> *arg)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Pthread:2 Come !\n&quot;</span>);</span><br><span class="line">    pthread_cancel((<span class="type">pthread_t</span>)arg);</span><br><span class="line">    pthread_exit(<span class="literal">NULL</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> **argv)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">pthread_t</span> tid[<span class="number">2</span>];</span><br><span class="line">    <span class="type">int</span> i, iRet, flag = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    iRet = pthread_create(&amp;tid[<span class="number">0</span>], <span class="literal">NULL</span>, func1, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="keyword">if</span>(iRet)</span><br><span class="line">    &#123;</span><br><span class="line">        perror(<span class="string">&quot;pthread_create&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    iRet = pthread_create(&amp;tid[<span class="number">1</span>], <span class="literal">NULL</span>, func2, (<span class="type">void</span> *)tid[<span class="number">0</span>]);</span><br><span class="line">    <span class="keyword">if</span>(iRet)</span><br><span class="line">    &#123;</span><br><span class="line">        perror(<span class="string">&quot;pthread_create&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span>(<span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">for</span>(i = <span class="number">0</span>; i &lt; <span class="number">2</span>; i++)</span><br><span class="line">            <span class="keyword">if</span>(pthread_tryjoin_np(tid[i], <span class="literal">NULL</span>) == <span class="number">0</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                flag++;</span><br><span class="line">                <span class="built_in">printf</span>(<span class="string">&quot;Pthread:%d back !\n&quot;</span>, i + <span class="number">1</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        <span class="keyword">if</span>(flag == <span class="number">2</span>)  <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>第一个的线程执行死循环睡眠逻辑，理论上除非进程结束，其永远不会结束，但在第二个线程中调用了 <code>pthread_cancel</code> 函数，相当于向该线程发送一个退出的指令，导致线程被退出，最终资源被非阻塞回收掉。</p>
-<h3 id="32-线程资源回收"><a class="markdownIt-Anchor" href="#32-线程资源回收"></a> 3.2 线程资源回收</h3>
-<h5 id="1-线程资源回收阻塞方式"><a class="markdownIt-Anchor" href="#1-线程资源回收阻塞方式"></a> (1) 线程资源回收(阻塞方式)</h5>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_join</span><span class="params">(<span class="type">pthread_t</span> thread, <span class="type">void</span> **retval)</span>;</span><br></pre></td></tr></table></figure>
-<p>该函数为线程回收函数，默认状态为阻塞状态，直到成功回收线程后才返回。第一个参数为要回收线程的 tid 号，第二个参数为线程回收后接受线程传出的数据。</p>
-<h5 id="2-线程资源回收非阻塞方式"><a class="markdownIt-Anchor" href="#2-线程资源回收非阻塞方式"></a> (2) 线程资源回收(非阻塞方式)</h5>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_tryjoin_np</span><span class="params">(<span class="type">pthread_t</span> thread, <span class="type">void</span> **retval)</span>;</span><br></pre></td></tr></table></figure>
-<p>该函数为非阻塞模式回收函数，通过返回值判断是否回收掉线程，成功回收则返回 0，其余参数与 pthread_join 一致。</p>
-<h4 id="323-示例代码"><a class="markdownIt-Anchor" href="#323-示例代码"></a> 3.2.3 示例代码</h4>
-<h5 id="1-示例代码1"><a class="markdownIt-Anchor" href="#1-示例代码1"></a> (1) 示例代码1：</h5>
-<p>通过阻塞方式回收线程资源</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span>* <span class="title function_">func1</span><span class="params">(<span class="type">void</span> *arg)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">static</span> <span class="type">int</span> tmp = <span class="number">0</span>;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%s:a = %d Addr = %p \n&quot;</span>, __FUNCTION__, *(<span class="type">int</span> *)arg, arg);</span><br><span class="line">    tmp =  *(<span class="type">int</span> *) arg + <span class="number">100</span>;</span><br><span class="line">    pthread_exit((<span class="type">void</span> *) &amp;tmp);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> **argv)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">pthread_t</span> tid;</span><br><span class="line">    <span class="type">int</span> iRet, a = <span class="number">100</span>;</span><br><span class="line">    <span class="type">void</span> *vTmp = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">    iRet = pthread_create(&amp;tid, <span class="literal">NULL</span>, func1, (<span class="type">void</span> *)&amp;a);</span><br><span class="line">    <span class="keyword">if</span>(iRet)</span><br><span class="line">    &#123;</span><br><span class="line">        perror(<span class="string">&quot;pthread_create&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    pthread_join(tid, &amp;vTmp);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%s:Addr = %p Val = %d\n&quot;</span>,__FUNCTION__,vTmp,*(<span class="type">int</span> *)vTmp);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h5 id="2-示例代码2"><a class="markdownIt-Anchor" href="#2-示例代码2"></a> (2) 示例代码2：</h5>
-<p>通过非阻塞方式回收线程资源</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> _GNU_SOURCE</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span>* <span class="title function_">func1</span><span class="params">(<span class="type">void</span> *arg)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;Pthread:%ld Come !\n&quot;</span>, (<span class="type">long</span>)arg);</span><br><span class="line">    pthread_exit(arg);</span><br><span class="line">   </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> **argv)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">pthread_t</span> tid[<span class="number">3</span>];</span><br><span class="line">    <span class="type">int</span> i, iRet, flag = <span class="number">0</span>;</span><br><span class="line">    <span class="type">void</span> *vTmp = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span>(i = <span class="number">1</span>; i &lt;= <span class="number">3</span>; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        iRet = pthread_create(&amp;tid[i - <span class="number">1</span>], <span class="literal">NULL</span>, func1, (<span class="type">void</span> *)(<span class="type">long</span>)i);</span><br><span class="line">        <span class="keyword">if</span>(iRet)</span><br><span class="line">        &#123;</span><br><span class="line">            perror(<span class="string">&quot;pthread_create&quot;</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">while</span>(<span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">for</span>(i = <span class="number">1</span>; i &lt;= <span class="number">3</span>; i++)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span>(pthread_tryjoin_np(tid[i - <span class="number">1</span>], &amp;vTmp) == <span class="number">0</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                flag++;</span><br><span class="line">                <span class="built_in">printf</span>(<span class="string">&quot;Pthread:%ld back !\n&quot;</span>, (<span class="type">long</span>)vTmp);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span>(flag == <span class="number">3</span>)</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>通过阻塞方式回收线程几乎规定了线程回收的顺序，若最先回收的线程未退出，则一直会被阻塞，导致后续先退出的线程无法及时的回收。</p>
-<p>通过函数 <code>pthread_tryjoin_np</code>，使用非阻塞回收，线程可以根据退出先后顺序及时进行资源的回收。</p>
-<h2 id="4-线程的控制"><a class="markdownIt-Anchor" href="#4-线程的控制"></a> 4. 线程的控制</h2>
-<h3 id="41-互斥锁"><a class="markdownIt-Anchor" href="#41-互斥锁"></a> 4.1 互斥锁</h3>
-<p>多个线程都要访问某个临界资源，比如某个全局变量时，需要互斥地进行访问。</p>
-<h5 id="1-初始化互斥量"><a class="markdownIt-Anchor" href="#1-初始化互斥量"></a> (1) 初始化互斥量</h5>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_mutex_init</span><span class="params">(<span class="type">phtread_mutex_t</span> *mutex, <span class="type">const</span> <span class="type">pthread_mutexattr_t</span> *<span class="keyword">restrict</span> attr)</span>;</span><br></pre></td></tr></table></figure>
-<p>第一个参数是改互斥量指针，第二个参数为控制互斥量的属性，一般为 NULL。当函数成功后会返回 0，代表初始化互斥量成功。</p>
-<p>互斥量的初始化也可以调用宏快速初始化：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">pthread_mutex_t</span> mutex = PTHREAD_MUTEX_INITALIZER;</span><br></pre></td></tr></table></figure>
-<h5 id="2-互斥量加锁解锁"><a class="markdownIt-Anchor" href="#2-互斥量加锁解锁"></a> (2) 互斥量加锁/解锁</h5>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_mutex_lock</span><span class="params">(<span class="type">pthread_mutex_t</span> *mutex)</span>;     <span class="comment">//阻塞方式</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_mutex_trylock</span><span class="params">(<span class="type">pthread_mutex_t</span> *mutex)</span>;  <span class="comment">//非阻塞方式</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_mutex_unlock</span><span class="params">(<span class="type">pthread_mutex_t</span> *mutex)</span>;</span><br></pre></td></tr></table></figure>
-<p>成功后会返回 0。当某一个线程获得了执行权后，执行 lock 函数，一旦加锁成功后，其余线程遇到 lock 函数时候会发生阻塞，直至获取资源的线程执行 unlock 函数后。 unlock 函数会唤醒其他正在等待互斥量的线程。</p>
-<h5 id="3-销毁互斥量"><a class="markdownIt-Anchor" href="#3-销毁互斥量"></a> (3) 销毁互斥量</h5>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_mutex_destory</span><span class="params">(<span class="type">pthread_mutex_t</span> *mutex)</span>;</span><br></pre></td></tr></table></figure>
-<p>成功后会返回 0。</p>
-<h4 id="411-示例"><a class="markdownIt-Anchor" href="#411-示例"></a> 4.1.1 示例</h4>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> _GNU_SOURCE</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">pthread_mutex_t</span> mutex;  <span class="comment">// 互斥量一般申请全局变量</span></span><br><span class="line"><span class="type">int</span> iNum;               <span class="comment">// 临界变量</span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span>* <span class="title function_">func1</span><span class="params">(<span class="type">void</span> *arg)</span></span><br><span class="line">&#123;</span><br><span class="line">    pthread_mutex_lock(&amp;mutex);</span><br><span class="line">    <span class="keyword">while</span>(iNum &lt; <span class="number">3</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        iNum++;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%s:iNum = %d \n&quot;</span>, __FUNCTION__, iNum);</span><br><span class="line">    &#125;</span><br><span class="line">    pthread_mutex_unlock(&amp;mutex);</span><br><span class="line">    pthread_exit(<span class="literal">NULL</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> **argv)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">pthread_t</span> tid;</span><br><span class="line">    <span class="type">int</span> i, iRet;</span><br><span class="line"></span><br><span class="line">    iRet = pthread_mutex_init(&amp;mutex, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="keyword">if</span>(iRet != <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        perror(<span class="string">&quot;pthread_mutex_init&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    iRet = pthread_create(&amp;tid, <span class="literal">NULL</span>, func1, <span class="literal">NULL</span>);</span><br><span class="line">    <span class="keyword">if</span>(iRet)</span><br><span class="line">    &#123;</span><br><span class="line">        perror(<span class="string">&quot;pthread_create&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    pthread_mutex_lock(&amp;mutex);</span><br><span class="line">    <span class="keyword">while</span>(iNum &gt; <span class="number">-3</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        iNum--;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%s:iNum = %d \n&quot;</span>, __FUNCTION__, iNum);</span><br><span class="line">    &#125;</span><br><span class="line">    pthread_mutex_unlock(&amp;mutex);</span><br><span class="line">    pthread_join(tid, <span class="literal">NULL</span>);        <span class="comment">// 回收线程</span></span><br><span class="line">    pthread_mutex_destroy(&amp;mutex);  <span class="comment">// 销毁互斥量</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="42-信号量"><a class="markdownIt-Anchor" href="#42-信号量"></a> 4.2 信号量</h3>
-<p>信号量跟互斥量不一样，<strong>互斥量用来防止多个线程同时访问某个临界资源</strong>。<strong>信号量起通知作用</strong>，线程 A 在等待某件事，线程 B 完成了这件事后就可以给线程 A 发信号</p>
-<h5 id="1-初始化信号量"><a class="markdownIt-Anchor" href="#1-初始化信号量"></a> (1) 初始化信号量</h5>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;semaphore.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">sem_init</span><span class="params">(<span class="type">sem_t</span> *sem,<span class="type">int</span> pshared,<span class="type">unsigned</span> <span class="type">int</span> value)</span>;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>该函数可以初始化一个信号量，第一个参数传入 sem_t 类型指针；</li>
-<li>第二个参数传入 0 代表线程控制，否则为进程控制；</li>
-<li>第三个参数表示信号量的初始值，0 表示没有资源，正数表示资源的个数，不允许为负数。</li>
-<li>待初始化结束信号量后，若执行成功会返回 0。</li>
-</ul>
-<h5 id="2-信号量pv操作"><a class="markdownIt-Anchor" href="#2-信号量pv操作"></a> (2) 信号量PV操作</h5>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">sem_wait</span><span class="params">(<span class="type">sem_t</span> *sem)</span>;      <span class="comment">// 阻塞方式</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">sem_trywait</span><span class="params">(<span class="type">sem_t</span> *sem)</span>;   <span class="comment">// 非阻塞方式</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">sem_post</span><span class="params">(<span class="type">sem_t</span> *sem)</span>;</span><br></pre></td></tr></table></figure>
-<ul>
-<li><code>sem_wait</code> 函数作用为检测指定信号量是否有资源可用，若无资源可用会阻塞等待，若有资源可用会自动的执行&quot;sem-1&quot;的操作。所谓的&quot;sem-1&quot;是与上述初始化函数中第三个参数值一致，成功执行会返回 0</li>
-<li><code>sem_trywait</code>：此函数是信号量申请资源的非阻塞函数，功能与 sem_wait 一致。</li>
-<li><code>sem_post</code> 函数会释放指定信号量的资源，执行&quot;sem+1&quot;操作。 通过以上 2 个函数可以完成所谓的 PV 操作，即信号量的申请与释放，完成 对线程执行顺序的控制。</li>
-</ul>
-<h5 id="3-信号量销毁"><a class="markdownIt-Anchor" href="#3-信号量销毁"></a> (3) 信号量销毁</h5>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">sem_destory</span><span class="params">(<span class="type">sem_t</span> *sem)</span>;</span><br></pre></td></tr></table></figure>
-<p>该函数为信号量销毁函数，执行过后可将信号量进行销毁。成功时返回0。</p>
-<h4 id="421-示例代码"><a class="markdownIt-Anchor" href="#421-示例代码"></a> 4.2.1 示例代码</h4>
-<p>通过加入信号量，使得线程的执行顺序变得可控。</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> _GNU_SOURCE</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;semaphore.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">sem_t</span> sem[<span class="number">3</span>];</span><br><span class="line"><span class="type">void</span>* <span class="title function_">func1</span><span class="params">(<span class="type">void</span> *arg)</span></span><br><span class="line">&#123;</span><br><span class="line">    sem_wait(&amp;sem[<span class="number">0</span>]);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%s executed\n&quot;</span>, __FUNCTION__);</span><br><span class="line">    sem_post(&amp;sem[<span class="number">1</span>]);</span><br><span class="line">    pthread_exit(<span class="literal">NULL</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span>* <span class="title function_">func2</span><span class="params">(<span class="type">void</span> *arg)</span></span><br><span class="line">&#123;</span><br><span class="line">    sem_wait(&amp;sem[<span class="number">1</span>]);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%s executed\n&quot;</span>, __FUNCTION__);</span><br><span class="line">    sem_post(&amp;sem[<span class="number">2</span>]);</span><br><span class="line">    pthread_exit(<span class="literal">NULL</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">void</span>* <span class="title function_">func3</span><span class="params">(<span class="type">void</span> *arg)</span></span><br><span class="line">&#123;</span><br><span class="line">    sem_wait(&amp;sem[<span class="number">2</span>]);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%s executed\n&quot;</span>, __FUNCTION__);</span><br><span class="line">    pthread_exit(<span class="literal">NULL</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> **argv)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">pthread_t</span> tid[<span class="number">3</span>];</span><br><span class="line">    <span class="type">int</span> i, iRet, flag = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    sem_init(&amp;sem[<span class="number">0</span>], <span class="number">0</span>, <span class="number">1</span>);   <span class="comment">// 信号量初始化要在线程之前</span></span><br><span class="line">    sem_init(&amp;sem[<span class="number">1</span>], <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">    sem_init(&amp;sem[<span class="number">2</span>], <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">    pthread_create(&amp;tid[<span class="number">0</span>], <span class="literal">NULL</span>, func1, <span class="literal">NULL</span>);</span><br><span class="line">    pthread_create(&amp;tid[<span class="number">1</span>], <span class="literal">NULL</span>, func2, <span class="literal">NULL</span>);</span><br><span class="line">    pthread_create(&amp;tid[<span class="number">2</span>], <span class="literal">NULL</span>, func3, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; <span class="number">3</span>; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        pthread_join(tid[i], <span class="literal">NULL</span>);</span><br><span class="line">        sem_destroy(&amp;sem[i]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="43-条件变量"><a class="markdownIt-Anchor" href="#43-条件变量"></a> 4.3 条件变量</h3>
-<p>条件变量时一种<strong>同步机制</strong>，用来通知其他线程条件满足了。一般是用来通知对方<strong>共享数据</strong>的状态信息，因此条件变量时结合互斥量来使用的。</p>
-<h5 id="1-初始化"><a class="markdownIt-Anchor" href="#1-初始化"></a> (1) 初始化</h5>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_cond_init</span><span class="params">(<span class="type">pthread_cond_t</span> *cond, <span class="type">pthread_condattr_t</span> *cond_attr)</span>;</span><br></pre></td></tr></table></figure>
-<ul>
-<li>该函数可以初始化一个条件变量，第一个参数传入 pthread_cond_t类型指针；</li>
-<li>第二个参数传入控制条件变量的属性，一般为 NULL。</li>
-<li>待初始化结束信号量后，若执行成功会返回 0。</li>
-</ul>
-<p>可以通过如下宏直接初始化条件变量：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">pthread_cond_t</span> cond = PTHREAD_COND_INITIALIZER; </span><br></pre></td></tr></table></figure>
-<h5 id="2-waitsignal"><a class="markdownIt-Anchor" href="#2-waitsignal"></a> (2) wait/signal</h5>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_cond_wait</span><span class="params">(<span class="type">pthread_cond_t</span> *cond, <span class="type">pthread_mutex_t</span> *mutex)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pthread_cond_signal</span><span class="params">(<span class="type">pthread_cond_t</span> *cond)</span>;</span><br></pre></td></tr></table></figure>
-<p><code>pthread_cond_wait</code>函数需要结合互斥量一起使用：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">pthread_mutex_lock(&amp;g_tMutex); </span><br><span class="line"><span class="comment">// 如果条件不满足则，会 unlock g_tMutex </span></span><br><span class="line"><span class="comment">// 条件满足后被唤醒，会 lock g_tMutex </span></span><br><span class="line">pthread_cond_wait(&amp;g_tConVar, &amp;g_tMutex); </span><br><span class="line"><span class="comment">/* ----- 操作临界资源 ----- */</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* -------- End  -------- */</span></span><br><span class="line">pthread_mutex_unlock(&amp;g_tMutex);</span><br></pre></td></tr></table></figure>
-<p>如果条件满足，则继续往下执行；如果条件不满足，则会释放互斥量，阻塞直到条件满足并且可以获得互斥锁时，继续往下执行。</p>
-<h5 id="3-销毁条件变量"><a class="markdownIt-Anchor" href="#3-销毁条件变量"></a> (3) 销毁条件变量</h5>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">pthread_cond_destroy</span><span class="params">(<span class="type">pthread_cond_t</span> *cond)</span>;</span><br></pre></td></tr></table></figure>
-<p>成功时返回0。</p>
-<h4 id="431-示例代码"><a class="markdownIt-Anchor" href="#431-示例代码"></a> 4.3.1 示例代码</h4>
-<p>在主线程中从stdin中接收输入，并在创建的线程中进行打印</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;semaphore.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">char</span> g_buf[<span class="number">1000</span>];</span><br><span class="line"><span class="type">static</span> <span class="type">pthread_mutex_t</span> g_tMutex  = PTHREAD_MUTEX_INITIALIZER;</span><br><span class="line"><span class="type">static</span> <span class="type">pthread_cond_t</span>  g_tConVar = PTHREAD_COND_INITIALIZER;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> *<span class="title function_">my_thread_func</span> <span class="params">(<span class="type">void</span> *data)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">while</span> (<span class="number">1</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		pthread_mutex_lock(&amp;g_tMutex);</span><br><span class="line">		pthread_cond_wait(&amp;g_tConVar, &amp;g_tMutex);	</span><br><span class="line"></span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;recv: %s\n&quot;</span>, g_buf);</span><br><span class="line">		pthread_mutex_unlock(&amp;g_tMutex);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> **argv)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">pthread_t</span> tid;</span><br><span class="line">	<span class="type">int</span> ret;</span><br><span class="line">	<span class="type">char</span> buf[<span class="number">1000</span>];</span><br><span class="line">	</span><br><span class="line">	ret = pthread_create(&amp;tid, <span class="literal">NULL</span>, my_thread_func, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">while</span> (<span class="number">1</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		fgets(buf, <span class="number">1000</span>, <span class="built_in">stdin</span>);</span><br><span class="line">		pthread_mutex_lock(&amp;g_tMutex);</span><br><span class="line">		<span class="built_in">memcpy</span>(g_buf, buf, <span class="number">1000</span>);</span><br><span class="line">		pthread_cond_signal(&amp;g_tConVar); <span class="comment">/* 通知接收线程 */</span></span><br><span class="line">		pthread_mutex_unlock(&amp;g_tMutex);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="5总结"><a class="markdownIt-Anchor" href="#5总结"></a> 5.总结</h2>
-<h3 id="51-线程使用流程图"><a class="markdownIt-Anchor" href="#51-线程使用流程图"></a> 5.1 线程使用流程图</h3>
-<p><img src="../images/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%BC%96%E7%A8%8B/image-20231004201228798.png" alt="image-20231004201228798" /></p>
-<h3 id="52-互斥量使用流程图"><a class="markdownIt-Anchor" href="#52-互斥量使用流程图"></a> 5.2 互斥量使用流程图</h3>
-<p><img src="../images/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%BC%96%E7%A8%8B/image-20231004201303646.png" alt="image-20231004201303646" /></p>
-<h3 id="53-信号量使用流程图"><a class="markdownIt-Anchor" href="#53-信号量使用流程图"></a> 5.3 信号量使用流程图</h3>
-<p><img src="../images/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%BC%96%E7%A8%8B/image-20231004201343650.png" alt="image-20231004201343650" /></p>
-]]></content>
-      <categories>
-        <category>Linux应用开发</category>
-      </categories>
-      <tags>
-        <tag>嵌入式</tag>
-        <tag>Linux</tag>
-        <tag>C/C++</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>imx6null-mini开发板</title>
-    <url>/2023/09/05/%E5%BC%80%E5%8F%91%E6%9D%BF/</url>
-    <content><![CDATA[<h2 id="1硬件资源简介"><a class="markdownIt-Anchor" href="#1硬件资源简介"></a> 1.硬件资源简介</h2>
-<p><img src="../images/%E5%BC%80%E5%8F%91%E6%9D%BF/image-20230905203618081.png" alt="image-20230905203618081" /></p>
-<p><img src="../images/%E5%BC%80%E5%8F%91%E6%9D%BF/image-20230905204358901.png" alt="image-20230905204358901" /></p>
-<h2 id="2-启动方式"><a class="markdownIt-Anchor" href="#2-启动方式"></a> 2. 启动方式</h2>
-<p><img src="../images/%E5%BC%80%E5%8F%91%E6%9D%BF/image-20230905204619465.png" alt="image-20230905204619465" /></p>
-<h2 id="3-开发板挂载ubuntu的nfs目录"><a class="markdownIt-Anchor" href="#3-开发板挂载ubuntu的nfs目录"></a> 3. 开发板挂载Ubuntu的NFS目录</h2>
-<h3 id="31-network-file-systemnfs"><a class="markdownIt-Anchor" href="#31-network-file-systemnfs"></a> 3.1 Network File System(NFS)</h3>
-<p>NFS协议基于C/S架构，通过RPC协议进行通信。NFS的最大特点就是将服务端的文件系统目录树映射到客户端，而在客户端访问该 目录树与访问本地文件系统没有任何差别。</p>
-<p><img src="../images/%E5%BC%80%E5%8F%91%E6%9D%BF/image-20230905205227025.png" alt="image-20230905205227025" /></p>
-<h3 id="32-挂载"><a class="markdownIt-Anchor" href="#32-挂载"></a> 3.2 挂载</h3>
-<ol>
-<li>
-<p>Ubuntu开放相关目录的访问权限，即配置  <code>/etc/exports</code>文件</p>
-</li>
-<li>
-<p>Ubuntu启动NFS服务</p>
-</li>
-<li>
-<p>开发板上挂载Ubuntu上的相关目录到本地</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">mount -t nfs -o nolock,vers=3 192.168.5.11:/home/book/nfs_rootfs /mnt</span><br></pre></td></tr></table></figure>
-<ul>
-<li><code>mount</code>: 这个命令用于挂载文件系统到指定的目录上。</li>
-<li><code>-t nfs</code>: 该选项指定要挂载的文件系统类型为NFS。</li>
-<li><code>-o nolock,vers=3</code>: 这些选项是用于指定挂载NFS文件系统时的一些选项。<code>nolock</code>选项用于禁用文件锁定机制，而<code>vers=3</code>选项指定使用NFS版本3协议。</li>
-</ul>
-</li>
 </ol>
 ]]></content>
       <categories>
