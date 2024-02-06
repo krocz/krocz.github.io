@@ -163,145 +163,6 @@
       </tags>
   </entry>
   <entry>
-    <title>LED驱动程序</title>
-    <url>/2023/10/30/LED%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F/</url>
-    <content><![CDATA[<h2 id="1-学会看芯片手册"><a href="#1-学会看芯片手册" class="headerlink" title="1.学会看芯片手册"></a>1.学会看芯片手册</h2><h3 id="1-1-GPIO的通用操作方法"><a href="#1-1-GPIO的通用操作方法" class="headerlink" title="1.1 GPIO的通用操作方法"></a>1.1 GPIO的通用操作方法</h3><p>参考stm32的GPIO引脚的使用过程：</p>
-<ol>
-<li>使能GPIOx时钟</li>
-<li>设置GPIOx引脚的工作模式（输入、输出、复用、<strong>重定向</strong>）</li>
-<li>读取/设置GOPIOx引脚的电平</li>
-</ol>
-<p>一般的，芯片GPIO引脚使能的操作如下：</p>
-<ol>
-<li>芯片手册一般有相关章节，用来介绍：power/clock 可以设置对应寄存器使能某个 GPIO 模块(Module) 。有些芯片的 GPIO 是没有使能开关的，即它总是使能的</li>
-<li>一个引脚可以用于 GPIO、串口、USB 或其他功能， 有对应的寄存器来选择引脚的功能</li>
-<li>对于已经设置为 GPIO 功能的引脚，有方向寄存器用来设置它的方向：输出、输入</li>
-<li>对于已经设置为 GPIO 功能的引脚，有数据寄存器用来写、读引脚电平状态</li>
-</ol>
-<p>对于GPIO写电平状态根据硬件也有两种方式：</p>
-<ol>
-<li>仅有GPIO数据寄存器：先读，设置位，再写</li>
-<li>使用<code>set-and-clear protocol</code>：这种方式，硬件上有三个寄存器<code>set_reg,clr_eg,data_reg</code>，对于置位和复位寄存器，均是在相应位写1执行置位/复位功能，然后由硬件来完成置位/复位。</li>
-</ol>
-<h3 id="1-2-操作IMX6ULL的GPIO点亮LED"><a href="#1-2-操作IMX6ULL的GPIO点亮LED" class="headerlink" title="1.2 操作IMX6ULL的GPIO点亮LED"></a>1.2 操作IMX6ULL的GPIO点亮LED</h3><p>在本节，通过查询开发板原理图和芯片手册来获取点亮LED所需要的所有编程所需信息</p>
-<h4 id="1-2-1-查看LED对应的GPIO引脚"><a href="#1-2-1-查看LED对应的GPIO引脚" class="headerlink" title="1.2.1 查看LED对应的GPIO引脚"></a>1.2.1 查看LED对应的GPIO引脚</h4><p><img src="../images/LED驱动程序/image-20231030205647245.png" alt="image-20231030205647245"></p>
-<p>在原理图中发现，LED2对应引脚GPIO5_3  </p>
-<h4 id="1-2-2-GPIO的整体框图"><a href="#1-2-2-GPIO的整体框图" class="headerlink" title="1.2.2 GPIO的整体框图"></a>1.2.2 GPIO的整体框图</h4><p><img src="../images/LED驱动程序/image-20231106193130990.png" alt="image-20231106193130990"></p>
-<p>第一次没看懂，当了解完图中的每一个模块后，再来解读图中所表达的内容。</p>
-<p>这张图描述了如何定义一个引脚(PAD)的功能。</p>
-<ul>
-<li>IOMUXC(IO Mulitplexing Control)用来定义每一个PAD的功能<ul>
-<li>IOMUX作为一个cell用来控制一个PAD的多路复用</li>
-<li>通过配置寄存器<code>SW_MUX_CTL_PAD_*</code>来定义PAD选择哪一路功能</li>
-<li>通过配置寄存器<code>SW_PAD_CTL_PAD_*</code>来定义有关PAD的具体设置，例如引脚的边沿速率，驱动能力等</li>
-</ul>
-</li>
-<li>GPIO(General-purpose IO)<ul>
-<li>GPIO.DR：数据寄存器，输出模式下用来控制引脚输出电平，输入模式下可以用来读取输入电平</li>
-<li>GPIO.GDIR(GPIO direction register)：用来控制GPIO的输入输出方向</li>
-<li>GPIO.PSR(Pad status register)：用来读取引脚的电平状态</li>
-</ul>
-</li>
-<li>CCM(Clock Control Manage)<ul>
-<li>主要就是使能IOMUXC和GPIO模块</li>
-</ul>
-</li>
-</ul>
-<h4 id="1-2-3-IOMUXC"><a href="#1-2-3-IOMUXC" class="headerlink" title="1.2.3 IOMUXC"></a>1.2.3 IOMUXC</h4><blockquote>
-<p>IOMUX控制器（IOMUXC）与IOMUX一起使IC能够共享一个焊盘到多个功能块。这种共享是通过多路复用焊盘的输入和输出信号来实现的。每个模块都需要特定的焊盘设置（如上拉或保持器），每个焊盘最多有8个多路复用选项（称为ALT模式）。极板设置参数由IOMUXC控制。IOMUX仅由几个基本IOMUX单元组合而成的组合逻辑组成。每个基本IOMUX单元仅处理一个焊盘信号的复用。</p>
-</blockquote>
-<h5 id="（1）IOMUX-cell"><a href="#（1）IOMUX-cell" class="headerlink" title="（1）IOMUX_cell"></a>（1）IOMUX_cell</h5><p>IOMUX由多个（大约是SoC中焊盘的数量）基本IOMUX_cell单元组成。如果特定焊盘<strong>只需要一种功能模式，则不需要IOMUX，并且信号可以直接从模块连接到I/O</strong>。每当特定焊盘需要两个或多个功能模式时，或者当需要一个功能模式和一个测试模式时，都需要IOMUX单元。iomux_cell的基本设计允许两个级别的HW信号控制（在ALT6和ALT7模式下，ALT7获得最高优先级），如图32-2所示。</p>
-<p>ALT7和ALT6扩展复用模式允许系统中的任何信号（如保险丝、焊盘输入、JTAG或软件寄存器）覆盖任何软件配置并强制ALT6/ALT7复用模式。它还允许IOMUX软件寄存器控制一组焊盘。</p>
-<p><img src="../images/LED驱动程序/image-20231101122916164.png" alt="image-20231101122916164"></p>
-<h5 id="（2）寄存器"><a href="#（2）寄存器" class="headerlink" title="（2）寄存器"></a>（2）寄存器</h5><p><strong>多路复用控制寄存器</strong></p>
-<p><img src="../images/LED驱动程序/image-20231106113954556.png" alt="image-20231106113954556"></p>
-<ul>
-<li><code>4-SION</code>：<strong>该位用于配置引脚的loopback回环模式，在测试时可以使能方便调试。使能之后会强制将引脚的真实电平状态输入到相应寄存器中，例如GPIOx_PSR寄存器。</strong></li>
-<li>这个引脚的多路复用仅有功能<code>ALT5</code>，一般会有<code>ALT0</code>~<code>ALT7</code>八路复用可选。</li>
-</ul>
-<p><strong>引脚控制寄存器</strong></p>
-<p><img src="../images/LED驱动程序/image-20231106114027051.png" alt="image-20231106114027051"></p>
-<p><img src="../images/LED驱动程序/image-20231106114042999.png" alt="image-20231106114042999"></p>
-<ul>
-<li><p><code>16-Hysteresis</code>：输入方式，施密特触发器或者CMOS输入模式。</p>
-</li>
-<li><p><code>13-pull/Keep Enable Field</code>：拉电阻/保持电阻，拉电阻就是上拉或者下拉。保持电阻是在引脚浮空时能够使引脚保持在引脚上一时刻的电平状态。</p>
-</li>
-<li><p><code>5-3-Drive Strength Field</code>：用于控制输出引脚的驱动能力。驱动能力指的是芯片输出引脚能够提供的电流或功率，它决定了该引脚可以驱动外部电路的能力。</p>
-</li>
-<li><code>0-Slew Rate Field</code>：用于配置输出引脚的边沿速率（slew rate）。边沿速率指的是输出信号在从一个电压状态迅速变化到另一个电压状态时的变化速度。</li>
-</ul>
-<h4 id="1-2-4-GPIO"><a href="#1-2-4-GPIO" class="headerlink" title="1.2.4 GPIO"></a>1.2.4 GPIO</h4><p>GPIO通用框图：</p>
-<p><img src="../images/LED驱动程序/image-20231030212700304.png" alt="image-20231030212700304"></p>
-<ul>
-<li>Data register (GPIO_DR) </li>
-<li>Pad status register (GPIO_PSR) </li>
-<li>GPIO direction register (GPIO_GDIR) </li>
-<li>Edge select register (GPIO_EDGE_SEL) </li>
-<li>Interrupt control registers (GPIO_ICR1, GPIO_ICR2)</li>
-<li>Interrupt mask register (GPIO_IMR) </li>
-<li>Interrupt status register (GPIO_ISR)</li>
-</ul>
-<p>查询GPIO寄存器的基地址：</p>
-<p><img src="../images/LED驱动程序/image-20231129163423384.png" alt="image-20231129163423384"></p>
-<h5 id="1-GPIOx-GDIR"><a href="#1-GPIOx-GDIR" class="headerlink" title="(1) GPIOx_GDIR"></a>(1) GPIOx_GDIR</h5><p><img src="../images/LED驱动程序/image-20231101120322237.png" alt="image-20231101120322237"></p>
-<h5 id="2-GPIOx-DR"><a href="#2-GPIOx-DR" class="headerlink" title="(2) GPIOx_DR"></a>(2) GPIOx_DR</h5><p>读取DR位的结果取决于IOMUXC输入模式设置和相应的GDIR位，如下所示：</p>
-<ul>
-<li>如果设置了GDIR[n]，并且IOMUXC输入模式为GPIO，则读取DR[n]将返回DR[n]的内容。</li>
-<li>如果设置了GDIR[n]，并且IOMUXC输入模式不是GPIO，则读取DR[n]将返回DR[n]的内容。</li>
-<li>如果GDIR[n]被清除，IOMUXC输入模式为GPIO，则读取DR[n]返回相应的输入信号值。</li>
-<li>如果GDIR[n]被清除，并且IOMUXC输入模式不是GPIO，那么读取DR[n]总是返回零。</li>
-</ul>
-<p><img src="../images/LED驱动程序/image-20231129170159399.png" alt="image-20231129170159399"></p>
-<h5 id="3-GPIOx-PSR"><a href="#3-GPIOx-PSR" class="headerlink" title="(3) GPIOx_PSR"></a>(3) GPIOx_PSR</h5><p>GPIO_PSR是一个只读寄存器。每个比特存储对应的输入信号的值（如在IOMUX中配置的）。<strong>此寄存器使用ipg_clk_s时钟进行计时，这意味着只有在访问此位置时才会对输入信号进行采样。每当访问此寄存器进行同步时，都需要两种等待状态。</strong></p>
-<p><img src="../images/LED驱动程序/image-20231106202237538.png" alt="image-20231106202237538"></p>
-<p><img src="../images/LED驱动程序/image-20231106120228246.png" alt="image-20231106120228246"></p>
-<h4 id="1-2-5-CCM"><a href="#1-2-5-CCM" class="headerlink" title="1.2.5 CCM"></a>1.2.5 CCM</h4><h5 id="1-GPIO使能"><a href="#1-GPIO使能" class="headerlink" title="(1) GPIO使能"></a>(1) GPIO使能</h5><p><img src="../images/LED驱动程序/image-20231030215135900.png" alt="image-20231030215135900"></p>
-<h5 id="2-IOMUXC使能"><a href="#2-IOMUXC使能" class="headerlink" title="(2) IOMUXC使能"></a>(2) IOMUXC使能</h5><p><img src="../images/LED驱动程序/image-20231106202806993.png" alt="image-20231106202806993"></p>
-<h5 id="3-如何操作CCGR寄存器"><a href="#3-如何操作CCGR寄存器" class="headerlink" title="(3) 如何操作CCGR寄存器"></a>(3) 如何操作CCGR寄存器</h5><p>对于每一个<code>CGx</code>配置值及其对应功能如下：</p>
-<p><img src="../images/LED驱动程序/image-20231106203816118.png" alt="image-20231106203816118"></p>
-<p>例如CCGR1：</p>
-<p><img src="../images/LED驱动程序/image-20231106203915142.png" alt="image-20231106203915142"></p>
-<p><strong>还可以知道默认几乎所有模块的时钟再上电时都是打开的</strong></p>
-<h4 id="1-2-6-总结配置过程"><a href="#1-2-6-总结配置过程" class="headerlink" title="1.2.6 总结配置过程"></a>1.2.6 总结配置过程</h4><ol>
-<li>在CCG模块中使能GPIO和IOMUXC模块的时钟（默认已经使能）</li>
-<li>在IOMUXC模块中设置GPIO5_3(SNVS_TAMPER3)焊盘的多路复用和焊盘本身相关配置</li>
-<li>在GPIP模块的寄存器GPIOx_GDIR中配置GPIO是输出模式还是输入模式</li>
-<li>配置GPIO模块的寄存器GPIOx_DR，配置引脚的电平状态</li>
-</ol>
-<h2 id="2-编写LED驱动程序"><a href="#2-编写LED驱动程序" class="headerlink" title="2.编写LED驱动程序"></a>2.编写LED驱动程序</h2><p>根据上一篇“编写第一个驱动程序“了解了驱动程序的基本框架，本篇先通过阅读数据手册得知如何配置寄存器才能够点亮LED灯。现在还差的是：如何在驱动程序中读写寄存器。</p>
-<h3 id="2-1-如何在驱动程序中读写寄存器"><a href="#2-1-如何在驱动程序中读写寄存器" class="headerlink" title="2.1 如何在驱动程序中读写寄存器"></a>2.1 如何在驱动程序中读写寄存器</h3><p><strong>将寄存器物理地址映射到虚拟地址</strong>：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="comment">/* GPIO5_GDIR 地址：0x020AC000 + 0x04 */</span></span><br><span class="line"><span class="type">static</span> <span class="keyword">volatile</span> <span class="type">unsigned</span> <span class="type">int</span> *GPIO5_GDIR;</span><br><span class="line"><span class="comment">/* ioremap：将寄存器的物理地址映射为虚拟地址 */</span></span><br><span class="line">GPIO5_GDIR = ioremap(<span class="number">0x020AC000</span> + <span class="number">0x04</span>, <span class="number">4</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">/* iounmap：取消虚拟地址的映射 */</span></span><br><span class="line">iounmap(GPIO5_GDIR);</span><br></pre></td></tr></table></figure>
-<p><strong>根据虚拟地址读写寄存器</strong>：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">*GPIO5_GDIR |= (<span class="number">1</span> &lt;&lt; <span class="number">3</span>);</span><br></pre></td></tr></table></figure>
-<h4 id="2-1-1-问题"><a href="#2-1-1-问题" class="headerlink" title="2.1.1 问题"></a>2.1.1 问题</h4><p><strong>问题1：为什么需要将寄存器物理地址映射为虚拟地址？</strong></p>
-<p>在Linux系统中，驱动程序在读写硬件寄存器时通常需要将寄存器的物理地址映射成虚拟地址。这涉及到操作系统的虚拟内存管理机制和硬件访问的相关性。</p>
-<ol>
-<li><strong>抽象硬件访问：</strong> 操作系统的设计目标之一是提供对硬件的抽象，使应用程序和驱动程序能够在不同硬件平台上运行而无需修改。通过将物理地址映射为虚拟地址，驱动程序可以使用虚拟地址来访问硬件资源，而不必担心底层硬件的物理地址。</li>
-<li><strong>虚拟内存隔离：</strong> 操作系统使用虚拟内存来提供对内存的隔离和保护。将硬件寄存器的物理地址映射到虚拟地址空间中，使得驱动程序可以利用虚拟内存管理机制，确保不会越界访问或者非法修改其他进程的内存。</li>
-<li><strong>内存映射：</strong> 内存映射是一种将文件或设备映射到进程地址空间的技术。通过内存映射，驱动程序可以将硬件寄存器映射到自己的地址空间中，从而使得访问硬件寄存器就像访问内存一样简单。</li>
-<li><strong>缓存管理：</strong> 操作系统可以通过虚拟内存管理来优化对硬件寄存器的访问，例如使用缓存。虚拟内存管理可以确保合适的缓存策略用于访问硬件寄存器，提高数据访问的效率。</li>
-</ol>
-<p>总体而言，将硬件寄存器的物理地址映射为虚拟地址是为了提供更高层次的抽象和隔离，使得驱动程序能够以更安全和通用的方式访问硬件资源。这也有助于确保驱动程序的可移植性和可维护性。</p>
-<p><strong>问题2：地址指针为什么需要使用<code>volatile</code>关键字进行修饰？</strong></p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">static</span> <span class="keyword">volatile</span> <span class="type">unsigned</span> <span class="type">int</span> *GPIO5_GDIR;</span><br></pre></td></tr></table></figure>
-<p>在这个声明中，<code>volatile</code> 关键字的作用是告诉编译器，该指针所指向的内存位置的值是可以在程序的控制之外被改变的，因此编译器在优化时应该小心处理这个指针所指向的内存。</p>
-<p>在嵌入式系统和驱动程序开发中，经常会涉及到与硬件直接交互的情况。<strong>硬件寄存器的值可能会在程序的正常控制流程之外被外部因素更改，比如中断服务程序、其他设备或者直接由硬件</strong>。使用 <code>volatile</code> 关键字<strong>告诉编译器不要对这些变量的读写进行优化，以确保编译器不会在代码中插入不必要的优化</strong>，例如缓存变量的值，而直接使用缓存中的值，而不是每次都从内存中读取。</p>
-<p>在上述代码中，<code>GPIO5_GDIR</code> 是一个指向寄存器的指针，这个寄存器的值可能会被硬件或者中断服务程序在程序的控制之外修改。因此，使用 <code>volatile</code> 关键字是为了确保编译器不会对这个指针进行过度的优化，从而保证读写该寄存器的操作是可见且正确的。</p>
-<h3 id="2-2-代码"><a href="#2-2-代码" class="headerlink" title="2.2 代码"></a>2.2 代码</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;asm/io.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;asm/uaccess.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;linux/printk.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;linux/stddef.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/module.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/major.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/errno.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/delay.h&gt;</span>	<span class="comment">/* guess what */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/fs.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/mm.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/init.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/device.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/mutex.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/firmware.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/platform_device.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/uaccess.h&gt;</span>	<span class="comment">/* For put_user and get_user */</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 函数声明 */</span></span><br><span class="line"><span class="type">static</span> <span class="type">ssize_t</span> <span class="title function_">led_drv_open</span><span class="params">(<span class="keyword">struct</span> inode *node, <span class="keyword">struct</span> file *file)</span>;</span><br><span class="line"><span class="type">static</span> <span class="type">ssize_t</span> <span class="title function_">led_drv_write</span><span class="params">(<span class="keyword">struct</span> file *file, <span class="type">const</span> <span class="type">char</span> __user *buf, <span class="type">size_t</span> size, <span class="type">loff_t</span> *ppos)</span>;</span><br><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">led_drv_close</span><span class="params">(<span class="keyword">struct</span> inode *node, <span class="keyword">struct</span> file *file)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* registers */</span></span><br><span class="line"><span class="comment">// IOMUXC_SNVS_SW_MUX_CTL_PAD_SNVS_TAMPER3 地址：0x02290000 + 0x14</span></span><br><span class="line"><span class="type">static</span> <span class="keyword">volatile</span> <span class="type">unsigned</span> <span class="type">int</span> *IOMUXC_SNVS_SW_MUX_CTL_PAD_SNVS_TAMPER3;</span><br><span class="line"><span class="comment">// IOMUXC_SNVS_SW_PAD_CTL_PAD_SNVS_TAMPER3 地址：0x02290000 + 0x58</span></span><br><span class="line"><span class="type">static</span> <span class="keyword">volatile</span> <span class="type">unsigned</span> <span class="type">int</span> *IOMUXC_SNVS_SW_PAD_CTL_PAD_SNVS_TAMPER3;</span><br><span class="line"><span class="comment">// GPIO5_GDIR 地址：0x020AC000 + 0x04</span></span><br><span class="line"><span class="type">static</span> <span class="keyword">volatile</span> <span class="type">unsigned</span> <span class="type">int</span> *GPIO5_GDIR;</span><br><span class="line"><span class="comment">// GPIO5_DR 地址：0x020AC000 + 0x00</span></span><br><span class="line"><span class="type">static</span> <span class="keyword">volatile</span> <span class="type">unsigned</span> <span class="type">int</span> *GPIO5_DR;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 全局变量 */</span></span><br><span class="line"><span class="type">int</span> major;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="keyword">class</span> *<span class="title">myled_class</span>;</span></span><br><span class="line"><span class="type">static</span> <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">file_operations</span> <span class="title">myled_fops</span> =</span> &#123;</span><br><span class="line">	.owner		= THIS_MODULE,</span><br><span class="line">    .open = led_drv_open,</span><br><span class="line">    .write = led_drv_write,</span><br><span class="line">	.release = led_drv_close,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">led_drv_open</span><span class="params">(<span class="keyword">struct</span> inode *inode, <span class="keyword">struct</span> file *file)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//当前所在的源代码文件的文件名 当前所在的函数的名称 代码行号</span></span><br><span class="line">    printk(<span class="string">&quot;file:%s  func:%s  line:%d\n&quot;</span>, __FILE__ , __FUNCTION__, __LINE__);</span><br><span class="line">	<span class="comment">// 注意修改寄存器的值时不要影响其他位</span></span><br><span class="line">	*IOMUXC_SNVS_SW_MUX_CTL_PAD_SNVS_TAMPER3 &amp;= ~<span class="number">0xf</span>; <span class="comment">//先清除</span></span><br><span class="line">	*IOMUXC_SNVS_SW_MUX_CTL_PAD_SNVS_TAMPER3 |= <span class="number">0x5</span>;  <span class="comment">//再赋值，失能测试模式，配置复用为ALT5</span></span><br><span class="line">	*GPIO5_GDIR |= (<span class="number">1</span> &lt;&lt; <span class="number">3</span>);  <span class="comment">// 配置引脚为输出模式</span></span><br><span class="line">	*GPIO5_DR |= (<span class="number">1</span> &lt;&lt; <span class="number">3</span>);    <span class="comment">// 先熄灭LED</span></span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">led_drv_close</span><span class="params">(<span class="keyword">struct</span> inode *node, <span class="keyword">struct</span> file *file)</span></span><br><span class="line">&#123;</span><br><span class="line">    printk(<span class="string">&quot;file:%s  func:%s  line:%d\n&quot;</span>, __FILE__ , __FUNCTION__, __LINE__);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">ssize_t</span> <span class="title function_">led_drv_write</span><span class="params">(<span class="keyword">struct</span> file *file, <span class="type">const</span> <span class="type">char</span> __user *buf, <span class="type">size_t</span> size, <span class="type">loff_t</span> *ppos)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">char</span> c;</span><br><span class="line">	<span class="type">int</span> ret;</span><br><span class="line">    <span class="comment">//当前所在的源代码文件的文件名 当前所在的函数的名称 代码行号</span></span><br><span class="line">    printk(<span class="string">&quot;file:%s  func:%s  line:%d\n&quot;</span>, __FILE__ , __FUNCTION__, __LINE__);</span><br><span class="line">	ret = copy_from_user(&amp;c, buf, <span class="number">1</span>);</span><br><span class="line">	<span class="keyword">if</span>(c == <span class="string">&#x27;1&#x27;</span>)</span><br><span class="line">		<span class="comment">/* set led on*/</span></span><br><span class="line">		*GPIO5_DR &amp;= ~(<span class="number">1</span> &lt;&lt; <span class="number">3</span>);</span><br><span class="line">	<span class="keyword">else</span></span><br><span class="line">		<span class="comment">/* set led off */</span></span><br><span class="line">		*GPIO5_DR |= (<span class="number">1</span> &lt;&lt; <span class="number">3</span>);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> __init <span class="title function_">led_init_driver</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    printk(<span class="string">&quot;file:%s  func:%s  line:%d\n&quot;</span>, __FILE__ , __FUNCTION__, __LINE__);</span><br><span class="line">    major = register_chrdev(<span class="number">0</span>, <span class="string">&quot;myled&quot;</span>, &amp;myled_fops);</span><br><span class="line">    </span><br><span class="line">	<span class="comment">/* ioremap：将寄存器的物理地址映射为虚拟地址 */</span></span><br><span class="line">	IOMUXC_SNVS_SW_MUX_CTL_PAD_SNVS_TAMPER3 = ioremap(<span class="number">0x02290000</span> + <span class="number">0x14</span>, <span class="number">4</span>);</span><br><span class="line">	IOMUXC_SNVS_SW_PAD_CTL_PAD_SNVS_TAMPER3 = ioremap(<span class="number">0x02290000</span> + <span class="number">0x58</span>, <span class="number">4</span>);</span><br><span class="line">	GPIO5_GDIR = ioremap(<span class="number">0x020AC000</span> + <span class="number">0x04</span>, <span class="number">4</span>);</span><br><span class="line">	GPIO5_DR = ioremap(<span class="number">0x020AC000</span> + <span class="number">0x00</span>, <span class="number">4</span>);</span><br><span class="line"></span><br><span class="line">	myled_class = class_create(THIS_MODULE, <span class="string">&quot;myled&quot;</span>);</span><br><span class="line">    device_create(myled_class, <span class="literal">NULL</span>, MKDEV(major, <span class="number">0</span>), <span class="literal">NULL</span>, <span class="string">&quot;myled&quot;</span>);</span><br><span class="line">    </span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> __exit <span class="title function_">led_exit_driver</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="comment">/* iounmap：取消虚拟地址的映射 */</span></span><br><span class="line">	iounmap(IOMUXC_SNVS_SW_MUX_CTL_PAD_SNVS_TAMPER3);</span><br><span class="line">	iounmap(IOMUXC_SNVS_SW_PAD_CTL_PAD_SNVS_TAMPER3);</span><br><span class="line">	iounmap(GPIO5_DR);</span><br><span class="line">	iounmap(GPIO5_GDIR);</span><br><span class="line">	</span><br><span class="line">	device_destroy(myled_class, MKDEV(major, <span class="number">0</span>));</span><br><span class="line">	class_destroy(myled_class);</span><br><span class="line">	unregister_chrdev(major, <span class="string">&quot;myled&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">module_init(led_init_driver);</span><br><span class="line">module_exit(led_exit_driver);</span><br><span class="line">MODULE_LICENSE(<span class="string">&quot;GPL&quot;</span>);</span><br></pre></td></tr></table></figure>
-<p>然后，简单编写一个APP用来测试：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/stat.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;fcntl.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> fd;</span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">char</span> c = <span class="string">&#x27;1&#x27;</span>;</span><br><span class="line">    <span class="type">int</span> ret;</span><br><span class="line">    fd = open(<span class="string">&quot;/dev/myled&quot;</span>, O_RDWR);</span><br><span class="line">    <span class="keyword">if</span>(fd == <span class="number">-1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        perror(<span class="string">&quot;open error &quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span>(<span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;input one char (1:led on, q:quit, other: led off):&quot;</span>);</span><br><span class="line">        <span class="built_in">scanf</span>(<span class="string">&quot;%c&quot;</span>, &amp;c);</span><br><span class="line">        getchar();</span><br><span class="line">        <span class="keyword">if</span>(c == <span class="string">&#x27;q&#x27;</span>) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        ret = write(fd, &amp;c, <span class="number">1</span>);</span><br><span class="line">        <span class="keyword">if</span>(ret != <span class="number">1</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            perror(<span class="string">&quot;write error &quot;</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-]]></content>
-      <categories>
-        <category>Linux应用开发</category>
-      </categories>
-      <tags>
-        <tag>嵌入式</tag>
-        <tag>Linux</tag>
-        <tag>C/C++</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>I2C应用编程</title>
     <url>/2023/10/13/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/</url>
     <content><![CDATA[<h2 id="1-I2C协议"><a href="#1-I2C协议" class="headerlink" title="1. I2C协议"></a>1. I2C协议</h2><p><img src="../images/IIC应用编程/image-20231013195434388.png" alt="image-20231013195434388"></p>
@@ -503,6 +364,145 @@
 <p><img src="../images/IIC应用编程/image-20231023200937458.png" alt="image-20231023200937458"></p>
 <p>传感器在采集时需要时间,主机发出测量指令（0xAC） 后,延时75毫秒以上再读取转换后的数据并判断返回的状 态位是否正常。若状态比特位[Bit7]为0代表数据可正常读取,为1时传感器为忙状态,主机需要等待数据处理完成。</p>
 <h5 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h5><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;i2cbusses.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;errno.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;i2c/smbus.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/i2c-dev.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/i2c.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/ioctl.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;time.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdint.h&gt;</span></span></span><br><span class="line"><span class="type">const</span> <span class="type">uint32_t</span> N = <span class="number">1</span> &lt;&lt; <span class="number">20</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> **argv)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">char</span> read_buffer[<span class="number">6</span>], dev_addr = <span class="number">0x38</span>;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">i2c_rdwr_ioctl_data</span> <span class="title">rdwr</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">i2c_msg</span> <span class="title">msg</span>;</span></span><br><span class="line">    <span class="type">char</span> filename[<span class="number">20</span>];</span><br><span class="line">    <span class="type">int</span> fd, ret;</span><br><span class="line">    <span class="type">float</span> temper, humid;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> t, h;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (argc != <span class="number">2</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;Usage:\n&quot;</span>);</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;read AHT10: %s &lt;i2c_bus_number&gt; string\n&quot;</span>, argv[<span class="number">0</span>]);</span><br><span class="line">		<span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">	&#125;    </span><br><span class="line">    <span class="comment">// 打开I2C Controller</span></span><br><span class="line">    fd = open_i2c_dev(argv[<span class="number">1</span>][<span class="number">0</span>] - <span class="string">&#x27;0&#x27;</span>, filename, <span class="keyword">sizeof</span>(filename), <span class="number">0</span>);</span><br><span class="line">    <span class="keyword">if</span> (fd &lt; <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;can&#x27;t open %s\n&quot;</span>, filename);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 设置从机地址</span></span><br><span class="line">    <span class="keyword">if</span> (set_slave_addr(fd, dev_addr, <span class="number">0</span>))</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;can&#x27;t set slave address\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//写入传感器触发测量的命令</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">3</span>; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//写入字：先写低8位,再写高8位</span></span><br><span class="line">        ret = i2c_smbus_write_word_data(fd, <span class="number">0xAC</span>, <span class="number">0x33</span>); </span><br><span class="line">        <span class="keyword">if</span> (ret)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;i2c_smbus_write_word_data error\n&quot;</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 循环监测传感器设备是否忙</span></span><br><span class="line">    <span class="keyword">do</span></span><br><span class="line">    &#123;</span><br><span class="line">        ret = i2c_smbus_read_byte(fd);</span><br><span class="line">        <span class="keyword">if</span> (ret &lt; <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;i2c_smbus_read_byte error\n&quot;</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">        &#125; </span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;ret = %d\n&quot;</span>, ret);</span><br><span class="line">    &#125; <span class="keyword">while</span> (ret &amp; <span class="number">0x80</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//通过ioctl函数读取I2C设备文件</span></span><br><span class="line">    msg.addr = dev_addr;</span><br><span class="line">    msg.flags = I2C_M_RD;</span><br><span class="line">    msg.len = <span class="number">6</span>;</span><br><span class="line">    <span class="built_in">memset</span>(read_buffer, <span class="number">0</span>, <span class="keyword">sizeof</span>(read_buffer));</span><br><span class="line">    msg.buf = read_buffer;</span><br><span class="line">    rdwr.msgs = &amp;msg;</span><br><span class="line">    rdwr.nmsgs = <span class="number">1</span>;</span><br><span class="line">    ret = ioctl(fd, I2C_RDWR, &amp;rdwr);</span><br><span class="line">    <span class="keyword">if</span>(ret == <span class="number">-1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        perror(<span class="string">&quot;ioctl_read_error&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//将数据转换为实际温湿度</span></span><br><span class="line">	h = ((<span class="type">uint32_t</span>)read_buffer[<span class="number">1</span>] &lt;&lt; <span class="number">12</span>) | ((<span class="type">uint32_t</span>)read_buffer[<span class="number">2</span>] &lt;&lt; <span class="number">4</span>) | (read_buffer[<span class="number">3</span>] &gt;&gt; <span class="number">4</span>);</span><br><span class="line">	t = ((<span class="type">uint32_t</span>)(read_buffer[<span class="number">3</span>] &amp; <span class="number">0x0f</span>) &lt;&lt; <span class="number">16</span>) | ((<span class="type">uint32_t</span>)read_buffer[<span class="number">4</span>] &lt;&lt; <span class="number">8</span>) | read_buffer[<span class="number">5</span>];</span><br><span class="line">	temper = <span class="number">-50.0</span> + <span class="number">200.0</span> * (<span class="type">float</span>)t / N;</span><br><span class="line">	humid = <span class="number">100.0</span> * h / N;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;temper=%f, humid=%f \n&quot;</span>, temper, humid);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>Linux应用开发</category>
+      </categories>
+      <tags>
+        <tag>嵌入式</tag>
+        <tag>Linux</tag>
+        <tag>C/C++</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>LED驱动程序</title>
+    <url>/2023/10/30/LED%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F/</url>
+    <content><![CDATA[<h2 id="1-学会看芯片手册"><a href="#1-学会看芯片手册" class="headerlink" title="1.学会看芯片手册"></a>1.学会看芯片手册</h2><h3 id="1-1-GPIO的通用操作方法"><a href="#1-1-GPIO的通用操作方法" class="headerlink" title="1.1 GPIO的通用操作方法"></a>1.1 GPIO的通用操作方法</h3><p>参考stm32的GPIO引脚的使用过程：</p>
+<ol>
+<li>使能GPIOx时钟</li>
+<li>设置GPIOx引脚的工作模式（输入、输出、复用、<strong>重定向</strong>）</li>
+<li>读取/设置GOPIOx引脚的电平</li>
+</ol>
+<p>一般的，芯片GPIO引脚使能的操作如下：</p>
+<ol>
+<li>芯片手册一般有相关章节，用来介绍：power/clock 可以设置对应寄存器使能某个 GPIO 模块(Module) 。有些芯片的 GPIO 是没有使能开关的，即它总是使能的</li>
+<li>一个引脚可以用于 GPIO、串口、USB 或其他功能， 有对应的寄存器来选择引脚的功能</li>
+<li>对于已经设置为 GPIO 功能的引脚，有方向寄存器用来设置它的方向：输出、输入</li>
+<li>对于已经设置为 GPIO 功能的引脚，有数据寄存器用来写、读引脚电平状态</li>
+</ol>
+<p>对于GPIO写电平状态根据硬件也有两种方式：</p>
+<ol>
+<li>仅有GPIO数据寄存器：先读，设置位，再写</li>
+<li>使用<code>set-and-clear protocol</code>：这种方式，硬件上有三个寄存器<code>set_reg,clr_eg,data_reg</code>，对于置位和复位寄存器，均是在相应位写1执行置位/复位功能，然后由硬件来完成置位/复位。</li>
+</ol>
+<h3 id="1-2-操作IMX6ULL的GPIO点亮LED"><a href="#1-2-操作IMX6ULL的GPIO点亮LED" class="headerlink" title="1.2 操作IMX6ULL的GPIO点亮LED"></a>1.2 操作IMX6ULL的GPIO点亮LED</h3><p>在本节，通过查询开发板原理图和芯片手册来获取点亮LED所需要的所有编程所需信息</p>
+<h4 id="1-2-1-查看LED对应的GPIO引脚"><a href="#1-2-1-查看LED对应的GPIO引脚" class="headerlink" title="1.2.1 查看LED对应的GPIO引脚"></a>1.2.1 查看LED对应的GPIO引脚</h4><p><img src="../images/LED驱动程序/image-20231030205647245.png" alt="image-20231030205647245"></p>
+<p>在原理图中发现，LED2对应引脚GPIO5_3  </p>
+<h4 id="1-2-2-GPIO的整体框图"><a href="#1-2-2-GPIO的整体框图" class="headerlink" title="1.2.2 GPIO的整体框图"></a>1.2.2 GPIO的整体框图</h4><p><img src="../images/LED驱动程序/image-20231106193130990.png" alt="image-20231106193130990"></p>
+<p>第一次没看懂，当了解完图中的每一个模块后，再来解读图中所表达的内容。</p>
+<p>这张图描述了如何定义一个引脚(PAD)的功能。</p>
+<ul>
+<li>IOMUXC(IO Mulitplexing Control)用来定义每一个PAD的功能<ul>
+<li>IOMUX作为一个cell用来控制一个PAD的多路复用</li>
+<li>通过配置寄存器<code>SW_MUX_CTL_PAD_*</code>来定义PAD选择哪一路功能</li>
+<li>通过配置寄存器<code>SW_PAD_CTL_PAD_*</code>来定义有关PAD的具体设置，例如引脚的边沿速率，驱动能力等</li>
+</ul>
+</li>
+<li>GPIO(General-purpose IO)<ul>
+<li>GPIO.DR：数据寄存器，输出模式下用来控制引脚输出电平，输入模式下可以用来读取输入电平</li>
+<li>GPIO.GDIR(GPIO direction register)：用来控制GPIO的输入输出方向</li>
+<li>GPIO.PSR(Pad status register)：用来读取引脚的电平状态</li>
+</ul>
+</li>
+<li>CCM(Clock Control Manage)<ul>
+<li>主要就是使能IOMUXC和GPIO模块</li>
+</ul>
+</li>
+</ul>
+<h4 id="1-2-3-IOMUXC"><a href="#1-2-3-IOMUXC" class="headerlink" title="1.2.3 IOMUXC"></a>1.2.3 IOMUXC</h4><blockquote>
+<p>IOMUX控制器（IOMUXC）与IOMUX一起使IC能够共享一个焊盘到多个功能块。这种共享是通过多路复用焊盘的输入和输出信号来实现的。每个模块都需要特定的焊盘设置（如上拉或保持器），每个焊盘最多有8个多路复用选项（称为ALT模式）。极板设置参数由IOMUXC控制。IOMUX仅由几个基本IOMUX单元组合而成的组合逻辑组成。每个基本IOMUX单元仅处理一个焊盘信号的复用。</p>
+</blockquote>
+<h5 id="（1）IOMUX-cell"><a href="#（1）IOMUX-cell" class="headerlink" title="（1）IOMUX_cell"></a>（1）IOMUX_cell</h5><p>IOMUX由多个（大约是SoC中焊盘的数量）基本IOMUX_cell单元组成。如果特定焊盘<strong>只需要一种功能模式，则不需要IOMUX，并且信号可以直接从模块连接到I/O</strong>。每当特定焊盘需要两个或多个功能模式时，或者当需要一个功能模式和一个测试模式时，都需要IOMUX单元。iomux_cell的基本设计允许两个级别的HW信号控制（在ALT6和ALT7模式下，ALT7获得最高优先级），如图32-2所示。</p>
+<p>ALT7和ALT6扩展复用模式允许系统中的任何信号（如保险丝、焊盘输入、JTAG或软件寄存器）覆盖任何软件配置并强制ALT6/ALT7复用模式。它还允许IOMUX软件寄存器控制一组焊盘。</p>
+<p><img src="../images/LED驱动程序/image-20231101122916164.png" alt="image-20231101122916164"></p>
+<h5 id="（2）寄存器"><a href="#（2）寄存器" class="headerlink" title="（2）寄存器"></a>（2）寄存器</h5><p><strong>多路复用控制寄存器</strong></p>
+<p><img src="../images/LED驱动程序/image-20231106113954556.png" alt="image-20231106113954556"></p>
+<ul>
+<li><code>4-SION</code>：<strong>该位用于配置引脚的loopback回环模式，在测试时可以使能方便调试。使能之后会强制将引脚的真实电平状态输入到相应寄存器中，例如GPIOx_PSR寄存器。</strong></li>
+<li>这个引脚的多路复用仅有功能<code>ALT5</code>，一般会有<code>ALT0</code>~<code>ALT7</code>八路复用可选。</li>
+</ul>
+<p><strong>引脚控制寄存器</strong></p>
+<p><img src="../images/LED驱动程序/image-20231106114027051.png" alt="image-20231106114027051"></p>
+<p><img src="../images/LED驱动程序/image-20231106114042999.png" alt="image-20231106114042999"></p>
+<ul>
+<li><p><code>16-Hysteresis</code>：输入方式，施密特触发器或者CMOS输入模式。</p>
+</li>
+<li><p><code>13-pull/Keep Enable Field</code>：拉电阻/保持电阻，拉电阻就是上拉或者下拉。保持电阻是在引脚浮空时能够使引脚保持在引脚上一时刻的电平状态。</p>
+</li>
+<li><p><code>5-3-Drive Strength Field</code>：用于控制输出引脚的驱动能力。驱动能力指的是芯片输出引脚能够提供的电流或功率，它决定了该引脚可以驱动外部电路的能力。</p>
+</li>
+<li><code>0-Slew Rate Field</code>：用于配置输出引脚的边沿速率（slew rate）。边沿速率指的是输出信号在从一个电压状态迅速变化到另一个电压状态时的变化速度。</li>
+</ul>
+<h4 id="1-2-4-GPIO"><a href="#1-2-4-GPIO" class="headerlink" title="1.2.4 GPIO"></a>1.2.4 GPIO</h4><p>GPIO通用框图：</p>
+<p><img src="../images/LED驱动程序/image-20231030212700304.png" alt="image-20231030212700304"></p>
+<ul>
+<li>Data register (GPIO_DR) </li>
+<li>Pad status register (GPIO_PSR) </li>
+<li>GPIO direction register (GPIO_GDIR) </li>
+<li>Edge select register (GPIO_EDGE_SEL) </li>
+<li>Interrupt control registers (GPIO_ICR1, GPIO_ICR2)</li>
+<li>Interrupt mask register (GPIO_IMR) </li>
+<li>Interrupt status register (GPIO_ISR)</li>
+</ul>
+<p>查询GPIO寄存器的基地址：</p>
+<p><img src="../images/LED驱动程序/image-20231129163423384.png" alt="image-20231129163423384"></p>
+<h5 id="1-GPIOx-GDIR"><a href="#1-GPIOx-GDIR" class="headerlink" title="(1) GPIOx_GDIR"></a>(1) GPIOx_GDIR</h5><p><img src="../images/LED驱动程序/image-20231101120322237.png" alt="image-20231101120322237"></p>
+<h5 id="2-GPIOx-DR"><a href="#2-GPIOx-DR" class="headerlink" title="(2) GPIOx_DR"></a>(2) GPIOx_DR</h5><p>读取DR位的结果取决于IOMUXC输入模式设置和相应的GDIR位，如下所示：</p>
+<ul>
+<li>如果设置了GDIR[n]，并且IOMUXC输入模式为GPIO，则读取DR[n]将返回DR[n]的内容。</li>
+<li>如果设置了GDIR[n]，并且IOMUXC输入模式不是GPIO，则读取DR[n]将返回DR[n]的内容。</li>
+<li>如果GDIR[n]被清除，IOMUXC输入模式为GPIO，则读取DR[n]返回相应的输入信号值。</li>
+<li>如果GDIR[n]被清除，并且IOMUXC输入模式不是GPIO，那么读取DR[n]总是返回零。</li>
+</ul>
+<p><img src="../images/LED驱动程序/image-20231129170159399.png" alt="image-20231129170159399"></p>
+<h5 id="3-GPIOx-PSR"><a href="#3-GPIOx-PSR" class="headerlink" title="(3) GPIOx_PSR"></a>(3) GPIOx_PSR</h5><p>GPIO_PSR是一个只读寄存器。每个比特存储对应的输入信号的值（如在IOMUX中配置的）。<strong>此寄存器使用ipg_clk_s时钟进行计时，这意味着只有在访问此位置时才会对输入信号进行采样。每当访问此寄存器进行同步时，都需要两种等待状态。</strong></p>
+<p><img src="../images/LED驱动程序/image-20231106202237538.png" alt="image-20231106202237538"></p>
+<p><img src="../images/LED驱动程序/image-20231106120228246.png" alt="image-20231106120228246"></p>
+<h4 id="1-2-5-CCM"><a href="#1-2-5-CCM" class="headerlink" title="1.2.5 CCM"></a>1.2.5 CCM</h4><h5 id="1-GPIO使能"><a href="#1-GPIO使能" class="headerlink" title="(1) GPIO使能"></a>(1) GPIO使能</h5><p><img src="../images/LED驱动程序/image-20231030215135900.png" alt="image-20231030215135900"></p>
+<h5 id="2-IOMUXC使能"><a href="#2-IOMUXC使能" class="headerlink" title="(2) IOMUXC使能"></a>(2) IOMUXC使能</h5><p><img src="../images/LED驱动程序/image-20231106202806993.png" alt="image-20231106202806993"></p>
+<h5 id="3-如何操作CCGR寄存器"><a href="#3-如何操作CCGR寄存器" class="headerlink" title="(3) 如何操作CCGR寄存器"></a>(3) 如何操作CCGR寄存器</h5><p>对于每一个<code>CGx</code>配置值及其对应功能如下：</p>
+<p><img src="../images/LED驱动程序/image-20231106203816118.png" alt="image-20231106203816118"></p>
+<p>例如CCGR1：</p>
+<p><img src="../images/LED驱动程序/image-20231106203915142.png" alt="image-20231106203915142"></p>
+<p><strong>还可以知道默认几乎所有模块的时钟再上电时都是打开的</strong></p>
+<h4 id="1-2-6-总结配置过程"><a href="#1-2-6-总结配置过程" class="headerlink" title="1.2.6 总结配置过程"></a>1.2.6 总结配置过程</h4><ol>
+<li>在CCG模块中使能GPIO和IOMUXC模块的时钟（默认已经使能）</li>
+<li>在IOMUXC模块中设置GPIO5_3(SNVS_TAMPER3)焊盘的多路复用和焊盘本身相关配置</li>
+<li>在GPIP模块的寄存器GPIOx_GDIR中配置GPIO是输出模式还是输入模式</li>
+<li>配置GPIO模块的寄存器GPIOx_DR，配置引脚的电平状态</li>
+</ol>
+<h2 id="2-编写LED驱动程序"><a href="#2-编写LED驱动程序" class="headerlink" title="2.编写LED驱动程序"></a>2.编写LED驱动程序</h2><p>根据上一篇“编写第一个驱动程序“了解了驱动程序的基本框架，本篇先通过阅读数据手册得知如何配置寄存器才能够点亮LED灯。现在还差的是：如何在驱动程序中读写寄存器。</p>
+<h3 id="2-1-如何在驱动程序中读写寄存器"><a href="#2-1-如何在驱动程序中读写寄存器" class="headerlink" title="2.1 如何在驱动程序中读写寄存器"></a>2.1 如何在驱动程序中读写寄存器</h3><p><strong>将寄存器物理地址映射到虚拟地址</strong>：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="comment">/* GPIO5_GDIR 地址：0x020AC000 + 0x04 */</span></span><br><span class="line"><span class="type">static</span> <span class="keyword">volatile</span> <span class="type">unsigned</span> <span class="type">int</span> *GPIO5_GDIR;</span><br><span class="line"><span class="comment">/* ioremap：将寄存器的物理地址映射为虚拟地址 */</span></span><br><span class="line">GPIO5_GDIR = ioremap(<span class="number">0x020AC000</span> + <span class="number">0x04</span>, <span class="number">4</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">/* iounmap：取消虚拟地址的映射 */</span></span><br><span class="line">iounmap(GPIO5_GDIR);</span><br></pre></td></tr></table></figure>
+<p><strong>根据虚拟地址读写寄存器</strong>：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">*GPIO5_GDIR |= (<span class="number">1</span> &lt;&lt; <span class="number">3</span>);</span><br></pre></td></tr></table></figure>
+<h4 id="2-1-1-问题"><a href="#2-1-1-问题" class="headerlink" title="2.1.1 问题"></a>2.1.1 问题</h4><p><strong>问题1：为什么需要将寄存器物理地址映射为虚拟地址？</strong></p>
+<p>在Linux系统中，驱动程序在读写硬件寄存器时通常需要将寄存器的物理地址映射成虚拟地址。这涉及到操作系统的虚拟内存管理机制和硬件访问的相关性。</p>
+<ol>
+<li><strong>抽象硬件访问：</strong> 操作系统的设计目标之一是提供对硬件的抽象，使应用程序和驱动程序能够在不同硬件平台上运行而无需修改。通过将物理地址映射为虚拟地址，驱动程序可以使用虚拟地址来访问硬件资源，而不必担心底层硬件的物理地址。</li>
+<li><strong>虚拟内存隔离：</strong> 操作系统使用虚拟内存来提供对内存的隔离和保护。将硬件寄存器的物理地址映射到虚拟地址空间中，使得驱动程序可以利用虚拟内存管理机制，确保不会越界访问或者非法修改其他进程的内存。</li>
+<li><strong>内存映射：</strong> 内存映射是一种将文件或设备映射到进程地址空间的技术。通过内存映射，驱动程序可以将硬件寄存器映射到自己的地址空间中，从而使得访问硬件寄存器就像访问内存一样简单。</li>
+<li><strong>缓存管理：</strong> 操作系统可以通过虚拟内存管理来优化对硬件寄存器的访问，例如使用缓存。虚拟内存管理可以确保合适的缓存策略用于访问硬件寄存器，提高数据访问的效率。</li>
+</ol>
+<p>总体而言，将硬件寄存器的物理地址映射为虚拟地址是为了提供更高层次的抽象和隔离，使得驱动程序能够以更安全和通用的方式访问硬件资源。这也有助于确保驱动程序的可移植性和可维护性。</p>
+<p><strong>问题2：地址指针为什么需要使用<code>volatile</code>关键字进行修饰？</strong></p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">static</span> <span class="keyword">volatile</span> <span class="type">unsigned</span> <span class="type">int</span> *GPIO5_GDIR;</span><br></pre></td></tr></table></figure>
+<p>在这个声明中，<code>volatile</code> 关键字的作用是告诉编译器，该指针所指向的内存位置的值是可以在程序的控制之外被改变的，因此编译器在优化时应该小心处理这个指针所指向的内存。</p>
+<p>在嵌入式系统和驱动程序开发中，经常会涉及到与硬件直接交互的情况。<strong>硬件寄存器的值可能会在程序的正常控制流程之外被外部因素更改，比如中断服务程序、其他设备或者直接由硬件</strong>。使用 <code>volatile</code> 关键字<strong>告诉编译器不要对这些变量的读写进行优化，以确保编译器不会在代码中插入不必要的优化</strong>，例如缓存变量的值，而直接使用缓存中的值，而不是每次都从内存中读取。</p>
+<p>在上述代码中，<code>GPIO5_GDIR</code> 是一个指向寄存器的指针，这个寄存器的值可能会被硬件或者中断服务程序在程序的控制之外修改。因此，使用 <code>volatile</code> 关键字是为了确保编译器不会对这个指针进行过度的优化，从而保证读写该寄存器的操作是可见且正确的。</p>
+<h3 id="2-2-代码"><a href="#2-2-代码" class="headerlink" title="2.2 代码"></a>2.2 代码</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;asm/io.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;asm/uaccess.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;linux/printk.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;linux/stddef.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/module.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/major.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/errno.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/delay.h&gt;</span>	<span class="comment">/* guess what */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/fs.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/mm.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/init.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/device.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/mutex.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/firmware.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/platform_device.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/uaccess.h&gt;</span>	<span class="comment">/* For put_user and get_user */</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 函数声明 */</span></span><br><span class="line"><span class="type">static</span> <span class="type">ssize_t</span> <span class="title function_">led_drv_open</span><span class="params">(<span class="keyword">struct</span> inode *node, <span class="keyword">struct</span> file *file)</span>;</span><br><span class="line"><span class="type">static</span> <span class="type">ssize_t</span> <span class="title function_">led_drv_write</span><span class="params">(<span class="keyword">struct</span> file *file, <span class="type">const</span> <span class="type">char</span> __user *buf, <span class="type">size_t</span> size, <span class="type">loff_t</span> *ppos)</span>;</span><br><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">led_drv_close</span><span class="params">(<span class="keyword">struct</span> inode *node, <span class="keyword">struct</span> file *file)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* registers */</span></span><br><span class="line"><span class="comment">// IOMUXC_SNVS_SW_MUX_CTL_PAD_SNVS_TAMPER3 地址：0x02290000 + 0x14</span></span><br><span class="line"><span class="type">static</span> <span class="keyword">volatile</span> <span class="type">unsigned</span> <span class="type">int</span> *IOMUXC_SNVS_SW_MUX_CTL_PAD_SNVS_TAMPER3;</span><br><span class="line"><span class="comment">// IOMUXC_SNVS_SW_PAD_CTL_PAD_SNVS_TAMPER3 地址：0x02290000 + 0x58</span></span><br><span class="line"><span class="type">static</span> <span class="keyword">volatile</span> <span class="type">unsigned</span> <span class="type">int</span> *IOMUXC_SNVS_SW_PAD_CTL_PAD_SNVS_TAMPER3;</span><br><span class="line"><span class="comment">// GPIO5_GDIR 地址：0x020AC000 + 0x04</span></span><br><span class="line"><span class="type">static</span> <span class="keyword">volatile</span> <span class="type">unsigned</span> <span class="type">int</span> *GPIO5_GDIR;</span><br><span class="line"><span class="comment">// GPIO5_DR 地址：0x020AC000 + 0x00</span></span><br><span class="line"><span class="type">static</span> <span class="keyword">volatile</span> <span class="type">unsigned</span> <span class="type">int</span> *GPIO5_DR;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 全局变量 */</span></span><br><span class="line"><span class="type">int</span> major;</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="keyword">class</span> *<span class="title">myled_class</span>;</span></span><br><span class="line"><span class="type">static</span> <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">file_operations</span> <span class="title">myled_fops</span> =</span> &#123;</span><br><span class="line">	.owner		= THIS_MODULE,</span><br><span class="line">    .open = led_drv_open,</span><br><span class="line">    .write = led_drv_write,</span><br><span class="line">	.release = led_drv_close,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">led_drv_open</span><span class="params">(<span class="keyword">struct</span> inode *inode, <span class="keyword">struct</span> file *file)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//当前所在的源代码文件的文件名 当前所在的函数的名称 代码行号</span></span><br><span class="line">    printk(<span class="string">&quot;file:%s  func:%s  line:%d\n&quot;</span>, __FILE__ , __FUNCTION__, __LINE__);</span><br><span class="line">	<span class="comment">// 注意修改寄存器的值时不要影响其他位</span></span><br><span class="line">	*IOMUXC_SNVS_SW_MUX_CTL_PAD_SNVS_TAMPER3 &amp;= ~<span class="number">0xf</span>; <span class="comment">//先清除</span></span><br><span class="line">	*IOMUXC_SNVS_SW_MUX_CTL_PAD_SNVS_TAMPER3 |= <span class="number">0x5</span>;  <span class="comment">//再赋值，失能测试模式，配置复用为ALT5</span></span><br><span class="line">	*GPIO5_GDIR |= (<span class="number">1</span> &lt;&lt; <span class="number">3</span>);  <span class="comment">// 配置引脚为输出模式</span></span><br><span class="line">	*GPIO5_DR |= (<span class="number">1</span> &lt;&lt; <span class="number">3</span>);    <span class="comment">// 先熄灭LED</span></span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">led_drv_close</span><span class="params">(<span class="keyword">struct</span> inode *node, <span class="keyword">struct</span> file *file)</span></span><br><span class="line">&#123;</span><br><span class="line">    printk(<span class="string">&quot;file:%s  func:%s  line:%d\n&quot;</span>, __FILE__ , __FUNCTION__, __LINE__);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">ssize_t</span> <span class="title function_">led_drv_write</span><span class="params">(<span class="keyword">struct</span> file *file, <span class="type">const</span> <span class="type">char</span> __user *buf, <span class="type">size_t</span> size, <span class="type">loff_t</span> *ppos)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">char</span> c;</span><br><span class="line">	<span class="type">int</span> ret;</span><br><span class="line">    <span class="comment">//当前所在的源代码文件的文件名 当前所在的函数的名称 代码行号</span></span><br><span class="line">    printk(<span class="string">&quot;file:%s  func:%s  line:%d\n&quot;</span>, __FILE__ , __FUNCTION__, __LINE__);</span><br><span class="line">	ret = copy_from_user(&amp;c, buf, <span class="number">1</span>);</span><br><span class="line">	<span class="keyword">if</span>(c == <span class="string">&#x27;1&#x27;</span>)</span><br><span class="line">		<span class="comment">/* set led on*/</span></span><br><span class="line">		*GPIO5_DR &amp;= ~(<span class="number">1</span> &lt;&lt; <span class="number">3</span>);</span><br><span class="line">	<span class="keyword">else</span></span><br><span class="line">		<span class="comment">/* set led off */</span></span><br><span class="line">		*GPIO5_DR |= (<span class="number">1</span> &lt;&lt; <span class="number">3</span>);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> __init <span class="title function_">led_init_driver</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    printk(<span class="string">&quot;file:%s  func:%s  line:%d\n&quot;</span>, __FILE__ , __FUNCTION__, __LINE__);</span><br><span class="line">    major = register_chrdev(<span class="number">0</span>, <span class="string">&quot;myled&quot;</span>, &amp;myled_fops);</span><br><span class="line">    </span><br><span class="line">	<span class="comment">/* ioremap：将寄存器的物理地址映射为虚拟地址 */</span></span><br><span class="line">	IOMUXC_SNVS_SW_MUX_CTL_PAD_SNVS_TAMPER3 = ioremap(<span class="number">0x02290000</span> + <span class="number">0x14</span>, <span class="number">4</span>);</span><br><span class="line">	IOMUXC_SNVS_SW_PAD_CTL_PAD_SNVS_TAMPER3 = ioremap(<span class="number">0x02290000</span> + <span class="number">0x58</span>, <span class="number">4</span>);</span><br><span class="line">	GPIO5_GDIR = ioremap(<span class="number">0x020AC000</span> + <span class="number">0x04</span>, <span class="number">4</span>);</span><br><span class="line">	GPIO5_DR = ioremap(<span class="number">0x020AC000</span> + <span class="number">0x00</span>, <span class="number">4</span>);</span><br><span class="line"></span><br><span class="line">	myled_class = class_create(THIS_MODULE, <span class="string">&quot;myled&quot;</span>);</span><br><span class="line">    device_create(myled_class, <span class="literal">NULL</span>, MKDEV(major, <span class="number">0</span>), <span class="literal">NULL</span>, <span class="string">&quot;myled&quot;</span>);</span><br><span class="line">    </span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> __exit <span class="title function_">led_exit_driver</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="comment">/* iounmap：取消虚拟地址的映射 */</span></span><br><span class="line">	iounmap(IOMUXC_SNVS_SW_MUX_CTL_PAD_SNVS_TAMPER3);</span><br><span class="line">	iounmap(IOMUXC_SNVS_SW_PAD_CTL_PAD_SNVS_TAMPER3);</span><br><span class="line">	iounmap(GPIO5_DR);</span><br><span class="line">	iounmap(GPIO5_GDIR);</span><br><span class="line">	</span><br><span class="line">	device_destroy(myled_class, MKDEV(major, <span class="number">0</span>));</span><br><span class="line">	class_destroy(myled_class);</span><br><span class="line">	unregister_chrdev(major, <span class="string">&quot;myled&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">module_init(led_init_driver);</span><br><span class="line">module_exit(led_exit_driver);</span><br><span class="line">MODULE_LICENSE(<span class="string">&quot;GPL&quot;</span>);</span><br></pre></td></tr></table></figure>
+<p>然后，简单编写一个APP用来测试：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/stat.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;fcntl.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> fd;</span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">char</span> c = <span class="string">&#x27;1&#x27;</span>;</span><br><span class="line">    <span class="type">int</span> ret;</span><br><span class="line">    fd = open(<span class="string">&quot;/dev/myled&quot;</span>, O_RDWR);</span><br><span class="line">    <span class="keyword">if</span>(fd == <span class="number">-1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        perror(<span class="string">&quot;open error &quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span>(<span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;input one char (1:led on, q:quit, other: led off):&quot;</span>);</span><br><span class="line">        <span class="built_in">scanf</span>(<span class="string">&quot;%c&quot;</span>, &amp;c);</span><br><span class="line">        getchar();</span><br><span class="line">        <span class="keyword">if</span>(c == <span class="string">&#x27;q&#x27;</span>) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">        ret = write(fd, &amp;c, <span class="number">1</span>);</span><br><span class="line">        <span class="keyword">if</span>(ret != <span class="number">1</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            perror(<span class="string">&quot;write error &quot;</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 ]]></content>
       <categories>
         <category>Linux应用开发</category>
@@ -1263,157 +1263,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Unix-Linux编程实践教程-章节2笔记</title>
-    <url>/2023/09/12/Unix-Linux%E7%BC%96%E7%A8%8B%E5%AE%9E%E8%B7%B5%E6%95%99%E7%A8%8B-%E7%AB%A0%E8%8A%822%E7%AC%94%E8%AE%B0/</url>
-    <content><![CDATA[<h2 id="who"><a href="#who" class="headerlink" title="who"></a>who</h2><ul>
-<li>把程序的可执行文件放到任意的一个目录中（/bin /usr/bin /usr/local/bin），就可以为系统添加新的命令</li>
-</ul>
-<h3 id="寻找who的踪迹"><a href="#寻找who的踪迹" class="headerlink" title="寻找who的踪迹"></a>寻找who的踪迹</h3><ul>
-<li><code>man who</code>:发现文件utmp,wtmp很关键</li>
-<li><code>man -k utmp</code>:按关键字搜索utmp，发现：</li>
-</ul>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">utmp (5)            - login records</span><br><span class="line">login (3)            - write utmp and wtmp entries</span><br><span class="line">logout (3)           - write utmp and wtmp entries</span><br></pre></td></tr></table></figure>
-<ul>
-<li><p><code>man 5 utmp</code>:发现<code>&lt;utmp.h&gt;</code>中关于utmp结构体的定义</p>
-</li>
-<li><p>通过阅读以上信息，知道<code>who</code>通过读文件获得需要的信息，而每一个登录用户的信息在文件中都有记录,所以编写<code>who</code>命令分为两步：</p>
-<ul>
-<li>a.从<code>UTMP_FILE</code>文件中读取数据结构</li>
-<li>b.将结构体中的信息以适当的形式显示出来</li>
-</ul>
-</li>
-</ul>
-<h3 id="如何读取数据结构"><a href="#如何读取数据结构" class="headerlink" title="如何读取数据结构"></a>如何读取数据结构</h3><ul>
-<li><p><code>man -k file | grep read</code>：将man的输出重定向到grep的输入，grep查找符合条件的字符串，发现：</p>
-<ul>
-<li><code>read (2)             - read from a file descriptor</code></li>
-<li>注：grep的查找关键字是随意输入的主题相关的单词</li>
-</ul>
-</li>
-<li><p><code>man 2 read</code>:发现文件操作必须的三个函数<code>read、open、close</code></p>
-</li>
-</ul>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line">ssize_t read(int fd, void *buf, size_t count);</span><br></pre></td></tr></table></figure>
-<ul>
-<li>返回值：成功则返回读取数量，遇到错误返回-1</li>
-</ul>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#include &lt;fcntl.h&gt;</span><br><span class="line">int open(const char *pathname, int flags);</span><br></pre></td></tr></table></figure>
-<ul>
-<li>参数：<ul>
-<li>flags:O_RDONLY, O_WRONLY, or O_RDWR，分别对应只读，只写，读写三种</li>
-</ul>
-</li>
-<li>返回值：成功则返回文件描述符，遇到错误返回-1</li>
-<li>打开文件可能出错的原因多种多样，具体请查看文档</li>
-</ul>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line">int close(int fd);</span><br></pre></td></tr></table></figure>
-<ul>
-<li>返回值：0表示成功关闭，-1表示出现错误</li>
-</ul>
-<p>通过以上三个函数即可读取登录信息记录文件<code>UTMP_FILE</code>:</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">if((utmpfd = open(UTMP_FILE , O_RDONLY)) == -1)</span><br><span class="line">    perror(UTMP_FILE);   //用法</span><br><span class="line"></span><br><span class="line">while (read(utmpfd , &amp;current_record , len) == len)</span><br><span class="line">    show_info(&amp;current_record);</span><br><span class="line"></span><br><span class="line">close(utmpfd);</span><br></pre></td></tr></table></figure>
-<h3 id="将结构体中的信息显示"><a href="#将结构体中的信息显示" class="headerlink" title="将结构体中的信息显示"></a>将结构体中的信息显示</h3><p>主要是以合适格式显示登录时间，通过以下命令查询相关函数：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">man -k time | grep transform</span><br><span class="line">man 3 ctime</span><br></pre></td></tr></table></figure>
-<p>函数ctime的信息如下：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#include &lt;time.h&gt;</span><br><span class="line">char *ctime(const time_t *timep);</span><br></pre></td></tr></table></figure>
-<ul>
-<li>返回值：格式为<code>&quot;Wed Jun 30 21:49:08 1993\n&quot;</code>的字符串</li>
-<li><code>time_t</code>为<code>long int</code>类型</li>
-<li>utmp文件中的<code>ut-&gt;time</code>表示用户从登录时间到初始时间所经过的秒数</li>
-</ul>
-<h3 id="who的工作流程"><a href="#who的工作流程" class="headerlink" title="who的工作流程"></a>who的工作流程</h3><p>1.打开UTMP_FILE路径对应的文件<br>2.读出一个utmp结构，并显示<br>3.关闭utmp文件</p>
-<h4 id="在用户空间中使用缓冲区"><a href="#在用户空间中使用缓冲区" class="headerlink" title="在用户空间中使用缓冲区"></a>在用户空间中使用缓冲区</h4><p>1.一次读取16个utmp结构，以供显示<br>2.当缓冲区中的内容显示完成之后，在进行系统调用，从内核中读取utmp结构数据</p>
-<h4 id="内核中的缓冲技术"><a href="#内核中的缓冲技术" class="headerlink" title="内核中的缓冲技术"></a>内核中的缓冲技术</h4><ul>
-<li>read()将数据从内核缓冲区读取到进程缓冲区。如果进程所要求的数据块不在内核缓冲区，则内核会把对该数据块的请求加入到请求数据队列中，然后将进程挂起；当内核把数据块从磁盘读取到内核缓冲区之后，再把数据从内核缓冲区复制到进程缓冲区，最后再唤醒挂起的进程。</li>
-<li>write()将数据从进程缓冲区复制到内核缓冲区。内核会把需要写的数据暂时存在缓冲区中，积累到一定数量之后再一次性写入到磁盘中。如果发生意外情况(停电)，有可能内核来不及将数据写入到磁盘中，就会导致数据丢失。</li>
-</ul>
-<h3 id="修改用户登录信息"><a href="#修改用户登录信息" class="headerlink" title="修改用户登录信息"></a>修改用户登录信息</h3><p>1.打开utmp文件<br>2.查找需要修改的登录记录，并修改<br>3.关闭文件</p>
-<h4 id="文件读取过程"><a href="#文件读取过程" class="headerlink" title="文件读取过程"></a>文件读取过程</h4><ul>
-<li>从文件读数据时，从指针标明的地方开始读取指定字节并将指针移动至下一未被读取的字节</li>
-<li>指针与文件描述符相关，所以两个程序同时读一个文件时互不影响</li>
-</ul>
-<h4 id="lseek-函数"><a href="#lseek-函数" class="headerlink" title="lseek()函数"></a>lseek()函数</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#include &lt;sys/type.h&gt;</span><br><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line">off_t oldpos = lseek(int fd , off_t dist , int base)</span><br></pre></td></tr></table></figure>
-<ul>
-<li>参数：<ul>
-<li>dist:移动的距离</li>
-<li>base:基准位置 <code>SEEK_SET -&gt; 文件开始</code>，<code>SEEK_CUR -&gt; 当前位置</code> ， <code>SEEK_END -&gt; 文件结尾</code></li>
-</ul>
-</li>
-<li>返回值：返回指针变化前的位置，返回-1表示遇到错误</li>
-</ul>
-<h3 id="修改UTMP文件中记录的ut-gt-type"><a href="#修改UTMP文件中记录的ut-gt-type" class="headerlink" title="修改UTMP文件中记录的ut-&gt;type"></a>修改UTMP文件中记录的ut-&gt;type</h3><ul>
-<li><code>ut-&gt;type</code>表示该记录的某种状态，例如<code>USER_PROCESS</code>表示正常的登录进程，<code>DEAD_PROCESS</code>表示终止的登录进程<ul>
-<li>不过用户logout之后并不会修改其为<code>DEAD_PROCESS</code>,不确定什么情况下会使用<code>DEAD_PROCESS</code>来标记登录记录</li>
-</ul>
-</li>
-<li><code>/var/lib/wtmp</code>:记录了本系统中历史登录信息</li>
-<li><code>/var/run/utmp</code>:记录当前的登录信息</li>
-</ul>
-<h4 id="编写logout-tty-函数"><a href="#编写logout-tty-函数" class="headerlink" title="编写logout_tty()函数"></a>编写logout_tty()函数</h4><p>1.打开wtmp文件<br>2.循环读取，寻找匹配记录<br>3.定位文件指针到该记录的开始位置<br>4.写入需要修改的内容<br>5.关闭文件</p>
-<ul>
-<li>通过对比传入的ut_line来修改对应记录的<code>ut-&gt;type</code>属性</li>
-<li>编写时注意<code>open()</code>传入的flags应为<code>O_RDWR</code><ul>
-<li>如果传了<code>O_RDONLY</code>则写入时会perror报<code>/var/log/wtmp: Bad file descriptor</code></li>
-<li><code>Bad file descriptor</code>:如果文件描述符有问题，也会报出这个错误(一般文件描述符不会太大，太大时八成是没有初始化)</li>
-</ul>
-</li>
-<li>查看一下<code>/var/lib/wtmp</code>的信息以及当前用户和root用户的所属组：<ul>
-<li>该文件属于root用户，而我们和root用户不同组，属于其他组，没有写入权限，报<code>/var/log/wtmp: Permission denied</code></li>
-<li>可以切换成root用户再执行</li>
-</ul>
-</li>
-</ul>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">//wtmp信息</span><br><span class="line">-rw-rw-r-- 1 root utmp 22656 10月 26 16:54 /var/log/wtmp</span><br><span class="line"></span><br><span class="line">// 用户所属组信息</span><br><span class="line">zhaoyan : zhaoyan adm cdrom sudo dip plugdev lpadmin lxd sambashare</span><br><span class="line">root : root</span><br></pre></td></tr></table></figure>
-<h2 id="cp"><a href="#cp" class="headerlink" title="cp"></a>cp</h2><ul>
-<li>拷贝：<code>cp source_file target_file</code></li>
-</ul>
-<h3 id="使用的系统调用"><a href="#使用的系统调用" class="headerlink" title="使用的系统调用"></a>使用的系统调用</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#include &lt;fcntl.h&gt;</span><br><span class="line">int creat(const char *pathname, mode_t mode);</span><br></pre></td></tr></table></figure>
-<ul>
-<li>参数：<ul>
-<li>mode:访问模式(mode_t应该是unsigned int类型) </li>
-</ul>
-</li>
-<li>返回值：成功返回文件描述符，失败返回-1</li>
-<li>没有则创建文件，如果文件存在则它的内容会被清空。</li>
-</ul>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line">ssize_t write(int fd, const void *buf, size_t count);</span><br></pre></td></tr></table></figure>
-<ul>
-<li>返回值：成功则返回写入的字节数，失败则返回-1</li>
-<li>为什么写入字节数会少于指定数量：<ul>
-<li>系统对文件的最大长度有限制，或者磁盘空间不足</li>
-<li>因此有必要校验是否完全写入</li>
-</ul>
-</li>
-</ul>
-<h4 id="linux权限"><a href="#linux权限" class="headerlink" title="linux权限"></a>linux权限</h4><p>例如<code>-rw--r--r-</code>:</p>
-<ul>
-<li>第一位表示文件类型，-表示文件，d表示目录</li>
-<li>从左到右分别是文件所有者的权限(u)，文件所有者所属组成员的权限(g)，所有者所属组之外的用户的权限(o)</li>
-<li>r对应4，w对应2，x对应1，-对应0，所以可以用<code>0644</code>来描述（<strong>0表示该数是一个八进制数</strong>）</li>
-<li>权限一般用八进制表示，因为二进制每三位对应一组权限，用十六或者十进制都得需要计算一下，不如八进制方便</li>
-</ul>
-<h2 id="错误提示"><a href="#错误提示" class="headerlink" title="错误提示"></a>错误提示</h2><ul>
-<li>在<errno.h>中包含错误类型和相应的说明。当系统调用出错时，就会把该文件中的errno全局变量设置为相应的错误代码，然后返回-1。程序可以通过检查errno来确定错误类型，并采取相应的措施。</li>
-<li>更方便是使用perror()函数，它可以自己查找错误代码，并在标准错误输出中显示相应的错误信息，string是同时显示的描述信息</li>
-</ul>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">void perror(const char *s);</span><br></pre></td></tr></table></figure>
-<h2 id="cat"><a href="#cat" class="headerlink" title="cat"></a>cat</h2><p>1.判断pathname是一个文件还是目录<br>2.打开该文件，并通过缓存读取并输出<br>3.关闭该文件</p>
-<h3 id="如何判断是文件还是目录"><a href="#如何判断是文件还是目录" class="headerlink" title="如何判断是文件还是目录"></a>如何判断是文件还是目录</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">- man 2 stat</span><br><span class="line"></span><br><span class="line">#include &lt;sys/types.h&gt;</span><br><span class="line">#include &lt;sys/stat.h&gt;</span><br><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line"></span><br><span class="line">int stat(const char *pathname, struct stat *statbuf);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">struct stat &#123;</span><br><span class="line">    dev_t     st_dev;         /* ID of device containing file */</span><br><span class="line">    ino_t     st_ino;         /* Inode number */ 索引编号</span><br><span class="line">    mode_t    st_mode;        /* File type and mode */</span><br><span class="line">    nlink_t   st_nlink;       /* Number of hard links */</span><br><span class="line">    uid_t     st_uid;         /* User ID of owner */</span><br><span class="line">    gid_t     st_gid;         /* Group ID of owner */</span><br><span class="line">    dev_t     st_rdev;        /* Device ID (if special file) */</span><br><span class="line">    off_t     st_size;        /* Total size, in bytes */</span><br><span class="line">    blksize_t st_blksize;     /* Block size for filesystem I/O */</span><br><span class="line">    blkcnt_t  st_blocks;      /* Number of 512B blocks allocated */</span><br><span class="line"></span><br><span class="line">    /* Since Linux 2.6, the kernel supports nanosecond</span><br><span class="line">        precision for the following timestamp fields.</span><br><span class="line">        For the details before Linux 2.6, see NOTES. */</span><br><span class="line"></span><br><span class="line">    struct timespec st_atim;  /* Time of last access */</span><br><span class="line">    struct timespec st_mtim;  /* Time of last modification */</span><br><span class="line">    struct timespec st_ctim;  /* Time of last status change */</span><br><span class="line"></span><br><span class="line">#define st_atime st_atim.tv_sec      /* Backward compatibility */</span><br><span class="line">#define st_mtime st_mtim.tv_sec</span><br><span class="line">#define st_ctime st_ctim.tv_sec</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">//检查文件类型</span><br><span class="line">#define	__S_ISTYPE(mode, mask)	(((mode) &amp; __S_IFMT) == (mask))</span><br><span class="line"></span><br><span class="line">#define	S_ISDIR(mode)	 __S_ISTYPE((mode), __S_IFDIR)  //目录</span><br><span class="line">#define	S_ISCHR(mode)	 __S_ISTYPE((mode), __S_IFCHR)  //字符特殊设备</span><br><span class="line">#define	S_ISBLK(mode)	 __S_ISTYPE((mode), __S_IFBLK)  //块特殊设备</span><br><span class="line">#define	S_ISREG(mode)	 __S_ISTYPE((mode), __S_IFREG)  //普通文件</span><br></pre></td></tr></table></figure>
-<ul>
-<li>返回值：如果成功返回0，否则返回-1，并且<code>error</code>会设置为相应的错误类型</li>
-</ul>
-<h2 id="习题"><a href="#习题" class="headerlink" title="习题"></a>习题</h2><p>习题写了cat head last命令，<br>其中last命令，由于没有找到用户logout信息在哪里存放，所以无法和系统的last保持一致<br>此外，与head命令相对应的tail命令不是很好写，难在“怎么定位一个文件的倒数10行开始处”这个问题怎么优雅的解决</p>
-]]></content>
-      <categories>
-        <category>读书笔记</category>
-        <category>《Unix-Linux编程实践教程》</category>
-      </categories>
-      <tags>
-        <tag>Linux</tag>
-        <tag>C/C++</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Unix-Linux编程实践教程-章节1笔记</title>
     <url>/2023/09/12/Unix-Linux%E7%BC%96%E7%A8%8B%E5%AE%9E%E8%B7%B5%E6%95%99%E7%A8%8B-%E7%AB%A0%E8%8A%821%E7%AC%94%E8%AE%B0/</url>
     <content><![CDATA[<h2 id="more"><a href="#more" class="headerlink" title="more"></a>more</h2><h3 id="more的三种用法"><a href="#more的三种用法" class="headerlink" title="more的三种用法"></a>more的三种用法</h3><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">more filename      //分页显示文件内容</span><br><span class="line">command | more     //将command命令的输出分页显示</span><br><span class="line">more &lt; filename    //more从标准输入中获取要分页显示的内容，而标准输入被从重定向到filename</span><br></pre></td></tr></table></figure>
@@ -1602,6 +1451,157 @@
 </ul>
 </li>
 </ul>
+]]></content>
+      <categories>
+        <category>读书笔记</category>
+        <category>《Unix-Linux编程实践教程》</category>
+      </categories>
+      <tags>
+        <tag>Linux</tag>
+        <tag>C/C++</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Unix-Linux编程实践教程-章节2笔记</title>
+    <url>/2023/09/12/Unix-Linux%E7%BC%96%E7%A8%8B%E5%AE%9E%E8%B7%B5%E6%95%99%E7%A8%8B-%E7%AB%A0%E8%8A%822%E7%AC%94%E8%AE%B0/</url>
+    <content><![CDATA[<h2 id="who"><a href="#who" class="headerlink" title="who"></a>who</h2><ul>
+<li>把程序的可执行文件放到任意的一个目录中（/bin /usr/bin /usr/local/bin），就可以为系统添加新的命令</li>
+</ul>
+<h3 id="寻找who的踪迹"><a href="#寻找who的踪迹" class="headerlink" title="寻找who的踪迹"></a>寻找who的踪迹</h3><ul>
+<li><code>man who</code>:发现文件utmp,wtmp很关键</li>
+<li><code>man -k utmp</code>:按关键字搜索utmp，发现：</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">utmp (5)            - login records</span><br><span class="line">login (3)            - write utmp and wtmp entries</span><br><span class="line">logout (3)           - write utmp and wtmp entries</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p><code>man 5 utmp</code>:发现<code>&lt;utmp.h&gt;</code>中关于utmp结构体的定义</p>
+</li>
+<li><p>通过阅读以上信息，知道<code>who</code>通过读文件获得需要的信息，而每一个登录用户的信息在文件中都有记录,所以编写<code>who</code>命令分为两步：</p>
+<ul>
+<li>a.从<code>UTMP_FILE</code>文件中读取数据结构</li>
+<li>b.将结构体中的信息以适当的形式显示出来</li>
+</ul>
+</li>
+</ul>
+<h3 id="如何读取数据结构"><a href="#如何读取数据结构" class="headerlink" title="如何读取数据结构"></a>如何读取数据结构</h3><ul>
+<li><p><code>man -k file | grep read</code>：将man的输出重定向到grep的输入，grep查找符合条件的字符串，发现：</p>
+<ul>
+<li><code>read (2)             - read from a file descriptor</code></li>
+<li>注：grep的查找关键字是随意输入的主题相关的单词</li>
+</ul>
+</li>
+<li><p><code>man 2 read</code>:发现文件操作必须的三个函数<code>read、open、close</code></p>
+</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line">ssize_t read(int fd, void *buf, size_t count);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>返回值：成功则返回读取数量，遇到错误返回-1</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#include &lt;fcntl.h&gt;</span><br><span class="line">int open(const char *pathname, int flags);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>参数：<ul>
+<li>flags:O_RDONLY, O_WRONLY, or O_RDWR，分别对应只读，只写，读写三种</li>
+</ul>
+</li>
+<li>返回值：成功则返回文件描述符，遇到错误返回-1</li>
+<li>打开文件可能出错的原因多种多样，具体请查看文档</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line">int close(int fd);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>返回值：0表示成功关闭，-1表示出现错误</li>
+</ul>
+<p>通过以上三个函数即可读取登录信息记录文件<code>UTMP_FILE</code>:</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">if((utmpfd = open(UTMP_FILE , O_RDONLY)) == -1)</span><br><span class="line">    perror(UTMP_FILE);   //用法</span><br><span class="line"></span><br><span class="line">while (read(utmpfd , &amp;current_record , len) == len)</span><br><span class="line">    show_info(&amp;current_record);</span><br><span class="line"></span><br><span class="line">close(utmpfd);</span><br></pre></td></tr></table></figure>
+<h3 id="将结构体中的信息显示"><a href="#将结构体中的信息显示" class="headerlink" title="将结构体中的信息显示"></a>将结构体中的信息显示</h3><p>主要是以合适格式显示登录时间，通过以下命令查询相关函数：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">man -k time | grep transform</span><br><span class="line">man 3 ctime</span><br></pre></td></tr></table></figure>
+<p>函数ctime的信息如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#include &lt;time.h&gt;</span><br><span class="line">char *ctime(const time_t *timep);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>返回值：格式为<code>&quot;Wed Jun 30 21:49:08 1993\n&quot;</code>的字符串</li>
+<li><code>time_t</code>为<code>long int</code>类型</li>
+<li>utmp文件中的<code>ut-&gt;time</code>表示用户从登录时间到初始时间所经过的秒数</li>
+</ul>
+<h3 id="who的工作流程"><a href="#who的工作流程" class="headerlink" title="who的工作流程"></a>who的工作流程</h3><p>1.打开UTMP_FILE路径对应的文件<br>2.读出一个utmp结构，并显示<br>3.关闭utmp文件</p>
+<h4 id="在用户空间中使用缓冲区"><a href="#在用户空间中使用缓冲区" class="headerlink" title="在用户空间中使用缓冲区"></a>在用户空间中使用缓冲区</h4><p>1.一次读取16个utmp结构，以供显示<br>2.当缓冲区中的内容显示完成之后，在进行系统调用，从内核中读取utmp结构数据</p>
+<h4 id="内核中的缓冲技术"><a href="#内核中的缓冲技术" class="headerlink" title="内核中的缓冲技术"></a>内核中的缓冲技术</h4><ul>
+<li>read()将数据从内核缓冲区读取到进程缓冲区。如果进程所要求的数据块不在内核缓冲区，则内核会把对该数据块的请求加入到请求数据队列中，然后将进程挂起；当内核把数据块从磁盘读取到内核缓冲区之后，再把数据从内核缓冲区复制到进程缓冲区，最后再唤醒挂起的进程。</li>
+<li>write()将数据从进程缓冲区复制到内核缓冲区。内核会把需要写的数据暂时存在缓冲区中，积累到一定数量之后再一次性写入到磁盘中。如果发生意外情况(停电)，有可能内核来不及将数据写入到磁盘中，就会导致数据丢失。</li>
+</ul>
+<h3 id="修改用户登录信息"><a href="#修改用户登录信息" class="headerlink" title="修改用户登录信息"></a>修改用户登录信息</h3><p>1.打开utmp文件<br>2.查找需要修改的登录记录，并修改<br>3.关闭文件</p>
+<h4 id="文件读取过程"><a href="#文件读取过程" class="headerlink" title="文件读取过程"></a>文件读取过程</h4><ul>
+<li>从文件读数据时，从指针标明的地方开始读取指定字节并将指针移动至下一未被读取的字节</li>
+<li>指针与文件描述符相关，所以两个程序同时读一个文件时互不影响</li>
+</ul>
+<h4 id="lseek-函数"><a href="#lseek-函数" class="headerlink" title="lseek()函数"></a>lseek()函数</h4><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#include &lt;sys/type.h&gt;</span><br><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line">off_t oldpos = lseek(int fd , off_t dist , int base)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>参数：<ul>
+<li>dist:移动的距离</li>
+<li>base:基准位置 <code>SEEK_SET -&gt; 文件开始</code>，<code>SEEK_CUR -&gt; 当前位置</code> ， <code>SEEK_END -&gt; 文件结尾</code></li>
+</ul>
+</li>
+<li>返回值：返回指针变化前的位置，返回-1表示遇到错误</li>
+</ul>
+<h3 id="修改UTMP文件中记录的ut-gt-type"><a href="#修改UTMP文件中记录的ut-gt-type" class="headerlink" title="修改UTMP文件中记录的ut-&gt;type"></a>修改UTMP文件中记录的ut-&gt;type</h3><ul>
+<li><code>ut-&gt;type</code>表示该记录的某种状态，例如<code>USER_PROCESS</code>表示正常的登录进程，<code>DEAD_PROCESS</code>表示终止的登录进程<ul>
+<li>不过用户logout之后并不会修改其为<code>DEAD_PROCESS</code>,不确定什么情况下会使用<code>DEAD_PROCESS</code>来标记登录记录</li>
+</ul>
+</li>
+<li><code>/var/lib/wtmp</code>:记录了本系统中历史登录信息</li>
+<li><code>/var/run/utmp</code>:记录当前的登录信息</li>
+</ul>
+<h4 id="编写logout-tty-函数"><a href="#编写logout-tty-函数" class="headerlink" title="编写logout_tty()函数"></a>编写logout_tty()函数</h4><p>1.打开wtmp文件<br>2.循环读取，寻找匹配记录<br>3.定位文件指针到该记录的开始位置<br>4.写入需要修改的内容<br>5.关闭文件</p>
+<ul>
+<li>通过对比传入的ut_line来修改对应记录的<code>ut-&gt;type</code>属性</li>
+<li>编写时注意<code>open()</code>传入的flags应为<code>O_RDWR</code><ul>
+<li>如果传了<code>O_RDONLY</code>则写入时会perror报<code>/var/log/wtmp: Bad file descriptor</code></li>
+<li><code>Bad file descriptor</code>:如果文件描述符有问题，也会报出这个错误(一般文件描述符不会太大，太大时八成是没有初始化)</li>
+</ul>
+</li>
+<li>查看一下<code>/var/lib/wtmp</code>的信息以及当前用户和root用户的所属组：<ul>
+<li>该文件属于root用户，而我们和root用户不同组，属于其他组，没有写入权限，报<code>/var/log/wtmp: Permission denied</code></li>
+<li>可以切换成root用户再执行</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">//wtmp信息</span><br><span class="line">-rw-rw-r-- 1 root utmp 22656 10月 26 16:54 /var/log/wtmp</span><br><span class="line"></span><br><span class="line">// 用户所属组信息</span><br><span class="line">zhaoyan : zhaoyan adm cdrom sudo dip plugdev lpadmin lxd sambashare</span><br><span class="line">root : root</span><br></pre></td></tr></table></figure>
+<h2 id="cp"><a href="#cp" class="headerlink" title="cp"></a>cp</h2><ul>
+<li>拷贝：<code>cp source_file target_file</code></li>
+</ul>
+<h3 id="使用的系统调用"><a href="#使用的系统调用" class="headerlink" title="使用的系统调用"></a>使用的系统调用</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#include &lt;fcntl.h&gt;</span><br><span class="line">int creat(const char *pathname, mode_t mode);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>参数：<ul>
+<li>mode:访问模式(mode_t应该是unsigned int类型) </li>
+</ul>
+</li>
+<li>返回值：成功返回文件描述符，失败返回-1</li>
+<li>没有则创建文件，如果文件存在则它的内容会被清空。</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line">ssize_t write(int fd, const void *buf, size_t count);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>返回值：成功则返回写入的字节数，失败则返回-1</li>
+<li>为什么写入字节数会少于指定数量：<ul>
+<li>系统对文件的最大长度有限制，或者磁盘空间不足</li>
+<li>因此有必要校验是否完全写入</li>
+</ul>
+</li>
+</ul>
+<h4 id="linux权限"><a href="#linux权限" class="headerlink" title="linux权限"></a>linux权限</h4><p>例如<code>-rw--r--r-</code>:</p>
+<ul>
+<li>第一位表示文件类型，-表示文件，d表示目录</li>
+<li>从左到右分别是文件所有者的权限(u)，文件所有者所属组成员的权限(g)，所有者所属组之外的用户的权限(o)</li>
+<li>r对应4，w对应2，x对应1，-对应0，所以可以用<code>0644</code>来描述（<strong>0表示该数是一个八进制数</strong>）</li>
+<li>权限一般用八进制表示，因为二进制每三位对应一组权限，用十六或者十进制都得需要计算一下，不如八进制方便</li>
+</ul>
+<h2 id="错误提示"><a href="#错误提示" class="headerlink" title="错误提示"></a>错误提示</h2><ul>
+<li>在<errno.h>中包含错误类型和相应的说明。当系统调用出错时，就会把该文件中的errno全局变量设置为相应的错误代码，然后返回-1。程序可以通过检查errno来确定错误类型，并采取相应的措施。</li>
+<li>更方便是使用perror()函数，它可以自己查找错误代码，并在标准错误输出中显示相应的错误信息，string是同时显示的描述信息</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">void perror(const char *s);</span><br></pre></td></tr></table></figure>
+<h2 id="cat"><a href="#cat" class="headerlink" title="cat"></a>cat</h2><p>1.判断pathname是一个文件还是目录<br>2.打开该文件，并通过缓存读取并输出<br>3.关闭该文件</p>
+<h3 id="如何判断是文件还是目录"><a href="#如何判断是文件还是目录" class="headerlink" title="如何判断是文件还是目录"></a>如何判断是文件还是目录</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">- man 2 stat</span><br><span class="line"></span><br><span class="line">#include &lt;sys/types.h&gt;</span><br><span class="line">#include &lt;sys/stat.h&gt;</span><br><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line"></span><br><span class="line">int stat(const char *pathname, struct stat *statbuf);</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">struct stat &#123;</span><br><span class="line">    dev_t     st_dev;         /* ID of device containing file */</span><br><span class="line">    ino_t     st_ino;         /* Inode number */ 索引编号</span><br><span class="line">    mode_t    st_mode;        /* File type and mode */</span><br><span class="line">    nlink_t   st_nlink;       /* Number of hard links */</span><br><span class="line">    uid_t     st_uid;         /* User ID of owner */</span><br><span class="line">    gid_t     st_gid;         /* Group ID of owner */</span><br><span class="line">    dev_t     st_rdev;        /* Device ID (if special file) */</span><br><span class="line">    off_t     st_size;        /* Total size, in bytes */</span><br><span class="line">    blksize_t st_blksize;     /* Block size for filesystem I/O */</span><br><span class="line">    blkcnt_t  st_blocks;      /* Number of 512B blocks allocated */</span><br><span class="line"></span><br><span class="line">    /* Since Linux 2.6, the kernel supports nanosecond</span><br><span class="line">        precision for the following timestamp fields.</span><br><span class="line">        For the details before Linux 2.6, see NOTES. */</span><br><span class="line"></span><br><span class="line">    struct timespec st_atim;  /* Time of last access */</span><br><span class="line">    struct timespec st_mtim;  /* Time of last modification */</span><br><span class="line">    struct timespec st_ctim;  /* Time of last status change */</span><br><span class="line"></span><br><span class="line">#define st_atime st_atim.tv_sec      /* Backward compatibility */</span><br><span class="line">#define st_mtime st_mtim.tv_sec</span><br><span class="line">#define st_ctime st_ctim.tv_sec</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">//检查文件类型</span><br><span class="line">#define	__S_ISTYPE(mode, mask)	(((mode) &amp; __S_IFMT) == (mask))</span><br><span class="line"></span><br><span class="line">#define	S_ISDIR(mode)	 __S_ISTYPE((mode), __S_IFDIR)  //目录</span><br><span class="line">#define	S_ISCHR(mode)	 __S_ISTYPE((mode), __S_IFCHR)  //字符特殊设备</span><br><span class="line">#define	S_ISBLK(mode)	 __S_ISTYPE((mode), __S_IFBLK)  //块特殊设备</span><br><span class="line">#define	S_ISREG(mode)	 __S_ISTYPE((mode), __S_IFREG)  //普通文件</span><br></pre></td></tr></table></figure>
+<ul>
+<li>返回值：如果成功返回0，否则返回-1，并且<code>error</code>会设置为相应的错误类型</li>
+</ul>
+<h2 id="习题"><a href="#习题" class="headerlink" title="习题"></a>习题</h2><p>习题写了cat head last命令，<br>其中last命令，由于没有找到用户logout信息在哪里存放，所以无法和系统的last保持一致<br>此外，与head命令相对应的tail命令不是很好写，难在“怎么定位一个文件的倒数10行开始处”这个问题怎么优雅的解决</p>
 ]]></content>
       <categories>
         <category>读书笔记</category>
@@ -2329,6 +2329,94 @@
       </tags>
   </entry>
   <entry>
+    <title>使用电阻屏和电容屏</title>
+    <url>/2023/09/22/%E4%BD%BF%E7%94%A8%E7%94%B5%E9%98%BB%E5%B1%8F%E5%92%8C%E7%94%B5%E5%AE%B9%E5%B1%8F/</url>
+    <content><![CDATA[<h2 id="1-电阻屏和电容屏定位原理"><a href="#1-电阻屏和电容屏定位原理" class="headerlink" title="1. 电阻屏和电容屏定位原理"></a>1. 电阻屏和电容屏定位原理</h2><h3 id="1-1-电阻屏"><a href="#1-1-电阻屏" class="headerlink" title="1.1 电阻屏"></a>1.1 电阻屏</h3><p><img src="../images/使用电阻屏和电容屏/image-20230922200403814.png" alt="image-20230922200403814"></p>
+<ul>
+<li>根据分压原理，计算电阻值。假设材料长度和电阻成线性关系，则可以计算出相对距离</li>
+<li>电阻屏分为上下两层薄膜，一层通电时，另一层在按压时作为探针获取分压值，从而进行计算</li>
+<li>电阻屏和LCD使用之前，需要进行五点校准二者的相对位置</li>
+</ul>
+<h4 id="1-1-1-电阻屏数据"><a href="#1-1-1-电阻屏数据" class="headerlink" title="1.1.1 电阻屏数据"></a>1.1.1 电阻屏数据</h4><p>按下时：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">EV_KEY    BTN_TOUCH       <span class="number">1</span>             <span class="comment">/* 按下 */</span> </span><br><span class="line">EV_ABS    ABS_PRESSURE    <span class="number">1</span>             <span class="comment">/* 压力值，可以上报，也可以不报，可以是其他压力值 */</span> </span><br><span class="line">EV_ABS    ABS_X           x_value       <span class="comment">/* X 坐标 */</span> </span><br><span class="line">EV_ABS    ABS_Y           y_value       <span class="comment">/* Y 坐标 */</span> </span><br><span class="line">EV_SYNC   <span class="number">0</span>               <span class="number">0</span>             <span class="comment">/* 同步事件 */</span></span><br></pre></td></tr></table></figure>
+<p>松开时：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">EV_KEY    BTN_TOUCH         <span class="number">0</span>           <span class="comment">/* 松开 */</span> </span><br><span class="line">EV_ABS    ABS_PRESSURE      <span class="number">0</span>           <span class="comment">/* 压力值，可以上报，也可以不报 */</span> </span><br><span class="line">EV_SYNC   <span class="number">0</span>                 <span class="number">0</span>           <span class="comment">/* 同步事件 */</span></span><br></pre></td></tr></table></figure>
+<h3 id="1-2-电容屏"><a href="#1-2-电容屏" class="headerlink" title="1.2 电容屏"></a>1.2 电容屏</h3><p><img src="../images/使用电阻屏和电容屏/image-20230922202123424.png" alt="image-20230922202123424"></p>
+<p>电容屏中有一个控制芯片，它会周期性产生驱动信号，接收电极接收到信号， 并可测量电荷大小。当电容屏被按下时，相当于引入了新的电容，从而影响了接 收电极接收到的电荷大小。主控芯片根据电荷大小即可计算出触点位置，应用开发人员只需要编写程序，通过 I2C 读取芯片寄存器即可得到这些数据。</p>
+<h4 id="1-2-1-电容屏多点触摸上报数据"><a href="#1-2-1-电容屏多点触摸上报数据" class="headerlink" title="1.2.1 电容屏多点触摸上报数据"></a>1.2.1 电容屏多点触摸上报数据</h4><figure class="highlight c"><table><tr><td class="code"><pre><span class="line">EV_ABS    ABS_MT_SLOT            <span class="number">0</span>    <span class="comment">// 这表示“我要上报一个触点信息了”，用来分隔触点信息 </span></span><br><span class="line">EV_ABS    ABS_MT_TRACKING_ID     <span class="number">45</span>   <span class="comment">// 这个触点的 ID 是 45，由控制芯片分配</span></span><br><span class="line">EV_ABS    ABS_MT_POSITION_X      x[<span class="number">0</span>] <span class="comment">// 触点 X 坐标 </span></span><br><span class="line">EV_ABS    ABS_MT_POSITION_Y      y[<span class="number">0</span>] <span class="comment">// 触点 Y 坐标 </span></span><br><span class="line">EV_ABS    ABS_MT_SLOT            <span class="number">1</span>    <span class="comment">// 这表示“我要上报一个触点信息了”，用来分隔触点信息 </span></span><br><span class="line">EV_ABS    ABS_MT_TRACKING_ID     <span class="number">46</span>   <span class="comment">// 这个触点的 ID 是 46，由控制芯片分配</span></span><br><span class="line">EV_ABS    ABS_MT_POSITION_X      x[<span class="number">1</span>] <span class="comment">// 触点 X 坐标 </span></span><br><span class="line">EV_ABS    ABS_MT_POSITION_Y      y[<span class="number">1</span>] <span class="comment">// 触点 Y 坐标 </span></span><br><span class="line">EV_SYNC   SYN_REPORT             <span class="number">0</span>    <span class="comment">// 全部数据上报完毕</span></span><br></pre></td></tr></table></figure>
+<p>当 ID 为 45 的触点正在移动时：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">EV_ABS    ABS_MT_SLOT            <span class="number">0</span>    <span class="comment">// 表示“要上报一个触点信息了”,之前上报过ID,就不用再上报ID </span></span><br><span class="line">EV_ABS    ABS_MT_POSITION_X      x[<span class="number">0</span>] <span class="comment">// 触点 X 坐标 </span></span><br><span class="line">EV_SYNC   SYN_REPORT             <span class="number">0</span>    <span class="comment">// 全部数据上报完毕</span></span><br></pre></td></tr></table></figure>
+<p>松开 ID 为 45 的触点时(在前面 slot 已经被设置为 0，这里不需要再重新设置 slot，slot 就像一个全局变量一样：如果它没变化的话，就无需再次设置)：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">EV_ABS    ABS_MT_TRACKING_ID     <span class="number">-1</span>   <span class="comment">// slot对应的ID是45,这里ID=-1，表示ID=45的触点被松开了</span></span><br><span class="line">EV_SYNC   SYN_REPORT             <span class="number">0</span>    <span class="comment">// 全部数据上报完毕</span></span><br></pre></td></tr></table></figure>
+<p>最后，松开 ID 为 46 的触点：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">EV_ABS    ABS_MT_SLOT            <span class="number">1</span>    <span class="comment">// 这表示“我要上报一个触点信息了”， slot 1 的 ID 为 46 </span></span><br><span class="line">EV_ABS    ABS_MT_TRACKING_ID    <span class="number">-1</span>     <span class="comment">// ID 为-1，表示 slot 1 被松开，即ID为46的触点被松开 </span></span><br><span class="line">EV_SYNC   SYN_REPORT                   <span class="comment">// 全部数据上报完毕</span></span><br></pre></td></tr></table></figure>
+<h4 id="1-2-2-电容屏实际数据分析"><a href="#1-2-2-电容屏实际数据分析" class="headerlink" title="1.2.2 电容屏实际数据分析"></a>1.2.2 电容屏实际数据分析</h4><p>电容屏单点击：</p>
+<p><img src="../images/使用电阻屏和电容屏/image-20230922204156789.png" alt="image-20230922204156789"></p>
+<ul>
+<li><code>xx_MAJOR</code>：用来描述触点大小，不是常用数据</li>
+<li><code>ABS_X/ABS_Y</code>：用来兼容老版本应用程序，电阻屏就是使用这个类型的数据</li>
+</ul>
+<p>两点触发：</p>
+<p><img src="../images/使用电阻屏和电容屏/image-20230922204750931.png" alt="image-20230922204750931"></p>
+<ul>
+<li>为了兼容老程序，它也上报了 ABS_X、ABS_Y 数据，但是只上报第 1 个触点的数据</li>
+</ul>
+<h2 id="2-触摸屏开源库-tslib"><a href="#2-触摸屏开源库-tslib" class="headerlink" title="2.触摸屏开源库-tslib"></a>2.触摸屏开源库-tslib</h2><h3 id="2-1-tslib框架分析"><a href="#2-1-tslib框架分析" class="headerlink" title="2.1 tslib框架分析"></a>2.1 tslib框架分析</h3><h4 id="2-1-1-目录结构"><a href="#2-1-1-目录结构" class="headerlink" title="2.1.1 目录结构"></a>2.1.1 目录结构</h4><p>tslib的主要代码文件结构：</p>
+<p><img src="../images/使用电阻屏和电容屏/image-20230922215156184.png" alt="image-20230922215156184"></p>
+<ul>
+<li>核心在于plugins目录，该目录下每一个文件都是一个module，每个module都提供2个函数：<code>read</code>和<code>read_mt</code>，<strong>前者用于读取单点触摸屏数据，后者用于读取多点触摸屏数据</strong></li>
+<li>test目录下是示例程序</li>
+</ul>
+<h4 id="2-1-2-框架结构"><a href="#2-1-2-框架结构" class="headerlink" title="2.1.2 框架结构"></a>2.1.2 框架结构</h4><p><img src="../images/使用电阻屏和电容屏/image-20230922224515068.png" alt="image-20230922224515068"></p>
+<ol>
+<li><p>调用<code>ts_open</code>后，可以打开某个设备节点，构造出一个 <code>tsdev</code> 结构体：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">tsdev</span> &#123;</span></span><br><span class="line">	<span class="type">int</span> fd;</span><br><span class="line">	<span class="type">char</span> *eventpath;                     <span class="comment">// 设备文件路径</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">tslib_module_info</span> *<span class="title">list</span>;</span>      <span class="comment">// 数据处理路径链表</span></span><br><span class="line">	<span class="comment">/* points to position in &#x27;list&#x27; where raw reads</span></span><br><span class="line"><span class="comment">	 * come from.  default is the position of the</span></span><br><span class="line"><span class="comment">	 * ts_read_raw module.</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">tslib_module_info</span> *<span class="title">list_raw</span>;</span> <span class="comment">//一般指向最底层的数据处理模块</span></span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span> res_x;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span> res_y;</span><br><span class="line">	<span class="type">int</span> rotation;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">tslib_module_info</span> &#123;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">tsdev</span> *<span class="title">dev</span>;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">tslib_module_info</span> *<span class="title">next</span>;</span>	<span class="comment">/* next module in chain	*/</span></span><br><span class="line">	<span class="type">void</span> *handle;			<span class="comment">/* dl handle		*/</span></span><br><span class="line">	<span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">tslib_ops</span> *<span class="title">ops</span>;</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>调用<code>ts_config</code>读取配置文件，假设<code>/etc/ts.conf</code>的内容如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">module_raw input </span><br><span class="line">module pthres pmin=1 </span><br><span class="line">module dejitter delta=100 </span><br><span class="line">module linear</span><br></pre></td></tr></table></figure>
+<ul>
+<li>每行表示一个module或moduel_raw。对于module都会插入<code>tsdev.list</code>表头(读取文件从上到下进行头插)</li>
+<li>对于所有的<code>module_raw</code>都会插入<code>tsdev.list_raw</code>链表头，一般都只有一个<code>module_raw</code></li>
+</ul>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> __ts_attach(<span class="keyword">struct</span> tsdev *ts, <span class="keyword">struct</span> tslib_module_info *info)</span><br><span class="line">&#123;</span><br><span class="line">	info-&gt;dev = ts;</span><br><span class="line">	info-&gt;next = ts-&gt;<span class="built_in">list</span>;</span><br><span class="line">	ts-&gt;<span class="built_in">list</span> = info;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>调用<code>ts_read</code>或者<code>ts_read_mt</code>都是通过<code>tsdev.list</code>中的模块来处理数据，该过程是一个递归向下调用的过程：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">linear_read</span><span class="params">(<span class="keyword">struct</span> tslib_module_info *info, <span class="keyword">struct</span> ts_sample *samp,</span></span><br><span class="line"><span class="params">		       <span class="type">int</span> nr_samples)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">tslib_linear</span> *<span class="title">lin</span> =</span> (<span class="keyword">struct</span> tslib_linear *)info;</span><br><span class="line">	<span class="type">int</span> ret;</span><br><span class="line">	<span class="type">int</span> xtemp, ytemp;</span><br><span class="line">    <span class="comment">//调用list中的下一个模块读取数据</span></span><br><span class="line">	ret = info-&gt;next-&gt;ops-&gt;read(info-&gt;next, samp, nr_samples); </span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h3 id="2-2-编译和安装tslib"><a href="#2-2-编译和安装tslib" class="headerlink" title="2.2 编译和安装tslib"></a>2.2 编译和安装tslib</h3><p>根据之前的知识，知道编译和安装库应该执行：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">./configure --host=arm-buildroot-linux-gnueabihf --prefix=$PWD/tmp </span><br><span class="line">make                </span><br><span class="line">make install</span><br></pre></td></tr></table></figure>
+<p>而<code>ts_config</code>函数首先会在环境变量<code>TSLIB_CONFFILE</code>指定的目录中寻找配置文件<code>ts.conf</code>，如果没有该环境变量，则会在宏定义<code>TS_CONF</code>中寻找配置文件<code>ts.conf</code>：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> ((conffile = getenv(<span class="string">&quot;TSLIB_CONFFILE&quot;</span>)) == <span class="literal">NULL</span>) &#123;</span><br><span class="line">	conffile = strdup(TS_CONF);</span><br><span class="line">	<span class="keyword">if</span> (conffile) &#123;</span><br><span class="line">		strdup_allocated = <span class="number">1</span>;</span><br><span class="line">	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">		ts_error(<span class="string">&quot;Couldn&#x27;t find tslib config file: %s\n&quot;</span>,</span><br><span class="line">				strerror(errno));</span><br><span class="line">		<span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如果按照之前的命令去编译库，指定<code>prefix=$PWD/tmp</code>，则查找宏定义<code>TS_CONF</code>的值发现：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">grep -nwr &quot;TS_CONF&quot; .</span><br><span class="line"></span><br><span class="line">TS_CONF = $&#123;sysconfdir&#125;/ts.conf</span><br><span class="line">sysconfdir = $&#123;prefix&#125;/etc</span><br><span class="line">prefix=&#x27;/home/book/vscodeFile/embbed_study/11_input/02_tslib/tslib-1.21/tmp&#x27;</span><br></pre></td></tr></table></figure>
+<p>这意味着在开发板上配置文件<code>ts.conf</code>需要放在<code>/home/book/vscodeFile/embbed_study/11_input/02_tslib/tslib-1.21/tmp/etc</code>这样一个目录下，这显然太麻烦了。为了将<code>ts.conf</code>放在开发板的<code>/etc/</code>目录时能够找的到，需要改变一下prefix参数值：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">./configure --host=arm-buildroot-linux-gnueabihf --prefix=/</span><br><span class="line">make                </span><br><span class="line">make install prefix=$PWD/tmp</span><br></pre></td></tr></table></figure>
+<p>按照上述命令，在执行<code>make install</code>会报错：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">libtool:   error: error: cannot install &#x27;linear.la&#x27; to a directory not ending in //lib/ts</span><br><span class="line">Makefile:813: recipe for target &#x27;install-pluginexecLTLIBRARIES&#x27; failed</span><br><span class="line">make[2]: *** [install-pluginexecLTLIBRARIES] Error 1</span><br><span class="line">make[2]: 离开目录“/home/book/vscodeFile/embbed_study/11_input/02_tslib/tslib-1.21/plugins”</span><br><span class="line">Makefile:1098: recipe for target &#x27;install-am&#x27; failed</span><br><span class="line">make[1]: *** [install-am] Error 2</span><br><span class="line">make[1]: 离开目录“/home/book/vscodeFile/embbed_study/11_input/02_tslib/tslib-1.21/plugins”</span><br><span class="line">Makefile:488: recipe for target &#x27;install-recursive&#x27; failed</span><br><span class="line">make: *** [install-recursive] Error 1</span><br></pre></td></tr></table></figure>
+<p>查找对应<code>plugins/Makefile</code>对应的代码：</p>
+<figure class="highlight makefile"><table><tr><td class="code"><pre><span class="line"><span class="section">install-pluginexecLTLIBRARIES: <span class="variable">$(pluginexec_LTLIBRARIES)</span></span></span><br><span class="line">        @<span class="variable">$(NORMAL_INSTALL)</span></span><br><span class="line">        @list=&#x27;<span class="variable">$(pluginexec_LTLIBRARIES)</span>&#x27;; test -n <span class="string">&quot;<span class="variable">$(pluginexecdir)</span>&quot;</span> || list=; \</span><br><span class="line">        list2=; for p in $$list; do \</span><br><span class="line">          if test -f $$p; then \</span><br><span class="line">            list2=<span class="string">&quot;$$list2 $$p&quot;</span>; \</span><br><span class="line">          <span class="keyword">else</span> :; fi; \</span><br><span class="line">        done; \</span><br><span class="line">        test -z <span class="string">&quot;$$list2&quot;</span> || &#123; \</span><br><span class="line">          echo <span class="string">&quot; <span class="variable">$(MKDIR_P)</span> &#x27;<span class="variable">$(DESTDIR)</span><span class="variable">$(pluginexecdir)</span>&#x27;&quot;</span>; \</span><br><span class="line">          <span class="variable">$(MKDIR_P)</span> <span class="string">&quot;<span class="variable">$(DESTDIR)</span><span class="variable">$(pluginexecdir)</span>&quot;</span> || exit 1; \</span><br><span class="line">          echo <span class="string">&quot; <span class="variable">$(LIBTOOL)</span> <span class="variable">$(AM_LIBTOOLFLAGS)</span> <span class="variable">$(LIBTOOLFLAGS)</span> --mode=install <span class="variable">$(INSTALL)</span> <span class="variable">$(INSTALL_STRIP_FLAG)</span> $$list2 &#x27;<span class="variable">$(DESTDIR)</span><span class="variable">$(pluginexecdir)</span>&#x27;&quot;</span>; \</span><br><span class="line">          <span class="variable">$(LIBTOOL)</span> <span class="variable">$(AM_LIBTOOLFLAGS)</span> <span class="variable">$(LIBTOOLFLAGS)</span> --mode=install <span class="variable">$(INSTALL)</span> <span class="variable">$(INSTALL_STRIP_FLAG)</span> $$list2 <span class="string">&quot;<span class="variable">$(DESTDIR)</span><span class="variable">$(pluginexecdir)</span>&quot;</span>; \</span><br></pre></td></tr></table></figure>
+<p>这段代码在安装动态库文件<code>pluginexec_LTLIBRARIES</code>，原因大概率是目标目录<code>$(DESTDIR)$(pluginexecdir)</code>设置的有问题，通过查找<code>DESTDIR</code>发现：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">   The second method involves providing the `DESTDIR&#x27; variable.  For</span><br><span class="line">example, `make install DESTDIR=/alternate/directory&#x27; will prepend</span><br><span class="line">`/alternate/directory&#x27; before all installation names.  The approach of</span><br><span class="line">`DESTDIR&#x27; overrides is not required by the GNU Coding Standards, and</span><br><span class="line">does not work on platforms that have drive letters.  On the other hand,</span><br><span class="line">it does better at avoiding recompilation issues, and works well even</span><br><span class="line">when some directory options were not specified in terms of `$&#123;prefix&#125;&#x27;</span><br><span class="line">at `configure&#x27; time.</span><br></pre></td></tr></table></figure>
+<p>所以，可以通过<code>DESTDIR</code>来指定安装目录：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">make install DESTDIR=$PWD/tmp</span><br></pre></td></tr></table></figure>
+<p>这样，即可实现安装在当前目录下，同时配置文件的寻找路径为<code>/etc/</code>了</p>
+<h4 id="2-2-1-将动态库和可执行程序放到开发板上"><a href="#2-2-1-将动态库和可执行程序放到开发板上" class="headerlink" title="2.2.1 将动态库和可执行程序放到开发板上"></a>2.2.1 将动态库和可执行程序放到开发板上</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">cp /mnt/tslib-1.21/tmp/lib/*so* -d /lib </span><br><span class="line">cp /mnt/tslib-1.21/tmp/lib/ts/*so* -d /lib</span><br><span class="line">cp /mnt/tslib-1.21/tmp/bin/* /bin </span><br><span class="line">cp /mnt/tslib-1.21/tmp/etc/ts.conf -d /etc</span><br></pre></td></tr></table></figure>
+<h3 id="2-3-使用tslib读取多点触摸数据"><a href="#2-3-使用tslib读取多点触摸数据" class="headerlink" title="2.3 使用tslib读取多点触摸数据"></a>2.3 使用tslib读取多点触摸数据</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="comment">//触点信息结构体</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">ts_sample_mt</span> &#123;</span></span><br><span class="line">	<span class="type">int</span>		x;</span><br><span class="line">	<span class="type">int</span>		y;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span>	pressure;</span><br><span class="line">	<span class="type">int</span>		slot;</span><br><span class="line">	<span class="type">int</span>		tracking_id;</span><br><span class="line"></span><br><span class="line">	<span class="type">int</span>		tool_type;</span><br><span class="line">	<span class="type">int</span>		tool_x;</span><br><span class="line">	<span class="type">int</span>		tool_y;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span>	touch_major;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span>	width_major;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span>	touch_minor;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span>	width_minor;</span><br><span class="line">	<span class="type">int</span>		orientation;</span><br><span class="line">	<span class="type">int</span>		distance;</span><br><span class="line">	<span class="type">int</span>		blob_id;</span><br><span class="line"></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">timeval</span>	<span class="title">tv</span>;</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">/* BTN_TOUCH state */</span></span><br><span class="line">	<span class="type">short</span>		pen_down;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* valid is set != 0 if this sample</span></span><br><span class="line"><span class="comment">	 * contains new data; see below for the</span></span><br><span class="line"><span class="comment">	 * bits that get set.</span></span><br><span class="line"><span class="comment">	 * valid is set to 0 otherwise</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="type">short</span>		valid;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>参考<code>ts_test_mt.c</code>，编写一个读取触点程序，实现如果有两个触点，则输出两个触点的距离的功能：</p>
+<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">tsdev</span> *<span class="title">ts</span>;</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">input_absinfo</span> <span class="title">slot</span>;</span></span><br><span class="line"><span class="type">int</span> i, max_slots, ret, touch_cnt;</span><br><span class="line"><span class="type">int</span> point_pressed[<span class="number">20</span>];</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">ts_sample_mt</span> **<span class="title">sample_mt</span>, **<span class="title">pre_sample_mt</span>;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//打开触摸屏设备文件</span></span><br><span class="line">ts = ts_setup(<span class="literal">NULL</span>, <span class="number">0</span>);</span><br><span class="line"><span class="comment">//读取触摸屏的配置信息</span></span><br><span class="line"><span class="keyword">if</span>(ioctl(ts_fd(ts), EVIOCGABS(ABS_MT_SLOT), &amp;slot) &lt; <span class="number">0</span>)</span><br><span class="line">&#123;</span><br><span class="line">	perror(<span class="string">&quot;ioctl EVIOCGABS&quot;</span>);</span><br><span class="line">	ts_close(ts);</span><br><span class="line">	<span class="keyword">return</span> errno;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 获取触摸屏最大支持的触点数(15 - 0 + 1)</span></span><br><span class="line">max_slots = slot.maximum - slot.minimum + <span class="number">1</span>;</span><br><span class="line"><span class="comment">//分配内存</span></span><br><span class="line">sample_mt = <span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> ts_sample_mt *));</span><br><span class="line">*sample_mt = <span class="built_in">calloc</span>(max_slots, <span class="keyword">sizeof</span>(<span class="keyword">struct</span> ts_sample_mt));</span><br><span class="line">pre_sample_mt = <span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> ts_sample_mt *));</span><br><span class="line">*pre_sample_mt = <span class="built_in">calloc</span>(max_slots, <span class="keyword">sizeof</span>(<span class="keyword">struct</span> ts_sample_mt));</span><br><span class="line"><span class="keyword">for</span>(i = <span class="number">0</span>; i &lt; max_slots; i++)</span><br><span class="line">	(*pre_sample_mt)[i].valid = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> (<span class="number">1</span>)</span><br><span class="line">&#123;</span><br><span class="line">	<span class="comment">// 读取max_slots个触点的信息，读取1次</span></span><br><span class="line">	ret = ts_read_mt(ts, sample_mt, max_slots, <span class="number">1</span>);</span><br><span class="line">    <span class="comment">// 将最新的有效信息更新到pre_sample_mt中</span></span><br><span class="line">	<span class="keyword">for</span>(i = <span class="number">0</span>; i &lt; max_slots; i++)</span><br><span class="line">		<span class="keyword">if</span>((*sample_mt)[i].valid)</span><br><span class="line">			<span class="built_in">memcpy</span>(&amp;pre_sample_mt[<span class="number">0</span>][i], &amp;sample_mt[<span class="number">0</span>][i], <span class="keyword">sizeof</span>(<span class="keyword">struct</span> ts_sample_mt));</span><br><span class="line"></span><br><span class="line">    <span class="comment">//point_pressed中保存所有还在接触的触点下标</span></span><br><span class="line">	touch_cnt = <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">for</span>(i = <span class="number">0</span>; i &lt; max_slots; i++)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">if</span>(pre_sample_mt[<span class="number">0</span>][i].valid &amp;&amp; pre_sample_mt[<span class="number">0</span>][i].tracking_id != <span class="number">-1</span>)</span><br><span class="line">			point_pressed[touch_cnt++] = i;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 如果有两个触点，则计算距离</span></span><br><span class="line">	<span class="keyword">if</span>(touch_cnt == <span class="number">2</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;distance %08d\n&quot;</span>, distance(&amp;pre_sample_mt[<span class="number">0</span>][point_pressed[<span class="number">0</span>]], &amp;pre_sample_mt[<span class="number">0</span>][point_pressed[<span class="number">1</span>]]));</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>之所以使用pre_sample_mt来备份信息，是因为如果触点接触之后没有移动，则第二次读取时该触点对应的有效位<code>valid</code>为非（不使用pre_sample_mt的话，判断tracking_id也可以实现类似的功能）</p>
+]]></content>
+      <categories>
+        <category>Linux应用开发</category>
+      </categories>
+      <tags>
+        <tag>嵌入式</tag>
+        <tag>Linux</tag>
+        <tag>C/C++</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>使用设备树的LED驱动框架</title>
     <url>/2024/01/02/%E4%BD%BF%E7%94%A8%E8%AE%BE%E5%A4%87%E6%A0%91%E7%9A%84LED%E9%A9%B1%E5%8A%A8%E6%A1%86%E6%9E%B6/</url>
     <content><![CDATA[<h2 id="1-设备树"><a href="#1-设备树" class="headerlink" title="1. 设备树"></a>1. 设备树</h2><h3 id="1-1-设备树的引入"><a href="#1-1-设备树的引入" class="headerlink" title="1.1 设备树的引入"></a>1.1 设备树的引入</h3><p>如果按照上面的方式来让我们的Linux内核支持所有的主控和开发板；也许常用的主控芯片并不是很多，但是基于主控芯片所设计出的开发板就是那就是千千万万了。如果要将所有的开发板的引脚配置编译到内核中，那内核中将充斥大量的高度重复的文件。为此，引入了设备树的概念，<strong>设备树用来给内核里的驱动程序指定硬件的信息</strong>：</p>
@@ -2556,94 +2644,6 @@
       </tags>
   </entry>
   <entry>
-    <title>使用电阻屏和电容屏</title>
-    <url>/2023/09/22/%E4%BD%BF%E7%94%A8%E7%94%B5%E9%98%BB%E5%B1%8F%E5%92%8C%E7%94%B5%E5%AE%B9%E5%B1%8F/</url>
-    <content><![CDATA[<h2 id="1-电阻屏和电容屏定位原理"><a href="#1-电阻屏和电容屏定位原理" class="headerlink" title="1. 电阻屏和电容屏定位原理"></a>1. 电阻屏和电容屏定位原理</h2><h3 id="1-1-电阻屏"><a href="#1-1-电阻屏" class="headerlink" title="1.1 电阻屏"></a>1.1 电阻屏</h3><p><img src="../images/使用电阻屏和电容屏/image-20230922200403814.png" alt="image-20230922200403814"></p>
-<ul>
-<li>根据分压原理，计算电阻值。假设材料长度和电阻成线性关系，则可以计算出相对距离</li>
-<li>电阻屏分为上下两层薄膜，一层通电时，另一层在按压时作为探针获取分压值，从而进行计算</li>
-<li>电阻屏和LCD使用之前，需要进行五点校准二者的相对位置</li>
-</ul>
-<h4 id="1-1-1-电阻屏数据"><a href="#1-1-1-电阻屏数据" class="headerlink" title="1.1.1 电阻屏数据"></a>1.1.1 电阻屏数据</h4><p>按下时：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">EV_KEY    BTN_TOUCH       <span class="number">1</span>             <span class="comment">/* 按下 */</span> </span><br><span class="line">EV_ABS    ABS_PRESSURE    <span class="number">1</span>             <span class="comment">/* 压力值，可以上报，也可以不报，可以是其他压力值 */</span> </span><br><span class="line">EV_ABS    ABS_X           x_value       <span class="comment">/* X 坐标 */</span> </span><br><span class="line">EV_ABS    ABS_Y           y_value       <span class="comment">/* Y 坐标 */</span> </span><br><span class="line">EV_SYNC   <span class="number">0</span>               <span class="number">0</span>             <span class="comment">/* 同步事件 */</span></span><br></pre></td></tr></table></figure>
-<p>松开时：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">EV_KEY    BTN_TOUCH         <span class="number">0</span>           <span class="comment">/* 松开 */</span> </span><br><span class="line">EV_ABS    ABS_PRESSURE      <span class="number">0</span>           <span class="comment">/* 压力值，可以上报，也可以不报 */</span> </span><br><span class="line">EV_SYNC   <span class="number">0</span>                 <span class="number">0</span>           <span class="comment">/* 同步事件 */</span></span><br></pre></td></tr></table></figure>
-<h3 id="1-2-电容屏"><a href="#1-2-电容屏" class="headerlink" title="1.2 电容屏"></a>1.2 电容屏</h3><p><img src="../images/使用电阻屏和电容屏/image-20230922202123424.png" alt="image-20230922202123424"></p>
-<p>电容屏中有一个控制芯片，它会周期性产生驱动信号，接收电极接收到信号， 并可测量电荷大小。当电容屏被按下时，相当于引入了新的电容，从而影响了接 收电极接收到的电荷大小。主控芯片根据电荷大小即可计算出触点位置，应用开发人员只需要编写程序，通过 I2C 读取芯片寄存器即可得到这些数据。</p>
-<h4 id="1-2-1-电容屏多点触摸上报数据"><a href="#1-2-1-电容屏多点触摸上报数据" class="headerlink" title="1.2.1 电容屏多点触摸上报数据"></a>1.2.1 电容屏多点触摸上报数据</h4><figure class="highlight c"><table><tr><td class="code"><pre><span class="line">EV_ABS    ABS_MT_SLOT            <span class="number">0</span>    <span class="comment">// 这表示“我要上报一个触点信息了”，用来分隔触点信息 </span></span><br><span class="line">EV_ABS    ABS_MT_TRACKING_ID     <span class="number">45</span>   <span class="comment">// 这个触点的 ID 是 45，由控制芯片分配</span></span><br><span class="line">EV_ABS    ABS_MT_POSITION_X      x[<span class="number">0</span>] <span class="comment">// 触点 X 坐标 </span></span><br><span class="line">EV_ABS    ABS_MT_POSITION_Y      y[<span class="number">0</span>] <span class="comment">// 触点 Y 坐标 </span></span><br><span class="line">EV_ABS    ABS_MT_SLOT            <span class="number">1</span>    <span class="comment">// 这表示“我要上报一个触点信息了”，用来分隔触点信息 </span></span><br><span class="line">EV_ABS    ABS_MT_TRACKING_ID     <span class="number">46</span>   <span class="comment">// 这个触点的 ID 是 46，由控制芯片分配</span></span><br><span class="line">EV_ABS    ABS_MT_POSITION_X      x[<span class="number">1</span>] <span class="comment">// 触点 X 坐标 </span></span><br><span class="line">EV_ABS    ABS_MT_POSITION_Y      y[<span class="number">1</span>] <span class="comment">// 触点 Y 坐标 </span></span><br><span class="line">EV_SYNC   SYN_REPORT             <span class="number">0</span>    <span class="comment">// 全部数据上报完毕</span></span><br></pre></td></tr></table></figure>
-<p>当 ID 为 45 的触点正在移动时：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">EV_ABS    ABS_MT_SLOT            <span class="number">0</span>    <span class="comment">// 表示“要上报一个触点信息了”,之前上报过ID,就不用再上报ID </span></span><br><span class="line">EV_ABS    ABS_MT_POSITION_X      x[<span class="number">0</span>] <span class="comment">// 触点 X 坐标 </span></span><br><span class="line">EV_SYNC   SYN_REPORT             <span class="number">0</span>    <span class="comment">// 全部数据上报完毕</span></span><br></pre></td></tr></table></figure>
-<p>松开 ID 为 45 的触点时(在前面 slot 已经被设置为 0，这里不需要再重新设置 slot，slot 就像一个全局变量一样：如果它没变化的话，就无需再次设置)：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">EV_ABS    ABS_MT_TRACKING_ID     <span class="number">-1</span>   <span class="comment">// slot对应的ID是45,这里ID=-1，表示ID=45的触点被松开了</span></span><br><span class="line">EV_SYNC   SYN_REPORT             <span class="number">0</span>    <span class="comment">// 全部数据上报完毕</span></span><br></pre></td></tr></table></figure>
-<p>最后，松开 ID 为 46 的触点：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line">EV_ABS    ABS_MT_SLOT            <span class="number">1</span>    <span class="comment">// 这表示“我要上报一个触点信息了”， slot 1 的 ID 为 46 </span></span><br><span class="line">EV_ABS    ABS_MT_TRACKING_ID    <span class="number">-1</span>     <span class="comment">// ID 为-1，表示 slot 1 被松开，即ID为46的触点被松开 </span></span><br><span class="line">EV_SYNC   SYN_REPORT                   <span class="comment">// 全部数据上报完毕</span></span><br></pre></td></tr></table></figure>
-<h4 id="1-2-2-电容屏实际数据分析"><a href="#1-2-2-电容屏实际数据分析" class="headerlink" title="1.2.2 电容屏实际数据分析"></a>1.2.2 电容屏实际数据分析</h4><p>电容屏单点击：</p>
-<p><img src="../images/使用电阻屏和电容屏/image-20230922204156789.png" alt="image-20230922204156789"></p>
-<ul>
-<li><code>xx_MAJOR</code>：用来描述触点大小，不是常用数据</li>
-<li><code>ABS_X/ABS_Y</code>：用来兼容老版本应用程序，电阻屏就是使用这个类型的数据</li>
-</ul>
-<p>两点触发：</p>
-<p><img src="../images/使用电阻屏和电容屏/image-20230922204750931.png" alt="image-20230922204750931"></p>
-<ul>
-<li>为了兼容老程序，它也上报了 ABS_X、ABS_Y 数据，但是只上报第 1 个触点的数据</li>
-</ul>
-<h2 id="2-触摸屏开源库-tslib"><a href="#2-触摸屏开源库-tslib" class="headerlink" title="2.触摸屏开源库-tslib"></a>2.触摸屏开源库-tslib</h2><h3 id="2-1-tslib框架分析"><a href="#2-1-tslib框架分析" class="headerlink" title="2.1 tslib框架分析"></a>2.1 tslib框架分析</h3><h4 id="2-1-1-目录结构"><a href="#2-1-1-目录结构" class="headerlink" title="2.1.1 目录结构"></a>2.1.1 目录结构</h4><p>tslib的主要代码文件结构：</p>
-<p><img src="../images/使用电阻屏和电容屏/image-20230922215156184.png" alt="image-20230922215156184"></p>
-<ul>
-<li>核心在于plugins目录，该目录下每一个文件都是一个module，每个module都提供2个函数：<code>read</code>和<code>read_mt</code>，<strong>前者用于读取单点触摸屏数据，后者用于读取多点触摸屏数据</strong></li>
-<li>test目录下是示例程序</li>
-</ul>
-<h4 id="2-1-2-框架结构"><a href="#2-1-2-框架结构" class="headerlink" title="2.1.2 框架结构"></a>2.1.2 框架结构</h4><p><img src="../images/使用电阻屏和电容屏/image-20230922224515068.png" alt="image-20230922224515068"></p>
-<ol>
-<li><p>调用<code>ts_open</code>后，可以打开某个设备节点，构造出一个 <code>tsdev</code> 结构体：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">tsdev</span> &#123;</span></span><br><span class="line">	<span class="type">int</span> fd;</span><br><span class="line">	<span class="type">char</span> *eventpath;                     <span class="comment">// 设备文件路径</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">tslib_module_info</span> *<span class="title">list</span>;</span>      <span class="comment">// 数据处理路径链表</span></span><br><span class="line">	<span class="comment">/* points to position in &#x27;list&#x27; where raw reads</span></span><br><span class="line"><span class="comment">	 * come from.  default is the position of the</span></span><br><span class="line"><span class="comment">	 * ts_read_raw module.</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">tslib_module_info</span> *<span class="title">list_raw</span>;</span> <span class="comment">//一般指向最底层的数据处理模块</span></span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span> res_x;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span> res_y;</span><br><span class="line">	<span class="type">int</span> rotation;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">tslib_module_info</span> &#123;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">tsdev</span> *<span class="title">dev</span>;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">tslib_module_info</span> *<span class="title">next</span>;</span>	<span class="comment">/* next module in chain	*/</span></span><br><span class="line">	<span class="type">void</span> *handle;			<span class="comment">/* dl handle		*/</span></span><br><span class="line">	<span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">tslib_ops</span> *<span class="title">ops</span>;</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>调用<code>ts_config</code>读取配置文件，假设<code>/etc/ts.conf</code>的内容如下：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">module_raw input </span><br><span class="line">module pthres pmin=1 </span><br><span class="line">module dejitter delta=100 </span><br><span class="line">module linear</span><br></pre></td></tr></table></figure>
-<ul>
-<li>每行表示一个module或moduel_raw。对于module都会插入<code>tsdev.list</code>表头(读取文件从上到下进行头插)</li>
-<li>对于所有的<code>module_raw</code>都会插入<code>tsdev.list_raw</code>链表头，一般都只有一个<code>module_raw</code></li>
-</ul>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">int</span> __ts_attach(<span class="keyword">struct</span> tsdev *ts, <span class="keyword">struct</span> tslib_module_info *info)</span><br><span class="line">&#123;</span><br><span class="line">	info-&gt;dev = ts;</span><br><span class="line">	info-&gt;next = ts-&gt;<span class="built_in">list</span>;</span><br><span class="line">	ts-&gt;<span class="built_in">list</span> = info;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>调用<code>ts_read</code>或者<code>ts_read_mt</code>都是通过<code>tsdev.list</code>中的模块来处理数据，该过程是一个递归向下调用的过程：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">linear_read</span><span class="params">(<span class="keyword">struct</span> tslib_module_info *info, <span class="keyword">struct</span> ts_sample *samp,</span></span><br><span class="line"><span class="params">		       <span class="type">int</span> nr_samples)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">tslib_linear</span> *<span class="title">lin</span> =</span> (<span class="keyword">struct</span> tslib_linear *)info;</span><br><span class="line">	<span class="type">int</span> ret;</span><br><span class="line">	<span class="type">int</span> xtemp, ytemp;</span><br><span class="line">    <span class="comment">//调用list中的下一个模块读取数据</span></span><br><span class="line">	ret = info-&gt;next-&gt;ops-&gt;read(info-&gt;next, samp, nr_samples); </span><br></pre></td></tr></table></figure>
-</li>
-</ol>
-<h3 id="2-2-编译和安装tslib"><a href="#2-2-编译和安装tslib" class="headerlink" title="2.2 编译和安装tslib"></a>2.2 编译和安装tslib</h3><p>根据之前的知识，知道编译和安装库应该执行：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">./configure --host=arm-buildroot-linux-gnueabihf --prefix=$PWD/tmp </span><br><span class="line">make                </span><br><span class="line">make install</span><br></pre></td></tr></table></figure>
-<p>而<code>ts_config</code>函数首先会在环境变量<code>TSLIB_CONFFILE</code>指定的目录中寻找配置文件<code>ts.conf</code>，如果没有该环境变量，则会在宏定义<code>TS_CONF</code>中寻找配置文件<code>ts.conf</code>：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> ((conffile = getenv(<span class="string">&quot;TSLIB_CONFFILE&quot;</span>)) == <span class="literal">NULL</span>) &#123;</span><br><span class="line">	conffile = strdup(TS_CONF);</span><br><span class="line">	<span class="keyword">if</span> (conffile) &#123;</span><br><span class="line">		strdup_allocated = <span class="number">1</span>;</span><br><span class="line">	&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">		ts_error(<span class="string">&quot;Couldn&#x27;t find tslib config file: %s\n&quot;</span>,</span><br><span class="line">				strerror(errno));</span><br><span class="line">		<span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>如果按照之前的命令去编译库，指定<code>prefix=$PWD/tmp</code>，则查找宏定义<code>TS_CONF</code>的值发现：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">grep -nwr &quot;TS_CONF&quot; .</span><br><span class="line"></span><br><span class="line">TS_CONF = $&#123;sysconfdir&#125;/ts.conf</span><br><span class="line">sysconfdir = $&#123;prefix&#125;/etc</span><br><span class="line">prefix=&#x27;/home/book/vscodeFile/embbed_study/11_input/02_tslib/tslib-1.21/tmp&#x27;</span><br></pre></td></tr></table></figure>
-<p>这意味着在开发板上配置文件<code>ts.conf</code>需要放在<code>/home/book/vscodeFile/embbed_study/11_input/02_tslib/tslib-1.21/tmp/etc</code>这样一个目录下，这显然太麻烦了。为了将<code>ts.conf</code>放在开发板的<code>/etc/</code>目录时能够找的到，需要改变一下prefix参数值：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">./configure --host=arm-buildroot-linux-gnueabihf --prefix=/</span><br><span class="line">make                </span><br><span class="line">make install prefix=$PWD/tmp</span><br></pre></td></tr></table></figure>
-<p>按照上述命令，在执行<code>make install</code>会报错：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">libtool:   error: error: cannot install &#x27;linear.la&#x27; to a directory not ending in //lib/ts</span><br><span class="line">Makefile:813: recipe for target &#x27;install-pluginexecLTLIBRARIES&#x27; failed</span><br><span class="line">make[2]: *** [install-pluginexecLTLIBRARIES] Error 1</span><br><span class="line">make[2]: 离开目录“/home/book/vscodeFile/embbed_study/11_input/02_tslib/tslib-1.21/plugins”</span><br><span class="line">Makefile:1098: recipe for target &#x27;install-am&#x27; failed</span><br><span class="line">make[1]: *** [install-am] Error 2</span><br><span class="line">make[1]: 离开目录“/home/book/vscodeFile/embbed_study/11_input/02_tslib/tslib-1.21/plugins”</span><br><span class="line">Makefile:488: recipe for target &#x27;install-recursive&#x27; failed</span><br><span class="line">make: *** [install-recursive] Error 1</span><br></pre></td></tr></table></figure>
-<p>查找对应<code>plugins/Makefile</code>对应的代码：</p>
-<figure class="highlight makefile"><table><tr><td class="code"><pre><span class="line"><span class="section">install-pluginexecLTLIBRARIES: <span class="variable">$(pluginexec_LTLIBRARIES)</span></span></span><br><span class="line">        @<span class="variable">$(NORMAL_INSTALL)</span></span><br><span class="line">        @list=&#x27;<span class="variable">$(pluginexec_LTLIBRARIES)</span>&#x27;; test -n <span class="string">&quot;<span class="variable">$(pluginexecdir)</span>&quot;</span> || list=; \</span><br><span class="line">        list2=; for p in $$list; do \</span><br><span class="line">          if test -f $$p; then \</span><br><span class="line">            list2=<span class="string">&quot;$$list2 $$p&quot;</span>; \</span><br><span class="line">          <span class="keyword">else</span> :; fi; \</span><br><span class="line">        done; \</span><br><span class="line">        test -z <span class="string">&quot;$$list2&quot;</span> || &#123; \</span><br><span class="line">          echo <span class="string">&quot; <span class="variable">$(MKDIR_P)</span> &#x27;<span class="variable">$(DESTDIR)</span><span class="variable">$(pluginexecdir)</span>&#x27;&quot;</span>; \</span><br><span class="line">          <span class="variable">$(MKDIR_P)</span> <span class="string">&quot;<span class="variable">$(DESTDIR)</span><span class="variable">$(pluginexecdir)</span>&quot;</span> || exit 1; \</span><br><span class="line">          echo <span class="string">&quot; <span class="variable">$(LIBTOOL)</span> <span class="variable">$(AM_LIBTOOLFLAGS)</span> <span class="variable">$(LIBTOOLFLAGS)</span> --mode=install <span class="variable">$(INSTALL)</span> <span class="variable">$(INSTALL_STRIP_FLAG)</span> $$list2 &#x27;<span class="variable">$(DESTDIR)</span><span class="variable">$(pluginexecdir)</span>&#x27;&quot;</span>; \</span><br><span class="line">          <span class="variable">$(LIBTOOL)</span> <span class="variable">$(AM_LIBTOOLFLAGS)</span> <span class="variable">$(LIBTOOLFLAGS)</span> --mode=install <span class="variable">$(INSTALL)</span> <span class="variable">$(INSTALL_STRIP_FLAG)</span> $$list2 <span class="string">&quot;<span class="variable">$(DESTDIR)</span><span class="variable">$(pluginexecdir)</span>&quot;</span>; \</span><br></pre></td></tr></table></figure>
-<p>这段代码在安装动态库文件<code>pluginexec_LTLIBRARIES</code>，原因大概率是目标目录<code>$(DESTDIR)$(pluginexecdir)</code>设置的有问题，通过查找<code>DESTDIR</code>发现：</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">   The second method involves providing the `DESTDIR&#x27; variable.  For</span><br><span class="line">example, `make install DESTDIR=/alternate/directory&#x27; will prepend</span><br><span class="line">`/alternate/directory&#x27; before all installation names.  The approach of</span><br><span class="line">`DESTDIR&#x27; overrides is not required by the GNU Coding Standards, and</span><br><span class="line">does not work on platforms that have drive letters.  On the other hand,</span><br><span class="line">it does better at avoiding recompilation issues, and works well even</span><br><span class="line">when some directory options were not specified in terms of `$&#123;prefix&#125;&#x27;</span><br><span class="line">at `configure&#x27; time.</span><br></pre></td></tr></table></figure>
-<p>所以，可以通过<code>DESTDIR</code>来指定安装目录：</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">make install DESTDIR=$PWD/tmp</span><br></pre></td></tr></table></figure>
-<p>这样，即可实现安装在当前目录下，同时配置文件的寻找路径为<code>/etc/</code>了</p>
-<h4 id="2-2-1-将动态库和可执行程序放到开发板上"><a href="#2-2-1-将动态库和可执行程序放到开发板上" class="headerlink" title="2.2.1 将动态库和可执行程序放到开发板上"></a>2.2.1 将动态库和可执行程序放到开发板上</h4><figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">cp /mnt/tslib-1.21/tmp/lib/*so* -d /lib </span><br><span class="line">cp /mnt/tslib-1.21/tmp/lib/ts/*so* -d /lib</span><br><span class="line">cp /mnt/tslib-1.21/tmp/bin/* /bin </span><br><span class="line">cp /mnt/tslib-1.21/tmp/etc/ts.conf -d /etc</span><br></pre></td></tr></table></figure>
-<h3 id="2-3-使用tslib读取多点触摸数据"><a href="#2-3-使用tslib读取多点触摸数据" class="headerlink" title="2.3 使用tslib读取多点触摸数据"></a>2.3 使用tslib读取多点触摸数据</h3><figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="comment">//触点信息结构体</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">ts_sample_mt</span> &#123;</span></span><br><span class="line">	<span class="type">int</span>		x;</span><br><span class="line">	<span class="type">int</span>		y;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span>	pressure;</span><br><span class="line">	<span class="type">int</span>		slot;</span><br><span class="line">	<span class="type">int</span>		tracking_id;</span><br><span class="line"></span><br><span class="line">	<span class="type">int</span>		tool_type;</span><br><span class="line">	<span class="type">int</span>		tool_x;</span><br><span class="line">	<span class="type">int</span>		tool_y;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span>	touch_major;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span>	width_major;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span>	touch_minor;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span>	width_minor;</span><br><span class="line">	<span class="type">int</span>		orientation;</span><br><span class="line">	<span class="type">int</span>		distance;</span><br><span class="line">	<span class="type">int</span>		blob_id;</span><br><span class="line"></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">timeval</span>	<span class="title">tv</span>;</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">/* BTN_TOUCH state */</span></span><br><span class="line">	<span class="type">short</span>		pen_down;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* valid is set != 0 if this sample</span></span><br><span class="line"><span class="comment">	 * contains new data; see below for the</span></span><br><span class="line"><span class="comment">	 * bits that get set.</span></span><br><span class="line"><span class="comment">	 * valid is set to 0 otherwise</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="type">short</span>		valid;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<p>参考<code>ts_test_mt.c</code>，编写一个读取触点程序，实现如果有两个触点，则输出两个触点的距离的功能：</p>
-<figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">tsdev</span> *<span class="title">ts</span>;</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">input_absinfo</span> <span class="title">slot</span>;</span></span><br><span class="line"><span class="type">int</span> i, max_slots, ret, touch_cnt;</span><br><span class="line"><span class="type">int</span> point_pressed[<span class="number">20</span>];</span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">ts_sample_mt</span> **<span class="title">sample_mt</span>, **<span class="title">pre_sample_mt</span>;</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//打开触摸屏设备文件</span></span><br><span class="line">ts = ts_setup(<span class="literal">NULL</span>, <span class="number">0</span>);</span><br><span class="line"><span class="comment">//读取触摸屏的配置信息</span></span><br><span class="line"><span class="keyword">if</span>(ioctl(ts_fd(ts), EVIOCGABS(ABS_MT_SLOT), &amp;slot) &lt; <span class="number">0</span>)</span><br><span class="line">&#123;</span><br><span class="line">	perror(<span class="string">&quot;ioctl EVIOCGABS&quot;</span>);</span><br><span class="line">	ts_close(ts);</span><br><span class="line">	<span class="keyword">return</span> errno;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 获取触摸屏最大支持的触点数(15 - 0 + 1)</span></span><br><span class="line">max_slots = slot.maximum - slot.minimum + <span class="number">1</span>;</span><br><span class="line"><span class="comment">//分配内存</span></span><br><span class="line">sample_mt = <span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> ts_sample_mt *));</span><br><span class="line">*sample_mt = <span class="built_in">calloc</span>(max_slots, <span class="keyword">sizeof</span>(<span class="keyword">struct</span> ts_sample_mt));</span><br><span class="line">pre_sample_mt = <span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> ts_sample_mt *));</span><br><span class="line">*pre_sample_mt = <span class="built_in">calloc</span>(max_slots, <span class="keyword">sizeof</span>(<span class="keyword">struct</span> ts_sample_mt));</span><br><span class="line"><span class="keyword">for</span>(i = <span class="number">0</span>; i &lt; max_slots; i++)</span><br><span class="line">	(*pre_sample_mt)[i].valid = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> (<span class="number">1</span>)</span><br><span class="line">&#123;</span><br><span class="line">	<span class="comment">// 读取max_slots个触点的信息，读取1次</span></span><br><span class="line">	ret = ts_read_mt(ts, sample_mt, max_slots, <span class="number">1</span>);</span><br><span class="line">    <span class="comment">// 将最新的有效信息更新到pre_sample_mt中</span></span><br><span class="line">	<span class="keyword">for</span>(i = <span class="number">0</span>; i &lt; max_slots; i++)</span><br><span class="line">		<span class="keyword">if</span>((*sample_mt)[i].valid)</span><br><span class="line">			<span class="built_in">memcpy</span>(&amp;pre_sample_mt[<span class="number">0</span>][i], &amp;sample_mt[<span class="number">0</span>][i], <span class="keyword">sizeof</span>(<span class="keyword">struct</span> ts_sample_mt));</span><br><span class="line"></span><br><span class="line">    <span class="comment">//point_pressed中保存所有还在接触的触点下标</span></span><br><span class="line">	touch_cnt = <span class="number">0</span>;</span><br><span class="line">	<span class="keyword">for</span>(i = <span class="number">0</span>; i &lt; max_slots; i++)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">if</span>(pre_sample_mt[<span class="number">0</span>][i].valid &amp;&amp; pre_sample_mt[<span class="number">0</span>][i].tracking_id != <span class="number">-1</span>)</span><br><span class="line">			point_pressed[touch_cnt++] = i;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 如果有两个触点，则计算距离</span></span><br><span class="line">	<span class="keyword">if</span>(touch_cnt == <span class="number">2</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;distance %08d\n&quot;</span>, distance(&amp;pre_sample_mt[<span class="number">0</span>][point_pressed[<span class="number">0</span>]], &amp;pre_sample_mt[<span class="number">0</span>][point_pressed[<span class="number">1</span>]]));</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>之所以使用pre_sample_mt来备份信息，是因为如果触点接触之后没有移动，则第二次读取时该触点对应的有效位<code>valid</code>为非（不使用pre_sample_mt的话，判断tracking_id也可以实现类似的功能）</p>
-]]></content>
-      <categories>
-        <category>Linux应用开发</category>
-      </categories>
-      <tags>
-        <tag>嵌入式</tag>
-        <tag>Linux</tag>
-        <tag>C/C++</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>多线程编程</title>
     <url>/2023/10/03/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%BC%96%E7%A8%8B/</url>
     <content><![CDATA[<h2 id="1-线程的标识-pthread-t"><a href="#1-线程的标识-pthread-t" class="headerlink" title="1. 线程的标识 pthread_t"></a>1. 线程的标识 pthread_t</h2><p>对于每一个进程都有唯一PID号与之对应，而对于线程而言，也有类似的tid号，即一个pthread_t类型的变量。线程号是表示线程的唯一标识，<strong>但是对于线程号而言，其仅仅在其所属的进程上下文中才有意义。</strong></p>
@@ -2746,6 +2746,38 @@
 <h2 id="5-总结"><a href="#5-总结" class="headerlink" title="5.总结"></a>5.总结</h2><h3 id="5-1-线程使用流程图"><a href="#5-1-线程使用流程图" class="headerlink" title="5.1 线程使用流程图"></a>5.1 线程使用流程图</h3><p><img src="../images/多线程编程/image-20231004201228798.png" alt="image-20231004201228798"></p>
 <h3 id="5-2-互斥量使用流程图"><a href="#5-2-互斥量使用流程图" class="headerlink" title="5.2 互斥量使用流程图"></a>5.2 互斥量使用流程图</h3><p><img src="../images/多线程编程/image-20231004201303646.png" alt="image-20231004201303646"></p>
 <h3 id="5-3-信号量使用流程图"><a href="#5-3-信号量使用流程图" class="headerlink" title="5.3 信号量使用流程图"></a>5.3 信号量使用流程图</h3><p><img src="../images/多线程编程/image-20231004201343650.png" alt="image-20231004201343650"></p>
+]]></content>
+      <categories>
+        <category>Linux应用开发</category>
+      </categories>
+      <tags>
+        <tag>嵌入式</tag>
+        <tag>Linux</tag>
+        <tag>C/C++</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>imx6null-mini开发板</title>
+    <url>/2023/09/05/%E5%BC%80%E5%8F%91%E6%9D%BF/</url>
+    <content><![CDATA[<h2 id="1-硬件资源简介"><a href="#1-硬件资源简介" class="headerlink" title="1.硬件资源简介"></a>1.硬件资源简介</h2><p><img src="../images/开发板/image-20230905203618081.png" alt="image-20230905203618081"></p>
+<p><img src="../images/开发板/image-20230905204358901.png" alt="image-20230905204358901"></p>
+<h2 id="2-启动方式"><a href="#2-启动方式" class="headerlink" title="2. 启动方式"></a>2. 启动方式</h2><p><img src="../images/开发板/image-20230905204619465.png" alt="image-20230905204619465"></p>
+<h2 id="3-开发板挂载Ubuntu的NFS目录"><a href="#3-开发板挂载Ubuntu的NFS目录" class="headerlink" title="3. 开发板挂载Ubuntu的NFS目录"></a>3. 开发板挂载Ubuntu的NFS目录</h2><h3 id="3-1-Network-File-System-NFS"><a href="#3-1-Network-File-System-NFS" class="headerlink" title="3.1 Network File System(NFS)"></a>3.1 Network File System(NFS)</h3><p>NFS协议基于C/S架构，通过RPC协议进行通信。NFS的最大特点就是将服务端的文件系统目录树映射到客户端，而在客户端访问该 目录树与访问本地文件系统没有任何差别。</p>
+<p><img src="../images/开发板/image-20230905205227025.png" alt="image-20230905205227025"></p>
+<h3 id="3-2-挂载"><a href="#3-2-挂载" class="headerlink" title="3.2 挂载"></a>3.2 挂载</h3><ol>
+<li><p>Ubuntu开放相关目录的访问权限，即配置  <code>/etc/exports</code>文件</p>
+</li>
+<li><p>Ubuntu启动NFS服务</p>
+</li>
+<li><p>开发板上挂载Ubuntu上的相关目录到本地</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">mount -t nfs -o nolock,vers=3 192.168.5.11:/home/book/nfs_rootfs /mnt</span><br></pre></td></tr></table></figure>
+<ul>
+<li><code>mount</code>: 这个命令用于挂载文件系统到指定的目录上。</li>
+<li><code>-t nfs</code>: 该选项指定要挂载的文件系统类型为NFS。</li>
+<li><code>-o nolock,vers=3</code>: 这些选项是用于指定挂载NFS文件系统时的一些选项。<code>nolock</code>选项用于禁用文件锁定机制，而<code>vers=3</code>选项指定使用NFS版本3协议。</li>
+</ul>
+</li>
+</ol>
 ]]></content>
       <categories>
         <category>Linux应用开发</category>
@@ -2982,38 +3014,6 @@
 <p>注册内核模块的代码省略，主要是 platform_driver 的注册：</p>
 <figure class="highlight c"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">gpio_key</span>&#123;</span></span><br><span class="line">	<span class="type">int</span> gpio;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">gpio_desc</span> *<span class="title">gpiod</span>;</span></span><br><span class="line">	<span class="type">int</span> flag;</span><br><span class="line">	<span class="type">int</span> irq;</span><br><span class="line">&#125; ;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">gpio_key</span> *<span class="title">gpio_keys_100ask</span>;</span></span><br><span class="line"><span class="type">static</span> <span class="type">irqreturn_t</span> <span class="title function_">gpio_key_isr</span><span class="params">(<span class="type">int</span> irq, <span class="type">void</span> *dev_id)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">gpio_key</span> *<span class="title">gpio_key</span> =</span> dev_id;</span><br><span class="line">	<span class="type">int</span> val;</span><br><span class="line">	val = gpiod_get_value(gpio_key-&gt;gpiod);</span><br><span class="line">	printk(<span class="string">&quot;key %d %d\n&quot;</span>, gpio_key-&gt;gpio, val);</span><br><span class="line">	reverse_led_status();  <span class="comment">// 每触发一次，翻转一下LED引脚的输出</span></span><br><span class="line">	</span><br><span class="line">	<span class="keyword">return</span> IRQ_HANDLED;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">of_device_id</span> <span class="title">krocz_keys</span>[] =</span> &#123;</span><br><span class="line">    &#123; .compatible = <span class="string">&quot;krocz,buttondrv&quot;</span> &#125;,</span><br><span class="line">    &#123; &#125;,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 1. 定义platform_driver */</span></span><br><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">platform_driver</span> <span class="title">gpio_keys_driver</span> =</span> &#123;</span><br><span class="line">    .probe      = gpio_key_probe,</span><br><span class="line">    .remove     = gpio_key_remove,</span><br><span class="line">    .driver     = &#123;</span><br><span class="line">        .name   = <span class="string">&quot;krocz_button_key&quot;</span>,</span><br><span class="line">        .of_match_table = krocz_keys,</span><br><span class="line">    &#125;,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">gpio_key_probe</span><span class="params">(<span class="keyword">struct</span> platform_device *pdev)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">int</span> err, count, i;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">device_node</span> *<span class="title">node</span> =</span> pdev-&gt;dev.of_node;</span><br><span class="line">	<span class="class"><span class="keyword">enum</span> <span class="title">of_gpio_flags</span> <span class="title">flag</span>;</span></span><br><span class="line">	<span class="type">unsigned</span> flags = GPIOF_IN;</span><br><span class="line">		</span><br><span class="line">	printk(<span class="string">&quot;%s %s line %d\n&quot;</span>, __FILE__, __FUNCTION__, __LINE__);</span><br><span class="line"></span><br><span class="line">	count = of_gpio_count(node);</span><br><span class="line">	<span class="keyword">if</span> (!count)  <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line"></span><br><span class="line">	gpio_keys_100ask = kzalloc(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> gpio_key) * count, GFP_KERNEL);</span><br><span class="line">	<span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; count; i++)</span><br><span class="line">	&#123;</span><br><span class="line">        <span class="comment">// 获取设备节点中第i个gpio引脚及其flag</span></span><br><span class="line">		gpio_keys_100ask[i].gpio = of_get_gpio_flags(node, i, &amp;flag);</span><br><span class="line">		<span class="keyword">if</span> (gpio_keys_100ask[i].gpio &lt; <span class="number">0</span>)    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">		<span class="comment">// gpio引脚转gpio_desc结构体</span></span><br><span class="line">		gpio_keys_100ask[i].gpiod = gpio_to_desc(gpio_keys_100ask[i].gpio);</span><br><span class="line">		gpio_keys_100ask[i].flag = flag &amp; OF_GPIO_ACTIVE_LOW;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (flag &amp; OF_GPIO_ACTIVE_LOW)  flags |= GPIOF_ACTIVE_LOW;</span><br><span class="line">        <span class="comment">// 看函数描述好像是用来初始化GPIO引脚的</span></span><br><span class="line">		err = devm_gpio_request_one(&amp;pdev-&gt;dev, gpio_keys_100ask[i].gpio, flags, <span class="literal">NULL</span>);</span><br><span class="line">        <span class="comment">// 设置GPIO引脚为输入</span></span><br><span class="line">		err = gpiod_direction_input(gpio_keys_100ask[i].gpiod);</span><br><span class="line">        <span class="comment">// gpio引脚号转虚拟中断号</span></span><br><span class="line">		gpio_keys_100ask[i].irq  = gpio_to_irq(gpio_keys_100ask[i].gpio);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 注册中断处理函数 gpio_key_isr，触发条件为下降沿</span></span><br><span class="line">	<span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; count; i++)</span><br><span class="line">		err = request_irq(gpio_keys_100ask[i].irq, gpio_key_isr, IRQF_TRIGGER_FALLING, <span class="string">&quot;krocz_gpio_key&quot;</span>, &amp;gpio_keys_100ask[i]);</span><br><span class="line">        </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">gpio_key_remove</span><span class="params">(<span class="keyword">struct</span> platform_device *pdev)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="comment">//int err;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">device_node</span> *<span class="title">node</span> =</span> pdev-&gt;dev.of_node;</span><br><span class="line">	<span class="type">int</span> count, i;</span><br><span class="line"></span><br><span class="line">	count = of_gpio_count(node);</span><br><span class="line">	<span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; count; i++)</span><br><span class="line">		free_irq(gpio_keys_100ask[i].irq, &amp;gpio_keys_100ask[i]);</span><br><span class="line">	kfree(gpio_keys_100ask);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>probe 函数的核心就是将中断处理函数 gpio_key_isr 进行注册，以便我们在按下按键时能够得到处理，因为硬件设计上有电容用来去抖动，所以不需要其他软件上的处理了。</p>
-]]></content>
-      <categories>
-        <category>Linux应用开发</category>
-      </categories>
-      <tags>
-        <tag>嵌入式</tag>
-        <tag>Linux</tag>
-        <tag>C/C++</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>imx6null-mini开发板</title>
-    <url>/2023/09/05/%E5%BC%80%E5%8F%91%E6%9D%BF/</url>
-    <content><![CDATA[<h2 id="1-硬件资源简介"><a href="#1-硬件资源简介" class="headerlink" title="1.硬件资源简介"></a>1.硬件资源简介</h2><p><img src="../images/开发板/image-20230905203618081.png" alt="image-20230905203618081"></p>
-<p><img src="../images/开发板/image-20230905204358901.png" alt="image-20230905204358901"></p>
-<h2 id="2-启动方式"><a href="#2-启动方式" class="headerlink" title="2. 启动方式"></a>2. 启动方式</h2><p><img src="../images/开发板/image-20230905204619465.png" alt="image-20230905204619465"></p>
-<h2 id="3-开发板挂载Ubuntu的NFS目录"><a href="#3-开发板挂载Ubuntu的NFS目录" class="headerlink" title="3. 开发板挂载Ubuntu的NFS目录"></a>3. 开发板挂载Ubuntu的NFS目录</h2><h3 id="3-1-Network-File-System-NFS"><a href="#3-1-Network-File-System-NFS" class="headerlink" title="3.1 Network File System(NFS)"></a>3.1 Network File System(NFS)</h3><p>NFS协议基于C/S架构，通过RPC协议进行通信。NFS的最大特点就是将服务端的文件系统目录树映射到客户端，而在客户端访问该 目录树与访问本地文件系统没有任何差别。</p>
-<p><img src="../images/开发板/image-20230905205227025.png" alt="image-20230905205227025"></p>
-<h3 id="3-2-挂载"><a href="#3-2-挂载" class="headerlink" title="3.2 挂载"></a>3.2 挂载</h3><ol>
-<li><p>Ubuntu开放相关目录的访问权限，即配置  <code>/etc/exports</code>文件</p>
-</li>
-<li><p>Ubuntu启动NFS服务</p>
-</li>
-<li><p>开发板上挂载Ubuntu上的相关目录到本地</p>
-<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">mount -t nfs -o nolock,vers=3 192.168.5.11:/home/book/nfs_rootfs /mnt</span><br></pre></td></tr></table></figure>
-<ul>
-<li><code>mount</code>: 这个命令用于挂载文件系统到指定的目录上。</li>
-<li><code>-t nfs</code>: 该选项指定要挂载的文件系统类型为NFS。</li>
-<li><code>-o nolock,vers=3</code>: 这些选项是用于指定挂载NFS文件系统时的一些选项。<code>nolock</code>选项用于禁用文件锁定机制，而<code>vers=3</code>选项指定使用NFS版本3协议。</li>
-</ul>
-</li>
-</ol>
 ]]></content>
       <categories>
         <category>Linux应用开发</category>
