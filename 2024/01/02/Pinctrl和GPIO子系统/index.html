@@ -20,21 +20,21 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="1. GPIO 和 Pinctrl 子系统的使用 在 LED 驱动程序中，我们使用寄存器操作的方式来配置硬件，这种方式是非常低效的，对于具有大量寄存器的芯片肯定需要将寄存器操作，可以由芯片厂的BSP工程师来封装成库，然后来让驱动开发人员进行调用，这就是今天引入的 GPIO 和 Pinctrl 子系统。 1.1 Pinctrl 子系统  参考文档：内核目录-bindings.txt">
+  <meta name="description" content="1.  GPIO 和 Pinctrl 子系统的使用在 LED 驱动程序中，我们使用寄存器操作的方式来配置硬件，这种方式是非常低效的，对于具有大量寄存器的芯片肯定需要将寄存器操作，可以由芯片厂的BSP工程师来封装成库，然后来让驱动开发人员进行调用，这就是今天引入的 GPIO 和 Pinctrl 子系统。 1.1 Pinctrl 子系统 参考文档：内核目录\Documentation\devicetr">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Pinctrl和GPIO子系统">
 <meta property="og:url" content="http://example.com/2024/01/02/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/index.html">
 <meta property="og:site_name" content="Krocz&#39;s Blog">
-<meta property="og:description" content="1. GPIO 和 Pinctrl 子系统的使用 在 LED 驱动程序中，我们使用寄存器操作的方式来配置硬件，这种方式是非常低效的，对于具有大量寄存器的芯片肯定需要将寄存器操作，可以由芯片厂的BSP工程师来封装成库，然后来让驱动开发人员进行调用，这就是今天引入的 GPIO 和 Pinctrl 子系统。 1.1 Pinctrl 子系统  参考文档：内核目录-bindings.txt">
+<meta property="og:description" content="1.  GPIO 和 Pinctrl 子系统的使用在 LED 驱动程序中，我们使用寄存器操作的方式来配置硬件，这种方式是非常低效的，对于具有大量寄存器的芯片肯定需要将寄存器操作，可以由芯片厂的BSP工程师来封装成库，然后来让驱动开发人员进行调用，这就是今天引入的 GPIO 和 Pinctrl 子系统。 1.1 Pinctrl 子系统 参考文档：内核目录\Documentation\devicetr">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/2024/01/02/images/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/image-20240102204442724.png">
-<meta property="og:image" content="http://example.com/2024/01/02/images/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/image-20240102210056127.png">
-<meta property="og:image" content="http://example.com/2024/01/02/images/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/image-20240102211315432.png">
-<meta property="og:image" content="http://example.com/2024/01/02/images/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/image-20240102212214670.png">
-<meta property="og:image" content="http://example.com/2024/01/02/images/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/image-20240102213415783.png">
-<meta property="og:image" content="http://example.com/2024/01/02/images/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/image-20240103114637359.png">
-<meta property="og:image" content="http://example.com/2024/01/02/images/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/image-20240103104344564.png">
-<meta property="og:image" content="http://example.com/2024/01/02/images/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/image-20240103202925506.png">
+<meta property="og:image" content="http://example.com/images/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/image-20240102204442724.png">
+<meta property="og:image" content="http://example.com/images/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/image-20240102210056127.png">
+<meta property="og:image" content="http://example.com/images/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/image-20240102211315432.png">
+<meta property="og:image" content="http://example.com/images/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/image-20240102212214670.png">
+<meta property="og:image" content="http://example.com/images/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/image-20240102213415783.png">
+<meta property="og:image" content="http://example.com/images/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/image-20240103114637359.png">
+<meta property="og:image" content="http://example.com/images/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/image-20240103104344564.png">
+<meta property="og:image" content="http://example.com/images/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/image-20240103202925506.png">
 <meta property="article:published_time" content="2024-01-02T11:43:44.000Z">
 <meta property="article:modified_time" content="2024-01-07T06:53:35.028Z">
 <meta property="article:author" content="Krocz">
@@ -42,7 +42,7 @@
 <meta property="article:tag" content="Linux">
 <meta property="article:tag" content="C&#x2F;C++">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://example.com/2024/01/02/images/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/image-20240102204442724.png">
+<meta name="twitter:image" content="http://example.com/images/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/image-20240102204442724.png">
 
 <link rel="canonical" href="http://example.com/2024/01/02/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/">
 
@@ -279,228 +279,134 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="gpio-和-pinctrl-子系统的使用">1. GPIO 和 Pinctrl
-子系统的使用</h2>
-<p>在 LED
-驱动程序中，我们使用寄存器操作的方式来配置硬件，这种方式是非常低效的，对于具有大量寄存器的芯片肯定需要将寄存器操作，可以由芯片厂的BSP工程师来封装成库，然后来让驱动开发人员进行调用，这就是今天引入的
-GPIO 和 Pinctrl 子系统。</p>
-<h3 id="pinctrl-子系统">1.1 Pinctrl 子系统</h3>
-<blockquote>
-<p>参考文档：内核目录-bindings.txt</p>
+        <h2 id="1-GPIO-和-Pinctrl-子系统的使用"><a href="#1-GPIO-和-Pinctrl-子系统的使用" class="headerlink" title="1.  GPIO 和 Pinctrl 子系统的使用"></a>1.  GPIO 和 Pinctrl 子系统的使用</h2><p>在 LED 驱动程序中，我们使用寄存器操作的方式来配置硬件，这种方式是非常低效的，对于具有大量寄存器的芯片肯定需要将寄存器操作，可以由芯片厂的BSP工程师来封装成库，然后来让驱动开发人员进行调用，这就是今天引入的 GPIO 和 Pinctrl 子系统。</p>
+<h3 id="1-1-Pinctrl-子系统"><a href="#1-1-Pinctrl-子系统" class="headerlink" title="1.1 Pinctrl 子系统"></a>1.1 Pinctrl 子系统</h3><blockquote>
+<p>参考文档：内核目录\Documentation\devicetree\bindings\pinctrl\pinctrl-bindings.txt</p>
 </blockquote>
 <p>Pinctrl 子系统涉及 2 个对象：pin controller、client device。</p>
 <ul>
 <li>pin controller 提供服务，可以用它来复用引脚、配置引脚。</li>
-<li>client device
-使用服务，声明自己要使用哪些引脚的哪些功能，怎么配置它们。</li>
+<li>client device 使用服务，声明自己要使用哪些引脚的哪些功能，怎么配置它们。</li>
 </ul>
-<h4 id="pin-controller">1.1.1 pin controller</h4>
-<p>pin controller
-是一个软件上的概念，用来复用引脚，还可以配置引脚(比如上下拉电阻等)。</p>
+<h4 id="1-1-1-pin-controller"><a href="#1-1-1-pin-controller" class="headerlink" title="1.1.1 pin controller"></a>1.1.1 pin controller</h4><p>pin controller 是一个软件上的概念，用来复用引脚，还可以配置引脚(比如上下拉电阻等)。</p>
 <blockquote>
-<p>pin controller 和后面讲到的 GPIO Controller
-不是一回事，前者控制的引脚可用于 GPIO 功能、I2C
-功能；后者只是把引脚配置为输入、输出等简单的功能。</p>
+<p>pin controller 和后面讲到的 GPIO Controller 不是一回事，前者控制的引脚可用于 GPIO 功能、I2C 功能；后者只是把引脚配置为输入、输出等简单的功能。</p>
 </blockquote>
-<h4 id="client-device">1.1.2 client device</h4>
-<p>Pinctrl
-系统的客户，就是使用引脚的设备，<strong>它在设备树里会被定义为一个节点，在节点里声明要用哪些引脚</strong>。例如：</p>
-<figure>
-<img src="../images/Pinctrl和GPIO子系统/image-20240102204442724.png"
-alt="image-20240102204442724" />
-<figcaption aria-hidden="true">image-20240102204442724</figcaption>
-</figure>
+<h4 id="1-1-2-client-device"><a href="#1-1-2-client-device" class="headerlink" title="1.1.2 client device"></a>1.1.2 client device</h4><p>Pinctrl 系统的客户，就是使用引脚的设备，<strong>它在设备树里会被定义为一个节点，在节点里声明要用哪些引脚</strong>。例如：</p>
+<p><img src="/../images/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/image-20240102204442724.png" alt="image-20240102204442724"></p>
 <p>上图中，左边是 pin controller 节点，右边是 client device 节点.</p>
-<h5 id="pin-state">(1) pin state</h5>
-<p>比如对于一个 UART 设备，它有多个“状态”：default、sleep
-等，那对应的引脚在设备处于不同状态时也需要配置为不同的模式。例如UART默认状态两个引脚需要配置为输出+输入模式，在休眠模式下节约功耗则可以配置为均输出高电平。</p>
-<h5 id="groups-和-function">(2) groups 和 function</h5>
-<p>一个设备会用到一个或多个引脚，这些引脚就可以归为一组(group)；</p>
+<h5 id="1-pin-state"><a href="#1-pin-state" class="headerlink" title="(1) pin state"></a>(1) pin state</h5><p>比如对于一个 UART 设备，它有多个“状态”：default、sleep 等，那对应的引脚在设备处于不同状态时也需要配置为不同的模式。例如UART默认状态两个引脚需要配置为输出+输入模式，在休眠模式下节约功耗则可以配置为均输出高电平。</p>
+<h5 id="2-groups-和-function"><a href="#2-groups-和-function" class="headerlink" title="(2) groups 和 function"></a>(2) groups 和 function</h5><p>一个设备会用到一个或多个引脚，这些引脚就可以归为一组(group)；</p>
 <p>这些引脚可以复用为某个功能：function。</p>
-<p>当然：一个设备可以用到多组引脚，比如 A1、A2 两组引脚，A1 组复用为 F1
-功能，A2 组复用为 F2 功能。</p>
-<h5
-id="generic-pin-multiplexing-node-和-generic-pin-configuration-node">(3)
-Generic pin multiplexing node 和 Generic pin configuration node</h5>
-<p>在上图左边的 pin controller
-节点中，一些其他属性可以描述不同的引脚信息，例如，哪组 (group)
-引脚配置为哪 个设置功能 (setting)，比如上拉、下拉等。</p>
+<p>当然：一个设备可以用到多组引脚，比如 A1、A2 两组引脚，A1 组复用为 F1 功能，A2 组复用为 F2 功能。</p>
+<h5 id="3-Generic-pin-multiplexing-node-和-Generic-pin-configuration-node"><a href="#3-Generic-pin-multiplexing-node-和-Generic-pin-configuration-node" class="headerlink" title="(3) Generic pin multiplexing node 和 Generic pin configuration node"></a>(3) Generic pin multiplexing node 和 Generic pin configuration node</h5><p>在上图左边的 pin controller 节点中，一些其他属性可以描述不同的引脚信息，例如，哪组 (group) 引脚配置为哪 个设置功能 (setting)，比如上拉、下拉等。</p>
 <blockquote>
-<p>pin controller 节点的格式，没有统一的标准。每家芯片都不一样。
-甚至上面的 group、function 关键字也不一定有，但是概念是有的。</p>
+<p>pin controller 节点的格式，没有统一的标准。每家芯片都不一样。 甚至上面的 group、function 关键字也不一定有，但是概念是有的。</p>
 </blockquote>
 <p>Pinctrl 子系统举例：</p>
-<figure>
-<img src="../images/Pinctrl和GPIO子系统/image-20240102210056127.png"
-alt="image-20240102210056127" />
-<figcaption aria-hidden="true">image-20240102210056127</figcaption>
-</figure>
-<h4 id="代码中怎么引用-pinctrl">1.1.3 代码中怎么引用 pinctrl</h4>
-<p>基本上驱动程序不用管，当设备切换状态时，对应的 pinctrl
-就会被自动调用来切换引脚状态。</p>
+<p><img src="/../images/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/image-20240102210056127.png" alt="image-20240102210056127"></p>
+<h4 id="1-1-3-代码中怎么引用-pinctrl"><a href="#1-1-3-代码中怎么引用-pinctrl" class="headerlink" title="1.1.3 代码中怎么引用 pinctrl"></a>1.1.3 代码中怎么引用 pinctrl</h4><p>基本上驱动程序不用管，当设备切换状态时，对应的 pinctrl 就会被自动调用来切换引脚状态。</p>
 <p>非要调用，也有函数：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">devm_pinctrl_get_select_default(<span class="keyword">struct</span> device *dev); <span class="comment">// 使用&quot;default&quot;状态的引脚</span></span><br><span class="line">pinctrl_get_select(<span class="keyword">struct</span> device *dev, <span class="type">const</span> <span class="type">char</span> *name); <span class="comment">// 根据 name 选择某种状态的引脚</span></span><br></pre></td></tr></table></figure>
-<h3 id="gpio-子系统">1.2 GPIO 子系统</h3>
-<p>要操作 GPIO 引脚，先把所用引脚配置为 GPIO 功能，这通过 Pinctrl
-子系统来实现。</p>
-<p>然后就可以根据设置引脚方向(输入还是输出)，获取引脚电平(读)，设置引脚电平(写)，这通过
-GPIO 子系统来实现。</p>
-<h4 id="在设备树中指定引脚">1.2.1 在设备树中指定引脚</h4>
-<p>几乎所有 ARM 芯片中，GPIO 都分为几组，每组中有若干个引脚。</p>
+
+
+
+
+
+<h3 id="1-2-GPIO-子系统"><a href="#1-2-GPIO-子系统" class="headerlink" title="1.2 GPIO 子系统"></a>1.2 GPIO 子系统</h3><p>要操作 GPIO 引脚，先把所用引脚配置为 GPIO 功能，这通过 Pinctrl 子系统来实现。</p>
+<p>然后就可以根据设置引脚方向(输入还是输出)，获取引脚电平(读)，设置引脚电平(写)，这通过 GPIO 子系统来实现。</p>
+<h4 id="1-2-1-在设备树中指定引脚"><a href="#1-2-1-在设备树中指定引脚" class="headerlink" title="1.2.1 在设备树中指定引脚"></a>1.2.1 在设备树中指定引脚</h4><p>几乎所有 ARM 芯片中，GPIO 都分为几组，每组中有若干个引脚。</p>
 <p>所以在使用 GPIO 子系统之前，就要先确定引脚的组别和组内序号</p>
-<p><strong>在设备树中，“GPIO组”就是一个 GPIO
-Controller</strong>，这通常都由芯片厂家设置好。我们要做的是找到它名字，比如“gpio1”，然后指定要用它里面的哪个引脚，比如&lt;&amp;gpio1
-0&gt;。</p>
-<p>下图是一些芯片的 GPIO 控制器节点，它们一般都是厂家定义好，在 xxx.dtsi
-文件中：</p>
-<figure>
-<img src="../images/Pinctrl和GPIO子系统/image-20240102211315432.png"
-alt="image-20240102211315432" />
-<figcaption aria-hidden="true">image-20240102211315432</figcaption>
-</figure>
+<p><strong>在设备树中，“GPIO组”就是一个 GPIO Controller</strong>，这通常都由芯片厂家设置好。我们要做的是找到它名字，比如“gpio1”，然后指定要用它里面的哪个引脚，比如&lt;&amp;gpio1 0&gt;。</p>
+<p>下图是一些芯片的 GPIO 控制器节点，它们一般都是厂家定义好，在 xxx.dtsi 文件中：</p>
+<p><img src="/../images/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/image-20240102211315432.png" alt="image-20240102211315432"></p>
 <p>暂时只需要关心里面的这 2 个属性：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">gpio-controller; </span><br><span class="line">#gpio-cells = &lt;2&gt;;</span><br></pre></td></tr></table></figure>
+
 <ul>
-<li>gpio-controller 表示这个节点是一个 GPIO
-Controller，它下面有很多引脚。</li>
-<li>#gpio-cells = &lt;2&gt; 表示这个控制器下每一个引脚要用 2 个 32
-位的数
-(cell)来描述。具体用几个数以及如何表示都可以自己决定；<strong>普遍的用法是，用第
-1 个 cell 来表示哪一个引脚，用第 2 个 cell
-来表示有效电平</strong>：</li>
+<li>gpio-controller 表示这个节点是一个 GPIO Controller，它下面有很多引脚。</li>
+<li>#gpio-cells &#x3D; &lt;2&gt; 表示这个控制器下每一个引脚要用 2 个 32 位的数 (cell)来描述。具体用几个数以及如何表示都可以自己决定；<strong>普遍的用法是，用第 1 个 cell 来表示哪一个引脚，用第 2 个 cell 来表示有效电平</strong>：</li>
 </ul>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">GPIO_ACTIVE_HIGH: 高电平有效 </span><br><span class="line">GPIO_ACTIVE_LOW : 低电平有效</span><br></pre></td></tr></table></figure>
-<p>片厂来定义 GPIO Controller
-，我们如果需要修改设备树文件，只需要引用他们规定的引脚即可：</p>
-<figure>
-<img src="../images/Pinctrl和GPIO子系统/image-20240102212214670.png"
-alt="image-20240102212214670" />
-<figcaption aria-hidden="true">image-20240102212214670</figcaption>
-</figure>
-<p>例如上图中，在设备树文件，我们定义的设备节点中直接引用 "gpios" 或者
-"xxx-gpios" 属性即可</p>
-<h4 id="在驱动代码中调用-gpio-子系统">1.2.2 在驱动代码中调用 GPIO
-子系统</h4>
-<p>GPIO 子系统有两套接口：</p>
-<ol type="1">
-<li>基于描述符 - descriptor-based。函数都有前缀
-<code>gpiod_</code>，它使用 gpio_desc 结构体来表示 一个引脚；</li>
-<li>过时的接口 - legacy。函数都有前缀
-<code>gpio_</code>，它使用一个整数来表示一个引脚。</li>
+
+
+
+<p>片厂来定义 GPIO Controller ，我们如果需要修改设备树文件，只需要引用他们规定的引脚即可：</p>
+<p><img src="/../images/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/image-20240102212214670.png" alt="image-20240102212214670"></p>
+<p>例如上图中，在设备树文件，我们定义的设备节点中直接引用 “gpios” 或者 “xxx-gpios” 属性即可</p>
+<h4 id="1-2-2-在驱动代码中调用-GPIO-子系统"><a href="#1-2-2-在驱动代码中调用-GPIO-子系统" class="headerlink" title="1.2.2 在驱动代码中调用 GPIO 子系统"></a>1.2.2 在驱动代码中调用 GPIO 子系统</h4><p>GPIO 子系统有两套接口：</p>
+<ol>
+<li>基于描述符 - descriptor-based。函数都有前缀 <code>gpiod_</code>，它使用 gpio_desc 结构体来表示 一个引脚；</li>
+<li>过时的接口 - legacy。函数都有前缀 <code>gpio_</code>，它使用一个整数来表示一个引脚。</li>
 </ol>
 <p>要操作一个引脚，首先要 get 引脚，然后设置方向，读值、写值。</p>
-<h5 id="常用函数">(1) 常用函数</h5>
-<p>需包含头文件：</p>
+<h5 id="1-常用函数"><a href="#1-常用函数" class="headerlink" title="(1) 常用函数"></a>(1) 常用函数</h5><p>需包含头文件：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/gpio/consumer.h&gt;</span> <span class="comment">// descriptor-based</span></span></span><br><span class="line">or</span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/gpio.h&gt;</span> <span class="comment">// legacy</span></span></span><br></pre></td></tr></table></figure>
-<figure>
-<img src="../images/Pinctrl和GPIO子系统/image-20240102213415783.png"
-alt="image-20240102213415783" />
-<figcaption aria-hidden="true">image-20240102213415783</figcaption>
-</figure>
-<p>有前缀 <code>devm_</code> 的含义是“设备资源管理”(Managed Device
-Resource)，
-这是一种自动释放资源的机制。它的思想是“<strong>资源是属于设备的，设备不存在时资源就可以自动释放</strong>”。</p>
-<p>比如在 Linux 开发过程中，先申请了
-GPIO，再申请内存；如果内存申请失败，那么在返回之前就需要先释放 GPIO
-资源。如果使用 devm
-的相关函数，在内存申请失败时可以直接返回：设备的销毁函数会自动地释放已经申请了的
-GPIO
-资源。<strong>建议使用<code>devm_</code>版本的相关函数。</strong></p>
-<h5 id="使用-descriptor-based-方式获得引脚">(2) 使用 descriptor-based
-方式获得引脚</h5>
-<p>假设备在设备树中有如下节点：</p>
+
+<p><img src="/../images/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/image-20240102213415783.png" alt="image-20240102213415783"></p>
+<p>有前缀 <code>devm_</code> 的含义是“设备资源管理”(Managed Device Resource)， 这是一种自动释放资源的机制。它的思想是“<strong>资源是属于设备的，设备不存在时资源就可以自动释放</strong>”。</p>
+<p>比如在 Linux 开发过程中，先申请了 GPIO，再申请内存；如果内存申请失败，那么在返回之前就需要先释放 GPIO 资源。如果使用 devm 的相关函数，在内存申请失败时可以直接返回：设备的销毁函数会自动地释放已经申请了的 GPIO 资源。<strong>建议使用<code>devm_</code>版本的相关函数。</strong></p>
+<h5 id="2-使用-descriptor-based-方式获得引脚"><a href="#2-使用-descriptor-based-方式获得引脚" class="headerlink" title="(2) 使用 descriptor-based 方式获得引脚"></a>(2) 使用 descriptor-based 方式获得引脚</h5><p>假设备在设备树中有如下节点：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">foo_device</span><br><span class="line">&#123;</span><br><span class="line">    compatible = &quot;acme,foo&quot;;</span><br><span class="line">    ... </span><br><span class="line">    led-gpios   = &lt;&amp;gpio 15 GPIO_ACTIVE_HIGH&gt;, /* red */</span><br><span class="line">    			  &lt;&amp;gpio 16 GPIO_ACTIVE_HIGH&gt;, /* green */</span><br><span class="line">    			  &lt;&amp;gpio 17 GPIO_ACTIVE_HIGH&gt;; /* blue */</span><br><span class="line">    power-gpios = &lt;&amp;gpio 1 GPIO_ACTIVE_LOW&gt;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
 <p>那么可以使用下面的函数获得引脚：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">gpio_desc</span> *<span class="title">red</span>, *<span class="title">green</span>, *<span class="title">blue</span>, *<span class="title">power</span>;</span></span><br><span class="line">red = gpiod_get_index(dev, <span class="string">&quot;led&quot;</span>, <span class="number">0</span>, GPIOD_OUT_HIGH);</span><br><span class="line">green = gpiod_get_index(dev, <span class="string">&quot;led&quot;</span>, <span class="number">1</span>, GPIOD_OUT_HIGH);</span><br><span class="line">blue = gpiod_get_index(dev, <span class="string">&quot;led&quot;</span>, <span class="number">2</span>, GPIOD_OUT_HIGH);</span><br><span class="line">power = gpiod_get(dev, <span class="string">&quot;power&quot;</span>, GPIOD_OUT_HIGH);</span><br></pre></td></tr></table></figure>
+
 <blockquote>
-<p>gpiod_set_value
-设置的值是“逻辑值”，不一定等于物理值。之所以使用逻辑值，是为了保持功能代码不变。以LED不同的驱动电路为例，见下图：</p>
+<p>gpiod_set_value 设置的值是“逻辑值”，不一定等于物理值。之所以使用逻辑值，是为了保持功能代码不变。以LED不同的驱动电路为例，见下图：</p>
 </blockquote>
-<figure>
-<img src="../images/Pinctrl和GPIO子系统/image-20240103114637359.png"
-alt="image-20240103114637359" />
-<figcaption aria-hidden="true">image-20240103114637359</figcaption>
-</figure>
-<h5 id="使用老的方式获得引脚">(3) 使用老的方式获得引脚</h5>
-<p>旧的 <code>gpio_</code>
-函数没办法根据设备树信息获得引脚，它需要先知道引脚号。</p>
-<p>在 GPIO 子系统中，每注册一个 GPIO Controller 时会确定它的“base
-number”，那么这个控制器里的第 n 号引脚的号码就是：base number + n。
-但是<strong>如果硬件有变化、设备树有变化，这个 base number
-并不能保证是固定的，应该查看 sysfs 来确定 base number。</strong></p>
-<ol type="1">
-<li><p>先在开发板的/sys/class/gpio 目录下，找到各个 gpiochipxxx
-目录：</p></li>
-<li><p>然后进入某个 gpiochip 目录，查看文件 label 的内容</p></li>
-<li><p>根据 label 的内容对比设备树。label
-内容来自设备树，比如它的寄存器基地址。用来跟设备树(dtsi 文件)
-比较，就可以知道这对应哪一个 GPIO Controller。</p>
-<p><img src="../images/Pinctrl和GPIO子系统/image-20240103104344564.png"
-alt="image-20240103104344564" />、</p>
-<p>从图中可以知道 GPIO Controller (gpio4) 对应的基准引脚号是
-96，则对于引脚 "GPIO4_IO14"的引脚号为 96 + 14 =
-110，可以按照如下操作读取引脚的值：</p>
+<p><img src="/../images/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/image-20240103114637359.png" alt="image-20240103114637359"></p>
+<h5 id="3-使用老的方式获得引脚"><a href="#3-使用老的方式获得引脚" class="headerlink" title="(3) 使用老的方式获得引脚"></a>(3) 使用老的方式获得引脚</h5><p>旧的 <code>gpio_</code> 函数没办法根据设备树信息获得引脚，它需要先知道引脚号。</p>
+<p>在 GPIO 子系统中，每注册一个 GPIO Controller 时会确定它的“base number”，那么这个控制器里的第 n 号引脚的号码就是：base number + n。 但是<strong>如果硬件有变化、设备树有变化，这个 base number 并不能保证是固定的，应该查看 sysfs 来确定 base number。</strong></p>
+<ol>
+<li><p>先在开发板的&#x2F;sys&#x2F;class&#x2F;gpio 目录下，找到各个 gpiochipxxx 目录：</p>
+</li>
+<li><p>然后进入某个 gpiochip 目录，查看文件 label 的内容</p>
+</li>
+<li><p>根据 label 的内容对比设备树。label 内容来自设备树，比如它的寄存器基地址。用来跟设备树(dtsi 文件) 比较，就可以知道这对应哪一个 GPIO Controller。</p>
+<p><img src="/../images/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/image-20240103104344564.png" alt="image-20240103104344564">、</p>
+<p>从图中可以知道 GPIO Controller (gpio4) 对应的基准引脚号是 96，则对于引脚 “GPIO4_IO14”的引脚号为 96 + 14 &#x3D; 110，可以按照如下操作读取引脚的值：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">echo 110 &gt; /sys/class/gpio/export</span><br><span class="line">echo in &gt; /sys/class/gpio/gpio110/direction</span><br><span class="line">cat /sys/class/gpio/gpio110/value</span><br><span class="line">echo 110 &gt; /sys/class/gpio/unexport</span><br></pre></td></tr></table></figure>
+
 <p>按照如下操作设置引脚的值：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">echo 110 &gt; /sys/class/gpio/export</span><br><span class="line">echo out &gt; /sys/class/gpio/gpio110/direction</span><br><span class="line">echo 1 &gt; /sys/class/gpio/gpio110/value</span><br><span class="line">echo 110 &gt; /sys/class/gpio/unexport</span><br></pre></td></tr></table></figure></li>
 </ol>
 <blockquote>
-<p>如果驱动程序已经使用了该引脚，那么将会 export 失败，会提示：write
-error: Device orr resource busy</p>
+<p>如果驱动程序已经使用了该引脚，那么将会 export 失败，会提示：write error: Device orr resource busy</p>
 </blockquote>
-<h2 id="基于-pinctrl-和-gpio-子系统编写led驱动">2. 基于 Pinctrl 和 GPIO
-子系统编写LED驱动</h2>
-<p>通过使用 Pinctrl 和 GPIO
-子系统封装了硬件操作中大量的寄存器设备，使得驱动代码和芯片种类解绑，大大简化了驱动代码的编写。</p>
-<h3 id="基于-pinctrl-子系统修改设备树">2.1 基于 Pinctrl
-子系统修改设备树</h3>
-<ol type="1">
-<li>有些芯片提供了设备树生成工具，在 GUI 界面中选择引脚功能和配置信息，
-就可以自动生成 Pinctrl 子结点。把它复制到你的设备树文件中，再在 client
-device 结点中引用就可以。</li>
-<li>有些芯片只提供文档，那就去阅读文档，一般在内核源码目录
-Documentation下面，保存有该厂家的文档。</li>
-<li>如果连文档都没有，那只能参考内核源码中的设备树文件，在内核源码目录
-arch/arm/boot/dts 目录下。</li>
+<h2 id="2-基于-Pinctrl-和-GPIO-子系统编写LED驱动"><a href="#2-基于-Pinctrl-和-GPIO-子系统编写LED驱动" class="headerlink" title="2. 基于 Pinctrl 和 GPIO 子系统编写LED驱动"></a>2. 基于 Pinctrl 和 GPIO 子系统编写LED驱动</h2><p>通过使用 Pinctrl 和 GPIO 子系统封装了硬件操作中大量的寄存器设备，使得驱动代码和芯片种类解绑，大大简化了驱动代码的编写。</p>
+<h3 id="2-1-基于-Pinctrl-子系统修改设备树"><a href="#2-1-基于-Pinctrl-子系统修改设备树" class="headerlink" title="2.1 基于 Pinctrl 子系统修改设备树"></a>2.1 基于 Pinctrl 子系统修改设备树</h3><ol>
+<li>有些芯片提供了设备树生成工具，在 GUI 界面中选择引脚功能和配置信息， 就可以自动生成 Pinctrl 子结点。把它复制到你的设备树文件中，再在 client device 结点中引用就可以。</li>
+<li>有些芯片只提供文档，那就去阅读文档，一般在内核源码目录 Documentation\devicetree\bindings\pinctrl 下面，保存有该厂家的文档。</li>
+<li>如果连文档都没有，那只能参考内核源码中的设备树文件，在内核源码目录 arch&#x2F;arm&#x2F;boot&#x2F;dts 目录下。</li>
 </ol>
 <p>IMX6ULL提供了GUI工具，可以在GUI工具中配置引脚的复用和焊盘的相关参数：</p>
-<figure>
-<img src="../images/Pinctrl和GPIO子系统/image-20240103202925506.png"
-alt="image-20240103202925506" />
-<figcaption aria-hidden="true">image-20240103202925506</figcaption>
-</figure>
+<p><img src="/../images/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/image-20240103202925506.png" alt="image-20240103202925506"></p>
 <p>将生成的 Pinctrl 子节点添加到 dts 文件中：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">&amp;iomuxc_snvs &#123;</span><br><span class="line">    pinctrl-names = &quot;default_snvs&quot;;</span><br><span class="line">    pinctrl-0 = &lt;&amp;pinctrl_hog_2&gt;;</span><br><span class="line">    </span><br><span class="line">    imx6ull-board &#123;</span><br><span class="line">    pinctrl-0 = &lt;&amp;pinctrl_krocz_led&gt;;</span><br><span class="line">        pinctrl_krocz_led: krocz_ledgrp &#123;    </span><br><span class="line">            fsl,pins = &lt;</span><br><span class="line">                MX6ULL_PAD_SNVS_TAMPER3__GPIO5_IO03        0x000110E0</span><br><span class="line">            &gt;;</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;;</span><br><span class="line">    </span><br><span class="line">    imx6ul-evk &#123;</span><br><span class="line">        pinctrl_hog_2: hoggrp-2 &#123;</span><br><span class="line">            fsl,pins = &lt;</span><br><span class="line">                MX6ULL_PAD_SNVS_TAMPER9__GPIO5_IO09     0x1b0b0 /* enet1 reset */</span><br><span class="line">                MX6ULL_PAD_SNVS_TAMPER6__GPIO5_IO06     0x1b0b0 /* enet2 reset */</span><br><span class="line">                MX6ULL_PAD_SNVS_TAMPER1__GPIO5_IO01     0x000110A0 /*key 1*/</span><br><span class="line">            &gt;;</span><br><span class="line">        &#125;;</span><br><span class="line">        ...</span><br><span class="line">   &#125;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
 <blockquote>
-<p>PS：我尝试将 pinctrl_krocz_led 节点直接放置在 &amp;iomuxc_snvs
-节点下，但是重启开发板之后发现网络连接不上；通过串口连上开发板之后，装载内核驱动模块时报错找不着引脚，不过感觉语法上应该没有问题。之后，将
-pinctrl_krocz_led 放置在原有的 imx6ul-evk 或者像GUI生成的那样放在
-imx6ull-board 下是可以的，没有问题。</p>
+<p>PS：我尝试将 pinctrl_krocz_led 节点直接放置在 &amp;iomuxc_snvs 节点下，但是重启开发板之后发现网络连接不上；通过串口连上开发板之后，装载内核驱动模块时报错找不着引脚，不过感觉语法上应该没有问题。之后，将 pinctrl_krocz_led 放置在原有的 imx6ul-evk 或者像GUI生成的那样放在 imx6ull-board 下是可以的，没有问题。</p>
 </blockquote>
 <p>在 dts 中新加入一个设备节点：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">krocz_led &#123;</span><br><span class="line">    compatible = &quot;krocz,leddrv&quot;;               // 和 platform_driver 进行匹配</span><br><span class="line">    pinctrl-names = &quot;default&quot;;                 // 该设备节点可能的状态</span><br><span class="line">    pinctrl-0 = &lt;&amp;pinctrl_krocz_led&gt;;          // 第一种状态使用的 Pinctrl 配置</span><br><span class="line">    myled-gpios = &lt;&amp;gpio5 3 GPIO_ACTIVE_LOW&gt;;  // 设备节点所使用的引脚</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<p>通过上述代码，我们基于 Pinctrl 子系统设置了 LED
-引脚，以及引脚复用功能为
-GPIO，并且配置了引脚的相关属性，如上拉电阻阻值，驱动能力，引脚速率等。</p>
-<p>基于 GPIO 子系统设置了 LED
-引脚，以及该引脚逻辑电平和物理电平的关系，并可以通过 GPIO
-子系统来设置该引脚的方向，读写引脚值等。</p>
-<h3 id="通用led驱动代码">2.2 通用LED驱动代码</h3>
-<p>代码的主要部分：</p>
-<ol type="1">
+
+<p>通过上述代码，我们基于 Pinctrl 子系统设置了 LED 引脚，以及引脚复用功能为 GPIO，并且配置了引脚的相关属性，如上拉电阻阻值，驱动能力，引脚速率等。</p>
+<p>基于 GPIO 子系统设置了 LED 引脚，以及该引脚逻辑电平和物理电平的关系，并可以通过 GPIO 子系统来设置该引脚的方向，读写引脚值等。</p>
+<h3 id="2-2-通用LED驱动代码"><a href="#2-2-通用LED驱动代码" class="headerlink" title="2.2 通用LED驱动代码"></a>2.2 通用LED驱动代码</h3><p>代码的主要部分：</p>
+<ol>
 <li>注册 file_operations</li>
 <li>内核模块的 init 和 exit</li>
 <li>platform_driver 的 probe 和 remove</li>
 </ol>
-<h4 id="编写-file_operations">2.2.1 编写 file_operations</h4>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">ssize_t</span> <span class="title function_">led_drv_write</span> <span class="params">(<span class="keyword">struct</span> file *file, <span class="type">const</span> <span class="type">char</span> __user *buf, <span class="type">size_t</span> size, <span class="type">loff_t</span> *offset)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">int</span> err;</span><br><span class="line">	<span class="type">char</span> status;</span><br><span class="line">	printk(<span class="string">&quot;%s %s line %d\n&quot;</span>, __FILE__, __FUNCTION__, __LINE__);</span><br><span class="line">	err = copy_from_user(&amp;status, buf, <span class="number">1</span>);</span><br><span class="line">	gpiod_set_value(led_gpio, status);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">led_drv_open</span> <span class="params">(<span class="keyword">struct</span> inode *node, <span class="keyword">struct</span> file *file)</span></span><br><span class="line">&#123;	</span><br><span class="line">	printk(<span class="string">&quot;%s %s line %d\n&quot;</span>, __FILE__, __FUNCTION__, __LINE__);</span><br><span class="line">	gpiod_direction_output(led_gpio, <span class="number">0</span>);   <span class="comment">// 默认写逻辑0，熄灭LED灯</span></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">file_operations</span> <span class="title">led_drv</span> =</span> &#123;</span><br><span class="line">	.owner	 = THIS_MODULE,</span><br><span class="line">	.open    = led_drv_open,</span><br><span class="line">	.write   = led_drv_write,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<p>基于 Pinctrl 和 GPIO
-子系统将芯片寄存器操作封装，使得我们的驱动代码和芯片类型无关，从而使得仅这一个LED驱动代码就可以在任意芯片上通用。在不同的芯片上仅需要修改对应的设备树文件，不需要修改驱动代码文件。</p>
-<h4 id="内核模块注册">2.2.2 内核模块注册</h4>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> __init <span class="title function_">led_init</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> err;</span><br><span class="line">	printk(<span class="string">&quot;%s %s line %d\n&quot;</span>, __FILE__, __FUNCTION__, __LINE__);</span><br><span class="line">    err = platform_driver_register(&amp;chip_demo_gpio_driver); </span><br><span class="line">	<span class="keyword">return</span> err;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> __exit <span class="title function_">led_exit</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">	printk(<span class="string">&quot;%s %s line %d\n&quot;</span>, __FILE__, __FUNCTION__, __LINE__);</span><br><span class="line">    platform_driver_unregister(&amp;chip_demo_gpio_driver);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>主要是注册 platform_driver</p>
-<h4 id="设备驱动的注册">2.2.3 设备驱动的注册</h4>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">chip_demo_gpio_probe</span><span class="params">(<span class="keyword">struct</span> platform_device *pdev)</span></span><br><span class="line">&#123;</span><br><span class="line">	printk(<span class="string">&quot;%s %s line %d\n&quot;</span>, __FILE__, __FUNCTION__, __LINE__);</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* 4.1 设备树中定义  myled-gpios=&lt;...&gt;;	*/</span></span><br><span class="line">    <span class="comment">/* device结构体  char*的功能名称    用以GPIO初始化的flags，0表示高电平有效 */</span></span><br><span class="line">    led_gpio = gpiod_get(&amp;pdev-&gt;dev, <span class="string">&quot;myled&quot;</span>, <span class="number">0</span>);</span><br><span class="line">	<span class="keyword">if</span> (IS_ERR(led_gpio)) &#123;</span><br><span class="line">		dev_err(&amp;pdev-&gt;dev, <span class="string">&quot;Failed to get GPIO for led\n&quot;</span>);</span><br><span class="line">		<span class="keyword">return</span> PTR_ERR(led_gpio);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	major = register_chrdev(<span class="number">0</span>, <span class="string">&quot;krocz_led&quot;</span>, &amp;led_drv);  <span class="comment">/* /dev/led */</span></span><br><span class="line">	led_class = class_create(THIS_MODULE, <span class="string">&quot;krocz_led_class&quot;</span>);</span><br><span class="line">	<span class="keyword">if</span> (IS_ERR(led_class)) &#123;</span><br><span class="line">		printk(<span class="string">&quot;%s %s line %d\n&quot;</span>, __FILE__, __FUNCTION__, __LINE__);</span><br><span class="line">		unregister_chrdev(major, <span class="string">&quot;krocz_led&quot;</span>);</span><br><span class="line">		gpiod_put(led_gpio);</span><br><span class="line">		<span class="keyword">return</span> PTR_ERR(led_class);</span><br><span class="line">	&#125;</span><br><span class="line">	device_create(led_class, <span class="literal">NULL</span>, MKDEV(major, <span class="number">0</span>), <span class="literal">NULL</span>, <span class="string">&quot;krocz_led%d&quot;</span>, <span class="number">0</span>); </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">chip_demo_gpio_remove</span><span class="params">(<span class="keyword">struct</span> platform_device *pdev)</span></span><br><span class="line">&#123;</span><br><span class="line">	device_destroy(led_class, MKDEV(major, <span class="number">0</span>));</span><br><span class="line">	class_destroy(led_class);</span><br><span class="line">	unregister_chrdev(major, <span class="string">&quot;krocz_led&quot;</span>);</span><br><span class="line">	gpiod_put(led_gpio);</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="2-2-1-编写-file-operations"><a href="#2-2-1-编写-file-operations" class="headerlink" title="2.2.1 编写 file_operations"></a>2.2.1 编写 file_operations</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">ssize_t</span> <span class="title function_">led_drv_write</span> <span class="params">(<span class="keyword">struct</span> file *file, <span class="type">const</span> <span class="type">char</span> __user *buf, <span class="type">size_t</span> size, <span class="type">loff_t</span> *offset)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">int</span> err;</span><br><span class="line">	<span class="type">char</span> status;</span><br><span class="line">	printk(<span class="string">&quot;%s %s line %d\n&quot;</span>, __FILE__, __FUNCTION__, __LINE__);</span><br><span class="line">	err = copy_from_user(&amp;status, buf, <span class="number">1</span>);</span><br><span class="line">	gpiod_set_value(led_gpio, status);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">led_drv_open</span> <span class="params">(<span class="keyword">struct</span> inode *node, <span class="keyword">struct</span> file *file)</span></span><br><span class="line">&#123;	</span><br><span class="line">	printk(<span class="string">&quot;%s %s line %d\n&quot;</span>, __FILE__, __FUNCTION__, __LINE__);</span><br><span class="line">	gpiod_direction_output(led_gpio, <span class="number">0</span>);   <span class="comment">// 默认写逻辑0，熄灭LED灯</span></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">file_operations</span> <span class="title">led_drv</span> =</span> &#123;</span><br><span class="line">	.owner	 = THIS_MODULE,</span><br><span class="line">	.open    = led_drv_open,</span><br><span class="line">	.write   = led_drv_write,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>基于 Pinctrl 和 GPIO 子系统将芯片寄存器操作封装，使得我们的驱动代码和芯片类型无关，从而使得仅这一个LED驱动代码就可以在任意芯片上通用。在不同的芯片上仅需要修改对应的设备树文件，不需要修改驱动代码文件。</p>
+<h4 id="2-2-2-内核模块注册"><a href="#2-2-2-内核模块注册" class="headerlink" title="2.2.2 内核模块注册"></a>2.2.2 内核模块注册</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> __init <span class="title function_">led_init</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> err;</span><br><span class="line">	printk(<span class="string">&quot;%s %s line %d\n&quot;</span>, __FILE__, __FUNCTION__, __LINE__);</span><br><span class="line">    err = platform_driver_register(&amp;chip_demo_gpio_driver); </span><br><span class="line">	<span class="keyword">return</span> err;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> __exit <span class="title function_">led_exit</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">	printk(<span class="string">&quot;%s %s line %d\n&quot;</span>, __FILE__, __FUNCTION__, __LINE__);</span><br><span class="line">    platform_driver_unregister(&amp;chip_demo_gpio_driver);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>主要是注册 platform_driver </p>
+<h4 id="2-2-3-设备驱动的注册"><a href="#2-2-3-设备驱动的注册" class="headerlink" title="2.2.3 设备驱动的注册"></a>2.2.3 设备驱动的注册</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">chip_demo_gpio_probe</span><span class="params">(<span class="keyword">struct</span> platform_device *pdev)</span></span><br><span class="line">&#123;</span><br><span class="line">	printk(<span class="string">&quot;%s %s line %d\n&quot;</span>, __FILE__, __FUNCTION__, __LINE__);</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* 4.1 设备树中定义  myled-gpios=&lt;...&gt;;	*/</span></span><br><span class="line">    <span class="comment">/* device结构体  char*的功能名称    用以GPIO初始化的flags，0表示高电平有效 */</span></span><br><span class="line">    led_gpio = gpiod_get(&amp;pdev-&gt;dev, <span class="string">&quot;myled&quot;</span>, <span class="number">0</span>);</span><br><span class="line">	<span class="keyword">if</span> (IS_ERR(led_gpio)) &#123;</span><br><span class="line">		dev_err(&amp;pdev-&gt;dev, <span class="string">&quot;Failed to get GPIO for led\n&quot;</span>);</span><br><span class="line">		<span class="keyword">return</span> PTR_ERR(led_gpio);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	major = register_chrdev(<span class="number">0</span>, <span class="string">&quot;krocz_led&quot;</span>, &amp;led_drv);  <span class="comment">/* /dev/led */</span></span><br><span class="line">	led_class = class_create(THIS_MODULE, <span class="string">&quot;krocz_led_class&quot;</span>);</span><br><span class="line">	<span class="keyword">if</span> (IS_ERR(led_class)) &#123;</span><br><span class="line">		printk(<span class="string">&quot;%s %s line %d\n&quot;</span>, __FILE__, __FUNCTION__, __LINE__);</span><br><span class="line">		unregister_chrdev(major, <span class="string">&quot;krocz_led&quot;</span>);</span><br><span class="line">		gpiod_put(led_gpio);</span><br><span class="line">		<span class="keyword">return</span> PTR_ERR(led_class);</span><br><span class="line">	&#125;</span><br><span class="line">	device_create(led_class, <span class="literal">NULL</span>, MKDEV(major, <span class="number">0</span>), <span class="literal">NULL</span>, <span class="string">&quot;krocz_led%d&quot;</span>, <span class="number">0</span>); </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">chip_demo_gpio_remove</span><span class="params">(<span class="keyword">struct</span> platform_device *pdev)</span></span><br><span class="line">&#123;</span><br><span class="line">	device_destroy(led_class, MKDEV(major, <span class="number">0</span>));</span><br><span class="line">	class_destroy(led_class);</span><br><span class="line">	unregister_chrdev(major, <span class="string">&quot;krocz_led&quot;</span>);</span><br><span class="line">	gpiod_put(led_gpio);</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>主要获取 GPIO 引脚，注册 file_operations 结构体，创建设备文件等。</p>
 
     </div>
@@ -587,13 +493,7 @@ GPIO，并且配置了引脚的相关属性，如上拉电阻阻值，驱动能�
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#gpio-%E5%92%8C-pinctrl-%E5%AD%90%E7%B3%BB%E7%BB%9F%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="nav-number">1.</span> <span class="nav-text">1. GPIO 和 Pinctrl
-子系统的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#pinctrl-%E5%AD%90%E7%B3%BB%E7%BB%9F"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 Pinctrl 子系统</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#pin-controller"><span class="nav-number">1.1.1.</span> <span class="nav-text">1.1.1 pin controller</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#client-device"><span class="nav-number">1.1.2.</span> <span class="nav-text">1.1.2 client device</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#pin-state"><span class="nav-number">1.1.2.1.</span> <span class="nav-text">(1) pin state</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#groups-%E5%92%8C-function"><span class="nav-number">1.1.2.2.</span> <span class="nav-text">(2) groups 和 function</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#generic-pin-multiplexing-node-%E5%92%8C-generic-pin-configuration-node"><span class="nav-number">1.1.2.3.</span> <span class="nav-text">(3)
-Generic pin multiplexing node 和 Generic pin configuration node</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E4%B8%AD%E6%80%8E%E4%B9%88%E5%BC%95%E7%94%A8-pinctrl"><span class="nav-number">1.1.3.</span> <span class="nav-text">1.1.3 代码中怎么引用 pinctrl</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#gpio-%E5%AD%90%E7%B3%BB%E7%BB%9F"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 GPIO 子系统</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9C%A8%E8%AE%BE%E5%A4%87%E6%A0%91%E4%B8%AD%E6%8C%87%E5%AE%9A%E5%BC%95%E8%84%9A"><span class="nav-number">1.2.1.</span> <span class="nav-text">1.2.1 在设备树中指定引脚</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9C%A8%E9%A9%B1%E5%8A%A8%E4%BB%A3%E7%A0%81%E4%B8%AD%E8%B0%83%E7%94%A8-gpio-%E5%AD%90%E7%B3%BB%E7%BB%9F"><span class="nav-number">1.2.2.</span> <span class="nav-text">1.2.2 在驱动代码中调用 GPIO
-子系统</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">(1) 常用函数</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8-descriptor-based-%E6%96%B9%E5%BC%8F%E8%8E%B7%E5%BE%97%E5%BC%95%E8%84%9A"><span class="nav-number">1.2.2.2.</span> <span class="nav-text">(2) 使用 descriptor-based
-方式获得引脚</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E8%80%81%E7%9A%84%E6%96%B9%E5%BC%8F%E8%8E%B7%E5%BE%97%E5%BC%95%E8%84%9A"><span class="nav-number">1.2.2.3.</span> <span class="nav-text">(3) 使用老的方式获得引脚</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E-pinctrl-%E5%92%8C-gpio-%E5%AD%90%E7%B3%BB%E7%BB%9F%E7%BC%96%E5%86%99led%E9%A9%B1%E5%8A%A8"><span class="nav-number">2.</span> <span class="nav-text">2. 基于 Pinctrl 和 GPIO
-子系统编写LED驱动</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E-pinctrl-%E5%AD%90%E7%B3%BB%E7%BB%9F%E4%BF%AE%E6%94%B9%E8%AE%BE%E5%A4%87%E6%A0%91"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 基于 Pinctrl
-子系统修改设备树</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%80%9A%E7%94%A8led%E9%A9%B1%E5%8A%A8%E4%BB%A3%E7%A0%81"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 通用LED驱动代码</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BC%96%E5%86%99-file_operations"><span class="nav-number">2.2.1.</span> <span class="nav-text">2.2.1 编写 file_operations</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%86%85%E6%A0%B8%E6%A8%A1%E5%9D%97%E6%B3%A8%E5%86%8C"><span class="nav-number">2.2.2.</span> <span class="nav-text">2.2.2 内核模块注册</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%AE%BE%E5%A4%87%E9%A9%B1%E5%8A%A8%E7%9A%84%E6%B3%A8%E5%86%8C"><span class="nav-number">2.2.3.</span> <span class="nav-text">2.2.3 设备驱动的注册</span></a></li></ol></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-GPIO-%E5%92%8C-Pinctrl-%E5%AD%90%E7%B3%BB%E7%BB%9F%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="nav-number">1.</span> <span class="nav-text">1.  GPIO 和 Pinctrl 子系统的使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-Pinctrl-%E5%AD%90%E7%B3%BB%E7%BB%9F"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 Pinctrl 子系统</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-1-pin-controller"><span class="nav-number">1.1.1.</span> <span class="nav-text">1.1.1 pin controller</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-2-client-device"><span class="nav-number">1.1.2.</span> <span class="nav-text">1.1.2 client device</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-pin-state"><span class="nav-number">1.1.2.1.</span> <span class="nav-text">(1) pin state</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-groups-%E5%92%8C-function"><span class="nav-number">1.1.2.2.</span> <span class="nav-text">(2) groups 和 function</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-Generic-pin-multiplexing-node-%E5%92%8C-Generic-pin-configuration-node"><span class="nav-number">1.1.2.3.</span> <span class="nav-text">(3) Generic pin multiplexing node 和 Generic pin configuration node</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-3-%E4%BB%A3%E7%A0%81%E4%B8%AD%E6%80%8E%E4%B9%88%E5%BC%95%E7%94%A8-pinctrl"><span class="nav-number">1.1.3.</span> <span class="nav-text">1.1.3 代码中怎么引用 pinctrl</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-GPIO-%E5%AD%90%E7%B3%BB%E7%BB%9F"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 GPIO 子系统</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-1-%E5%9C%A8%E8%AE%BE%E5%A4%87%E6%A0%91%E4%B8%AD%E6%8C%87%E5%AE%9A%E5%BC%95%E8%84%9A"><span class="nav-number">1.2.1.</span> <span class="nav-text">1.2.1 在设备树中指定引脚</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-2-%E5%9C%A8%E9%A9%B1%E5%8A%A8%E4%BB%A3%E7%A0%81%E4%B8%AD%E8%B0%83%E7%94%A8-GPIO-%E5%AD%90%E7%B3%BB%E7%BB%9F"><span class="nav-number">1.2.2.</span> <span class="nav-text">1.2.2 在驱动代码中调用 GPIO 子系统</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">(1) 常用函数</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-%E4%BD%BF%E7%94%A8-descriptor-based-%E6%96%B9%E5%BC%8F%E8%8E%B7%E5%BE%97%E5%BC%95%E8%84%9A"><span class="nav-number">1.2.2.2.</span> <span class="nav-text">(2) 使用 descriptor-based 方式获得引脚</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-%E4%BD%BF%E7%94%A8%E8%80%81%E7%9A%84%E6%96%B9%E5%BC%8F%E8%8E%B7%E5%BE%97%E5%BC%95%E8%84%9A"><span class="nav-number">1.2.2.3.</span> <span class="nav-text">(3) 使用老的方式获得引脚</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E5%9F%BA%E4%BA%8E-Pinctrl-%E5%92%8C-GPIO-%E5%AD%90%E7%B3%BB%E7%BB%9F%E7%BC%96%E5%86%99LED%E9%A9%B1%E5%8A%A8"><span class="nav-number">2.</span> <span class="nav-text">2. 基于 Pinctrl 和 GPIO 子系统编写LED驱动</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E5%9F%BA%E4%BA%8E-Pinctrl-%E5%AD%90%E7%B3%BB%E7%BB%9F%E4%BF%AE%E6%94%B9%E8%AE%BE%E5%A4%87%E6%A0%91"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 基于 Pinctrl 子系统修改设备树</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E9%80%9A%E7%94%A8LED%E9%A9%B1%E5%8A%A8%E4%BB%A3%E7%A0%81"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 通用LED驱动代码</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-1-%E7%BC%96%E5%86%99-file-operations"><span class="nav-number">2.2.1.</span> <span class="nav-text">2.2.1 编写 file_operations</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-2-%E5%86%85%E6%A0%B8%E6%A8%A1%E5%9D%97%E6%B3%A8%E5%86%8C"><span class="nav-number">2.2.2.</span> <span class="nav-text">2.2.2 内核模块注册</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-3-%E8%AE%BE%E5%A4%87%E9%A9%B1%E5%8A%A8%E7%9A%84%E6%B3%A8%E5%86%8C"><span class="nav-number">2.2.3.</span> <span class="nav-text">2.2.3 设备驱动的注册</span></a></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -608,7 +508,7 @@ Generic pin multiplexing node 和 Generic pin configuration node</span></a></li>
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">26</span>
+          <span class="site-state-item-count">25</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

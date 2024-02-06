@@ -20,25 +20,26 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="1.异常和中断 1.1 异常和中断的概念 异常不可屏蔽，中断可以屏蔽，中断一种特殊的异常。   image-20240105105633741   初始化，设置中断源（设置中断源、设置中断控制器、使能CPU总开关） 执行程序 产生中断：中断源 -&gt; 中断控制器 -&gt; CPU CPU每执行完一条指令，都会检查有无中断&#x2F;异常产生 CPU发现有中断&#x2F;异常产生，开始处理">
+  <meta name="description" content="1.异常和中断1.1 异常和中断的概念异常不可屏蔽，中断可以屏蔽，中断一种特殊的异常。   初始化，设置中断源（设置中断源、设置中断控制器、使能CPU总开关） 执行程序 产生中断：中断源 -&gt; 中断控制器 -&gt; CPU CPU每执行完一条指令，都会检查有无中断&#x2F;异常产生 CPU发现有中断&#x2F;异常产生，开始处理 对于不同的异常，跳去不同的地址执行指令（中断向量表），这些">
 <meta property="og:type" content="article">
 <meta property="og:title" content="异常和中断">
 <meta property="og:url" content="http://example.com/2024/01/05/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/index.html">
 <meta property="og:site_name" content="Krocz&#39;s Blog">
-<meta property="og:description" content="1.异常和中断 1.1 异常和中断的概念 异常不可屏蔽，中断可以屏蔽，中断一种特殊的异常。   image-20240105105633741   初始化，设置中断源（设置中断源、设置中断控制器、使能CPU总开关） 执行程序 产生中断：中断源 -&gt; 中断控制器 -&gt; CPU CPU每执行完一条指令，都会检查有无中断&#x2F;异常产生 CPU发现有中断&#x2F;异常产生，开始处理">
+<meta property="og:description" content="1.异常和中断1.1 异常和中断的概念异常不可屏蔽，中断可以屏蔽，中断一种特殊的异常。   初始化，设置中断源（设置中断源、设置中断控制器、使能CPU总开关） 执行程序 产生中断：中断源 -&gt; 中断控制器 -&gt; CPU CPU每执行完一条指令，都会检查有无中断&#x2F;异常产生 CPU发现有中断&#x2F;异常产生，开始处理 对于不同的异常，跳去不同的地址执行指令（中断向量表），这些">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/2024/01/05/images/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/image-20240105105633741.png">
-<meta property="og:image" content="http://example.com/2024/01/05/images/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/image-20240105162631985.png">
-<meta property="og:image" content="http://example.com/2024/01/05/images/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/image-20240105163909446.png">
-<meta property="og:image" content="http://example.com/2024/01/05/images/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/image-20240105172133397.png">
-<meta property="og:image" content="http://example.com/2024/01/05/images/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/image-20240105194202446.png">
-<meta property="og:image" content="http://example.com/2024/01/05/images/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/image-20240105200529422.png">
-<meta property="og:image" content="http://example.com/2024/01/05/images/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/image-20240105204536400.png">
-<meta property="og:image" content="http://example.com/2024/01/05/images/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/image-20240105205204566.png">
-<meta property="og:image" content="http://example.com/2024/01/05/images/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/image-20240105210040202.png">
-<meta property="og:image" content="http://example.com/2024/01/05/images/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/image-20240106101640026.png">
-<meta property="og:image" content="http://example.com/2024/01/05/images/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/image-20240106114012876.png">
-<meta property="og:image" content="http://example.com/2024/01/05/images/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/image-20240107150811885.png">
+<meta property="og:image" content="http://example.com/images/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/image-20240105105633741.png">
+<meta property="og:image" content="http://example.com/images/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/image-20240105162631985.png">
+<meta property="og:image" content="http://example.com/images/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/image-20240105163909446.png">
+<meta property="og:image" content="http://example.com/images/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/image-20240105172133397.png">
+<meta property="og:image" content="http://example.com/images/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/image-20240105194202446.png">
+<meta property="og:image" content="http://example.com/images/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/image-20240105200529422.png">
+<meta property="og:image" content="http://example.com/images/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/image-20240105204536400.png">
+<meta property="og:image" content="http://example.com/images/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/image-20240105205204566.png">
+<meta property="og:image" content="http://example.com/images/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/image-20240105210040202.png">
+<meta property="og:image" content="http://example.com/images/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/image-20240106101640026.png">
+<meta property="og:image" content="http://example.com/images/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/image-20240106102152360.png">
+<meta property="og:image" content="http://example.com/images/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/image-20240106114012876.png">
+<meta property="og:image" content="http://example.com/images/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/image-20240107150811885.png">
 <meta property="article:published_time" content="2024-01-05T02:36:47.000Z">
 <meta property="article:modified_time" content="2024-01-11T02:17:01.175Z">
 <meta property="article:author" content="Krocz">
@@ -46,7 +47,7 @@
 <meta property="article:tag" content="Linux">
 <meta property="article:tag" content="C&#x2F;C++">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://example.com/2024/01/05/images/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/image-20240105105633741.png">
+<meta name="twitter:image" content="http://example.com/images/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/image-20240105105633741.png">
 
 <link rel="canonical" href="http://example.com/2024/01/05/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/">
 
@@ -283,406 +284,268 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="异常和中断">1.异常和中断</h2>
-<h3 id="异常和中断的概念">1.1 异常和中断的概念</h3>
-<p>异常不可屏蔽，中断可以屏蔽，中断一种特殊的异常。</p>
-<figure>
-<img src="../images/异常和中断/image-20240105105633741.png"
-alt="image-20240105105633741" />
-<figcaption aria-hidden="true">image-20240105105633741</figcaption>
-</figure>
-<ol type="1">
+        <h2 id="1-异常和中断"><a href="#1-异常和中断" class="headerlink" title="1.异常和中断"></a>1.异常和中断</h2><h3 id="1-1-异常和中断的概念"><a href="#1-1-异常和中断的概念" class="headerlink" title="1.1 异常和中断的概念"></a>1.1 异常和中断的概念</h3><p>异常不可屏蔽，中断可以屏蔽，中断一种特殊的异常。</p>
+<p><img src="/../images/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/image-20240105105633741.png" alt="image-20240105105633741"></p>
+<ol>
 <li>初始化，设置中断源（设置中断源、设置中断控制器、使能CPU总开关）</li>
 <li>执行程序</li>
 <li>产生中断：中断源 -&gt; 中断控制器 -&gt; CPU</li>
-<li>CPU每执行完一条指令，都会检查有无中断/异常产生</li>
-<li>CPU发现有中断/异常产生，开始处理</li>
+<li>CPU每执行完一条指令，都会检查有无中断&#x2F;异常产生</li>
+<li>CPU发现有中断&#x2F;异常产生，开始处理</li>
 <li>对于不同的异常，跳去不同的地址执行指令（中断向量表），这些指令只是一条跳转指令，跳去执行某个函数</li>
 <li>处理函数：保存现场，<strong>分辨中断源并调用相应的处理函数</strong>，恢复现场</li>
 </ol>
-<h3 id="异常向量表">1.2 异常向量表</h3>
-<p>u-boot 或是 Linux 内核，都有类似如下的代码：</p>
+<h3 id="1-2-异常向量表"><a href="#1-2-异常向量表" class="headerlink" title="1.2 异常向量表"></a>1.2 异常向量表</h3><p>u-boot 或是 Linux 内核，都有类似如下的代码：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">_start: b reset </span><br><span class="line">	ldr pc, _undefined_instruction </span><br><span class="line">	ldr pc, _software_interrupt </span><br><span class="line">	ldr pc, _prefetch_abort </span><br><span class="line">	ldr pc, _data_abort </span><br><span class="line">	ldr pc, _not_used </span><br><span class="line">	ldr pc, _irq           //发生中断时，CPU 跳到这个地址执行该指令 **假设地址为 0x18** </span><br><span class="line">	ldr pc, _fiq</span><br></pre></td></tr></table></figure>
+
 <p>这就是异常向量表，每一条指令对应一种异常。当发生不同的异常时，CPU会由硬件执行向量表中对应位置的指令。</p>
-<p>这些指令存放的位置是固定的，比如对于 ARM9 芯片中断向量的地址是
-0x18。当发生中断时，CPU 就强制跳去执行 0x18 处的代码。</p>
-<p>在向量表里，一般都是放置一条跳转指令，发生该异常时，CPU
-就会执行向量表中的跳转指令，去调用更复杂的函数。</p>
-<p>当然，向量表的位置并不总是从 0 地址开始，很多芯片可以设置某个 vector
-base 寄存器，指定向量表在其他位置，比如设置 vector base 为 0x80000000，
-指定为 DDR
-的某个地址。但是<strong>表中的各个异常向量的偏移地址是固定的</strong>：复位向量偏移地址是
-0，中断是 0x18。</p>
+<p>这些指令存放的位置是固定的，比如对于 ARM9 芯片中断向量的地址是 0x18。当发生中断时，CPU 就强制跳去执行 0x18 处的代码。</p>
+<p>在向量表里，一般都是放置一条跳转指令，发生该异常时，CPU 就会执行向量表中的跳转指令，去调用更复杂的函数。</p>
+<p>当然，向量表的位置并不总是从 0 地址开始，很多芯片可以设置某个 vector base 寄存器，指定向量表在其他位置，比如设置 vector base 为 0x80000000， 指定为 DDR 的某个地址。但是<strong>表中的各个异常向量的偏移地址是固定的</strong>：复位向量偏移地址是 0，中断是 0x18。</p>
 <blockquote>
-<p>对于 ARM 的中断控制器，称为 GIC (Generic Interrupt
-Controller)，到目前已经更新到 v4 版本了。</p>
-<p>各个版本的差别可以看这里：https://developer.arm.com/ip-products/system-ip/systemcontrollers/interrupt-controllers</p>
-<p>简单地说，GIC v3/v4 用于 ARMv8 架构，即 64 位 ARM 芯片。 而 GIC v2
-用于 ARMv7 和其他更低的架构。</p>
+<p>对于 ARM 的中断控制器，称为 GIC (Generic Interrupt Controller)，到目前已经更新到 v4 版本了。</p>
+<p>各个版本的差别可以看这里：<a target="_blank" rel="noopener" href="https://developer.arm.com/ip-products/system-ip/systemcontrollers/interrupt-controllers">https://developer.arm.com/ip-products/system-ip/systemcontrollers/interrupt-controllers</a></p>
+<p>简单地说，GIC v3&#x2F;v4 用于 ARMv8 架构，即 64 位 ARM 芯片。 而 GIC v2 用于 ARMv7 和其他更低的架构。</p>
 </blockquote>
-<p>## 2. Linux 对于中断的处理</p>
-<p><strong>(1) 进程/线程/中断的核心：栈</strong></p>
-<p>当 Linux
-在执行进程、线程的切换或者中断函数的处理时，需要保护现场，也就是将CPU内寄存器的值先保存在内存中，将寄存器的空间“腾”出来给待执行程序用。而保存现场这部分内存就是栈结构。</p>
-<p><strong>(2) 进程/线程的概念</strong></p>
+<h2 id="2-Linux-对于中断的处理"><a href="#2-Linux-对于中断的处理" class="headerlink" title="2. Linux 对于中断的处理"></a>2. Linux 对于中断的处理</h2><p><strong>(1) 进程&#x2F;线程&#x2F;中断的核心：栈</strong></p>
+<p> 当 Linux 在执行进程、线程的切换或者中断函数的处理时，需要保护现场，也就是将CPU内寄存器的值先保存在内存中，将寄存器的空间“腾”出来给待执行程序用。而保存现场这部分内存就是栈结构。</p>
+<p><strong>(2) 进程&#x2F;线程的概念</strong></p>
 <ul>
-<li><p>进程的引入：为例实现程序的并发执行</p></li>
-<li><p>线程的引入：进程之间传递资源消耗过大，而一个进程内的多个线程可以共享资源（如全局变量）。</p></li>
-<li><p>进程是资源分配的单位，线程是调度的单位，所以每一个线程都有自己的“栈”，以便在调度时保存/恢复现场。</p></li>
+<li><p>进程的引入：为例实现程序的并发执行</p>
+</li>
+<li><p>线程的引入：进程之间传递资源消耗过大，而一个进程内的多个线程可以共享资源（如全局变量）。</p>
+</li>
+<li><p>进程是资源分配的单位，线程是调度的单位，所以每一个线程都有自己的“栈”，以便在调度时保存&#x2F;恢复现场。</p>
+</li>
 </ul>
-<h3 id="linux-中断的演进">2.1 Linux 中断的演进</h3>
-<h4 id="硬件中断和软件中断">2.1.1 硬件中断和软件中断</h4>
-<p>硬件中断我们比较熟悉，由硬件本身产生中断信号触发，执行对应的处理函数。而软件中断是一种灵活的，人为的制造中断。</p>
-<h5 id="硬件中断">（1）硬件中断</h5>
-<p>对于硬件中断，触发信号由硬件产生，产生之后会尽快被处理。Linux系统对于硬件中断的处理原则：<strong>硬件中断不能嵌套，并且硬件中断的处理越快越好</strong>。</p>
+<h3 id="2-1-Linux-中断的演进"><a href="#2-1-Linux-中断的演进" class="headerlink" title="2.1 Linux 中断的演进"></a>2.1 Linux 中断的演进</h3><h4 id="2-1-1-硬件中断和软件中断"><a href="#2-1-1-硬件中断和软件中断" class="headerlink" title="2.1.1 硬件中断和软件中断"></a>2.1.1 硬件中断和软件中断</h4><p>硬件中断我们比较熟悉，由硬件本身产生中断信号触发，执行对应的处理函数。而软件中断是一种灵活的，人为的制造中断。</p>
+<h5 id="（1）硬件中断"><a href="#（1）硬件中断" class="headerlink" title="（1）硬件中断"></a>（1）硬件中断</h5><p>对于硬件中断，触发信号由硬件产生，产生之后会尽快被处理。Linux系统对于硬件中断的处理原则：<strong>硬件中断不能嵌套，并且硬件中断的处理越快越好</strong>。</p>
 <p>不能嵌套是为了防止突发的大量中断将栈空间耗尽。</p>
-<p>在中断的处理过程中，CPU
-是不能进行进程调度的，所以中断的处理要越快越好，尽早让其他中断能被处理，例如进程调度靠定时器中断来实现。</p>
+<p>在中断的处理过程中，CPU 是不能进行进程调度的，所以中断的处理要越快越好，尽早让其他中断能被处理，例如进程调度靠定时器中断来实现。</p>
 <p>在 Linux 为某一虚拟中断号 irq 配置处理函数：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">int</span> __must_check </span><br><span class="line"><span class="title function_">request_irq</span><span class="params">(<span class="type">unsigned</span> <span class="type">int</span> irq, <span class="type">irq_handler_t</span> handler, <span class="type">unsigned</span> <span class="type">long</span> flags, <span class="type">const</span> <span class="type">char</span> *name, <span class="type">void</span> *dev)</span></span><br></pre></td></tr></table></figure>
-<p>虚拟中断号 irq 的处理函数 handler
-的代码尽可能高效，耗时越短越好。</p>
+
+<p>虚拟中断号 irq 的处理函数 handler 的代码尽可能高效，耗时越短越好。</p>
 <blockquote>
-<p>为什么是虚拟中断号，后面会讲（硬件中断号 hwirq ←→ irq
-虚拟中断号）</p>
+<p>为什么是虚拟中断号，后面会讲（硬件中断号 hwirq   ←→  irq 虚拟中断号）</p>
 </blockquote>
-<h5 id="软件中断">（2）软件中断</h5>
-<p>而对于软件中断，需要知道软件中断的触发如何产生，以及何时进行软件中断的处理：</p>
-<ol type="1">
-<li>由软件来触发，对于 X 号软件中断，只需要将它的 flag 设置为 1
-就表示发生了该中断。</li>
-<li>软件中断不像硬件中断那样急迫，不必立刻处理；在 Linux
-系统中因为各种硬件中断频发，例如定时器中断（心跳）就每 10ms
-发生一次；所以在处理完硬件中断后，检查是否有软件中断被触发，如果有触发就去处理相应的软件中断。</li>
+<h5 id="（2）软件中断"><a href="#（2）软件中断" class="headerlink" title="（2）软件中断"></a>（2）软件中断</h5><p>而对于软件中断，需要知道软件中断的触发如何产生，以及何时进行软件中断的处理：</p>
+<ol>
+<li>由软件来触发，对于 X 号软件中断，只需要将它的 flag 设置为 1 就表示发生了该中断。</li>
+<li>软件中断不像硬件中断那样急迫，不必立刻处理；在 Linux 系统中因为各种硬件中断频发，例如定时器中断（心跳）就每 10ms 发生一次；所以在处理完硬件中断后，检查是否有软件中断被触发，如果有触发就去处理相应的软件中断。</li>
 </ol>
-<p>Linux
-的软件中断，参见内核源码<code>include/linux/interrupt.h</code>：</p>
+<p>Linux 的软件中断，参见内核源码<code>include/linux/interrupt.h</code>：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">enum</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">	HI_SOFTIRQ=<span class="number">0</span>,</span><br><span class="line">	TIMER_SOFTIRQ,</span><br><span class="line">	NET_TX_SOFTIRQ,</span><br><span class="line">	NET_RX_SOFTIRQ,</span><br><span class="line">	BLOCK_SOFTIRQ,</span><br><span class="line">	IRQ_POLL_SOFTIRQ,</span><br><span class="line">	TASKLET_SOFTIRQ,</span><br><span class="line">	SCHED_SOFTIRQ,</span><br><span class="line">	HRTIMER_SOFTIRQ, <span class="comment">/* Unused, but kept as tools rely on the</span></span><br><span class="line"><span class="comment">			    numbering. Sigh! */</span></span><br><span class="line">	RCU_SOFTIRQ,    <span class="comment">/* Preferable RCU should always be the last softirq */</span></span><br><span class="line"></span><br><span class="line">	NR_SOFTIRQS</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
 <p>配置软件中断的处理函数：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">extern</span> <span class="type">void</span> <span class="title function_">open_softirq</span><span class="params">(<span class="type">int</span> nr, <span class="type">void</span> (*action)(<span class="keyword">struct</span> softirq_action *))</span>;</span><br></pre></td></tr></table></figure>
+
 <p>触发软件中断：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">extern</span> <span class="type">void</span> <span class="title function_">raise_softirq</span><span class="params">(<span class="type">unsigned</span> <span class="type">int</span> nr)</span>;</span><br></pre></td></tr></table></figure>
-<h4 id="耗时中断">2.1.2 耗时中断</h4>
-<p>有些硬件中断不可能在短时间内处理完成，例如按键中断，需要等待几十毫秒的时间来消除抖动，不可能在硬件中断的处理函数中等待这么长的时间，使得其他硬件中断不能够及时响应，因此需要一些方法来解决此类问题。</p>
+
+
+
+<h4 id="2-1-2-耗时中断"><a href="#2-1-2-耗时中断" class="headerlink" title="2.1.2 耗时中断"></a>2.1.2 耗时中断</h4><p>有些硬件中断不可能在短时间内处理完成，例如按键中断，需要等待几十毫秒的时间来消除抖动，不可能在硬件中断的处理函数中等待这么长的时间，使得其他硬件中断不能够及时响应，因此需要一些方法来解决此类问题。</p>
 <p>可以将中断拆分成上半部和（硬件中断）下半部（软件中断是一种实现方式），在上半部中快速处理一些紧急的操作，在下半部中进行耗时的，可以被打断的操作：</p>
-<figure>
-<img src="../images/异常和中断/image-20240105162631985.png"
-alt="image-20240105162631985" />
-<figcaption aria-hidden="true">image-20240105162631985</figcaption>
-</figure>
-<p>主要讲两种中断下半部的处理方式：tasklet（小任务）、work queue
-（工作队列）</p>
-<h4 id="下半部耗时不长-tasklet">2.1.3 下半部耗时不长-tasklet</h4>
-<p>当下半部比较耗时但是能忍受，并且它的处理比较简单时，可以用软件中断
-tasklet 来实现：</p>
+<p><img src="/../images/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/image-20240105162631985.png" alt="image-20240105162631985"></p>
+<p>主要讲两种中断下半部的处理方式：tasklet（小任务）、work queue （工作队列）</p>
+<h4 id="2-1-3-下半部耗时不长-tasklet"><a href="#2-1-3-下半部耗时不长-tasklet" class="headerlink" title="2.1.3 下半部耗时不长-tasklet"></a>2.1.3 下半部耗时不长-tasklet</h4><p>当下半部比较耗时但是能忍受，并且它的处理比较简单时，可以用软件中断 tasklet 来实现：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">TASKLET_SOFTIRQ</span><br></pre></td></tr></table></figure>
+
 <p>通过下图中的函数调用关系，可以比较清楚的看出中断上半部和下半部的处理流程：</p>
-<figure>
-<img src="../images/异常和中断/image-20240105163909446.png"
-alt="image-20240105163909446" />
-<figcaption aria-hidden="true">image-20240105163909446</figcaption>
-</figure>
+<p><img src="/../images/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/image-20240105163909446.png" alt="image-20240105163909446"></p>
 <p>在上半部中，处于关中断状态，会根据硬件中断触发源来执行对应的中断处理函数；</p>
-<p>如果当前<strong>没有下半部的软件中断正在执行并且有软件中断被触发</strong>，就根据
-softirq_vec
-数组来执行对应的软件中断处理函数（注意，<strong>多个中断的下半部是汇集在一起进行处理的</strong>，即sfotirq_vec数组中可能有多个信号被触发）。</p>
+<p>如果当前<strong>没有下半部的软件中断正在执行并且有软件中断被触发</strong>，就根据 softirq_vec 数组来执行对应的软件中断处理函数（注意，<strong>多个中断的下半部是汇集在一起进行处理的</strong>，即sfotirq_vec数组中可能有多个信号被触发）。</p>
 <blockquote>
 <p>中断上半部、下半部的执行过程中，不能执行休眠函数：在中断中休眠的话，以后谁来调度进程啊</p>
 </blockquote>
-<h4 id="下半部复杂耗时长-工作队列">2.1.4 下半部复杂耗时长-工作队列</h4>
-<p>在中断下半部的执行过程中，虽然是开中断的，期间可以处理各类中断。但<strong>毕竟整个中断的处理还没走完，这期间
-APP
-是无法执行的</strong>，因此如果下半部耗时过长，并且使用软件中断的方式实现，则
-APP
-在中断执行过程中将无法相应，这同样是不可接收的，因此这种情况下，下半部可以使用<strong>内核线程</strong>来实现：<strong>在中断上半部唤醒内核线程。内核线程和
-APP 都 一样竞争执行，APP 有机会执行，系统不会卡顿</strong>。</p>
-<p>这个内核线程是系统帮我们创建的，一般是 kworker
-线程，内核中有很多这样的线程：</p>
-<figure>
-<img src="../images/异常和中断/image-20240105172133397.png"
-alt="image-20240105172133397" />
-<figcaption aria-hidden="true">image-20240105172133397</figcaption>
-</figure>
-<p><strong>kworker 线程要去 work queue 上取出一个一个 work，
-来执行它里面的函数。</strong>使用方式如下：</p>
-<ol type="1">
+<h4 id="2-1-4-下半部复杂耗时长-工作队列"><a href="#2-1-4-下半部复杂耗时长-工作队列" class="headerlink" title="2.1.4 下半部复杂耗时长-工作队列"></a>2.1.4 下半部复杂耗时长-工作队列</h4><p>在中断下半部的执行过程中，虽然是开中断的，期间可以处理各类中断。但<strong>毕竟整个中断的处理还没走完，这期间 APP 是无法执行的</strong>，因此如果下半部耗时过长，并且使用软件中断的方式实现，则 APP 在中断执行过程中将无法相应，这同样是不可接收的，因此这种情况下，下半部可以使用<strong>内核线程</strong>来实现：<strong>在中断上半部唤醒内核线程。内核线程和 APP 都 一样竞争执行，APP 有机会执行，系统不会卡顿</strong>。</p>
+<p>这个内核线程是系统帮我们创建的，一般是 kworker 线程，内核中有很多这样的线程：</p>
+<p><img src="/../images/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/image-20240105172133397.png" alt="image-20240105172133397"></p>
+<p><strong>kworker 线程要去 work queue 上取出一个一个 work， 来执行它里面的函数。</strong>使用方式如下：</p>
+<ol>
 <li><p>创建 work，将 work 和对应的处理函数绑定：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> DECLARE_WORK(n, f)						\</span></span><br><span class="line"><span class="meta">	struct work_struct n = __WORK_INITIALIZER(n, f)</span></span><br></pre></td></tr></table></figure>
-<p>将一个 work_struct 结构体和对应的处理函数 f 绑定</p></li>
+
+<p>将一个 work_struct 结构体和对应的处理函数 f 绑定</p>
+</li>
 <li><p>要执行处理函数时，仅需要将 work 提交给 work queue 即可：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">bool</span> <span class="title function_">schedule_work</span><span class="params">(<span class="keyword">struct</span> work_struct *work)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">return</span> queue_work(system_wq, work);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>上述函数会把 work 提供给系统默认的 work queue：system_wq，它是一
-个队列。</p>
-<p>在中断场景中，可以在中断上半部调用 schedule_work 函数。</p></li>
-<li><p>schedule_work 函数不仅仅是把 work 放入队列，还会把 kworker
-线程唤醒。此线程抢到时间运行时，它就会从队列中取出
-work，执行里面的函数。</p></li>
+
+<p>上述函数会把 work 提供给系统默认的 work queue：system_wq，它是一 个队列。</p>
+<p>在中断场景中，可以在中断上半部调用 schedule_work 函数。</p>
+</li>
+<li><p>schedule_work 函数不仅仅是把 work 放入队列，还会把 kworker 线程唤醒。此线程抢到时间运行时，它就会从队列中取出 work，执行里面的函数。</p>
+</li>
 </ol>
 <blockquote>
 <p>很耗时的中断处理，应该放到线程里去，从而防止 APP 不能够及时响应</p>
 <p>既然是在线程中运行，那对应的函数可以休眠</p>
 </blockquote>
-<h4 id="新技术---threaded-irq">2.1.5 新技术 - threaded irq</h4>
-<p>以前用 work 来线程化地处理中断，一个 worker 线程只能由一个 CPU 执行，
-多个中断的 work 都由同一个 worker 线程来处理，在单 CPU
-系统中没有问题，但是在SMP（Symmetric
-multiprocessing）系统中，这种方式不能够完全发挥多核的性能。因此，新技术
-threaded irq
-干脆为每一个中断都创建一个内核线程；多个中断的内核线程可以分配到多个 CPU
-上执行，这提高了效率。threaded irq 使用方法：</p>
+<h4 id="2-1-5-新技术-threaded-irq"><a href="#2-1-5-新技术-threaded-irq" class="headerlink" title="2.1.5 新技术 - threaded irq"></a>2.1.5 新技术 - threaded irq</h4><p>以前用 work 来线程化地处理中断，一个 worker 线程只能由一个 CPU 执行， 多个中断的 work 都由同一个 worker 线程来处理，在单 CPU 系统中没有问题，但是在SMP（Symmetric multiprocessing）系统中，这种方式不能够完全发挥多核的性能。因此，新技术 threaded irq 干脆为每一个中断都创建一个内核线程；多个中断的内核线程可以分配到多个 CPU 上执行，这提高了效率。threaded irq 使用方法：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">request_threaded_irq</span><span class="params">(<span class="type">unsigned</span> <span class="type">int</span> irq, <span class="type">irq_handler_t</span> handler,</span></span><br><span class="line"><span class="params">			 <span class="type">irq_handler_t</span> thread_fn, <span class="type">unsigned</span> <span class="type">long</span> irqflags,</span></span><br><span class="line"><span class="params">			 <span class="type">const</span> <span class="type">char</span> *devname, <span class="type">void</span> *dev_id)</span></span><br></pre></td></tr></table></figure>
+
 <ul>
 <li>irq：指示哪个中断</li>
 <li>handler：表示中断处理的上半部函数，可以为空</li>
 <li>thread_fn：表示在线程中运行的函数</li>
 </ul>
-<h3 id="linux-中断系统中的重要数据结构">2.2 Linux
-中断系统中的重要数据结构</h3>
-<p>Linux 中断系统最核心的结构体是
-irq_desc，它是一个结构体数组，该结构体内通过成员 action
-构建了一个链表，该数组用以记录所有硬件中断的相关数据。</p>
-<figure>
-<img src="../images/异常和中断/image-20240105194202446.png"
-alt="image-20240105194202446" />
-<figcaption aria-hidden="true">image-20240105194202446</figcaption>
-</figure>
+<h3 id="2-2-Linux-中断系统中的重要数据结构"><a href="#2-2-Linux-中断系统中的重要数据结构" class="headerlink" title="2.2 Linux 中断系统中的重要数据结构"></a>2.2 Linux 中断系统中的重要数据结构</h3><p>Linux 中断系统最核心的结构体是 irq_desc，它是一个结构体数组，该结构体内通过成员 action 构建了一个链表，该数组用以记录所有硬件中断的相关数据。</p>
+<p><img src="/../images/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/image-20240105194202446.png" alt="image-20240105194202446"></p>
 <blockquote>
-<p>如果内核配置了 CONFIG_SPARSE_IRQ，那么它就会用基数树(radix tree)
-来代替 irq_desc 数组。SPARSE 的意思是“稀疏”，假设大小为 1000
-的数组中只用到 2
-个数组项，那不是浪费嘛？所以在中断比较“稀疏”的情况下可以用基数树来代替数组。</p>
+<p>如果内核配置了 CONFIG_SPARSE_IRQ，那么它就会用基数树(radix tree) 来代替 irq_desc 数组。SPARSE 的意思是“稀疏”，假设大小为 1000 的数组中只用到 2 个数组项，那不是浪费嘛？所以在中断比较“稀疏”的情况下可以用基数树来代替数组。</p>
 </blockquote>
-<h4 id="irq_desc-数组">2.2.1 irq_desc 数组</h4>
-<p>irq_desc 结构体在 <code>include/linux/irqdesc.h</code>
-中定义，它的主要成员如下：</p>
+<h4 id="2-2-1-irq-desc-数组"><a href="#2-2-1-irq-desc-数组" class="headerlink" title="2.2.1 irq_desc 数组"></a>2.2.1 irq_desc 数组</h4><p>irq_desc 结构体在 <code>include/linux/irqdesc.h</code> 中定义，它的主要成员如下：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">irq_data</span> <span class="title">irq_data</span>;</span></span><br><span class="line"><span class="type">irq_flow_handler_t</span> handle_irq; </span><br><span class="line"><span class="type">const</span> <span class="type">char</span> *name; </span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">irqaction</span> *<span class="title">action</span>;</span></span><br></pre></td></tr></table></figure>
+
 <p>我们首先通过一个例子来理解 irq_desc 数组的整体结构：</p>
-<figure>
-<img src="../images/异常和中断/image-20240105200529422.png"
-alt="image-20240105200529422" />
-<figcaption aria-hidden="true">image-20240105200529422</figcaption>
-</figure>
-<p>外部设备 1、外部设备 n 共享一个 GPIO 中断 B，多个 GPIO 中断汇聚到 GIC
-(Generic Interrupt Controller)的 A 号中断，GIC 再去中断
-CPU。所以中断触发信号在图中一路从左向右传递到CPU。</p>
+<p><img src="/../images/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/image-20240105200529422.png" alt="image-20240105200529422"></p>
+<p>外部设备 1、外部设备 n 共享一个 GPIO 中断 B，多个 GPIO 中断汇聚到 GIC (Generic Interrupt Controller)的 A 号中断，GIC 再去中断 CPU。所以中断触发信号在图中一路从左向右传递到CPU。</p>
 <p>当CPU收到中断触发信号之后，软件应该在图中从右到左依次询问，来定位到底是那个硬件触发了中断，具体来说：</p>
-<ol type="1">
+<ol>
 <li><p>GIC 的处理函数：</p>
-<p>假设 irq_desc[A].handle_irq 是 XXX_gpio_irq_handler(XXX 指厂家)，
-这个函数需要读取芯片的 GPIO 控制器，细分发生的是哪一个 GPIO 中断(假设是
-B)，再去调用 irq_desc[B]. handle_irq。</p></li>
+<p>假设 irq_desc[A].handle_irq 是 XXX_gpio_irq_handler(XXX 指厂家)， 这个函数需要读取芯片的 GPIO 控制器，细分发生的是哪一个 GPIO 中断(假设是 B)，再去调用 irq_desc[B]. handle_irq。</p>
+</li>
 <li><p>模块的中断处理函数：</p>
-<p>irq_desc[B]. handle_irq，BSP 开发人员会设置对应的处理函数，一般是
-handle_level_irq 或
-handle_edge_irq，从名字上看是用来处理电平触发的中断、边沿触发的中断。该函数会去判断哪个<strong>设备</strong>触发了中断，可能有某个设备触发了中断，也可能有多个设备触发了中断，因此irq_desc[B].handle_irq
-会遍历 action
-成员指向的链表，并调用链表元素中的“<strong>具体的中断处理函数</strong>”，这些函数自行判断该中断是否由自己产生，若是则处理。</p></li>
+<p>irq_desc[B]. handle_irq，BSP 开发人员会设置对应的处理函数，一般是 handle_level_irq 或 handle_edge_irq，从名字上看是用来处理电平触发的中断、边沿触发的中断。该函数会去判断哪个<strong>设备</strong>触发了中断，可能有某个设备触发了中断，也可能有多个设备触发了中断，因此irq_desc[B].handle_irq 会遍历 action 成员指向的链表，并调用链表元素中的“<strong>具体的中断处理函数</strong>”，这些函数自行判断该中断是否由自己产生，若是则处理。</p>
+</li>
 <li><p>外部设备提供的中断处理函数：</p>
-<p>对应 irqaction 结构体中的 handler 或者 thread_fn
-成员，这些处理函数由自己驱动程序提供，应该具有判断设备是否发生了中断，如何处理中断的能力。</p></li>
+<p>对应 irqaction 结构体中的 handler 或者 thread_fn 成员，这些处理函数由自己驱动程序提供，应该具有判断设备是否发生了中断，如何处理中断的能力。</p>
+</li>
 </ol>
-<p>总的来说，<strong>irq_desc 数组对应“中断控制器模块”，链表中 irqaction
-结构体对应产生中断源的外部设备</strong>。</p>
+<p>总的来说，<strong>irq_desc 数组对应“中断控制器模块”，链表中 irqaction 结构体对应产生中断源的外部设备</strong>。</p>
 <blockquote>
-<p>上述过程中忽略了一点：当执行中断处理函数时，从中获取的是硬件中断号
-(hwirq)，而irq_desc 数组的寻址使用的是虚拟中断号 (irq) ，二者的映射在
-2.2.3 &amp; 2.2.4 节中讨论</p>
+<p>上述过程中忽略了一点：当执行中断处理函数时，从中获取的是硬件中断号 (hwirq)，而irq_desc 数组的寻址使用的是虚拟中断号 (irq) ，二者的映射在 2.2.3 &amp; 2.2.4 节中讨论 </p>
 </blockquote>
-<h4 id="irqaction-结构体">2.2.2 irqaction 结构体</h4>
-<p>irqaction 结构体在 <code>include/linux/interrupt.h</code>
-中定义，主要内容如下：</p>
+<h4 id="2-2-2-irqaction-结构体"><a href="#2-2-2-irqaction-结构体" class="headerlink" title="2.2.2 irqaction 结构体"></a>2.2.2 irqaction 结构体</h4><p>irqaction 结构体在 <code>include/linux/interrupt.h</code> 中定义，主要内容如下：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">irqaction</span> &#123;</span></span><br><span class="line">	<span class="type">irq_handler_t</span>		handler;</span><br><span class="line">    <span class="type">irq_handler_t</span>		thread_fn;</span><br><span class="line">	<span class="type">void</span>			*dev_id;</span><br><span class="line">	<span class="type">void</span> __percpu		*percpu_dev_id;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">irqaction</span>	*<span class="title">next</span>;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">task_struct</span>	*<span class="title">thread</span>;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">irqaction</span>	*<span class="title">secondary</span>;</span></span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span>		irq;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span>		flags;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span>		thread_flags;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span>		thread_mask;</span><br><span class="line">	<span class="type">const</span> <span class="type">char</span>		*name;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">proc_dir_entry</span>	*<span class="title">dir</span>;</span></span><br><span class="line">&#125; ____cacheline_internodealigned_in_smp;</span><br></pre></td></tr></table></figure>
-<p>当调用 request_irq、request_threaded_irq
-注册中断处理函数时，内核就会构造一个 irqaction
-结构体，该结构体最重要的是 handler、thread_fn、thread 成员：</p>
-<ol type="1">
+
+<p>当调用 request_irq、request_threaded_irq 注册中断处理函数时，内核就会构造一个 irqaction 结构体，该结构体最重要的是 handler、thread_fn、thread 成员：</p>
+<ol>
 <li>handler 是中断处理的上半部函数，用来处理紧急的事情。</li>
-<li>thread_fn 对应一个内核线程 thread，当 handler 执行完毕，Linux
-内核会唤醒对应的内核线程。在内核线程里，会调用 thread_fn 函数。</li>
-<li>可以提供 handler 而不提供 thread_fn，就退化为一般的 request_irq
-函数。</li>
-<li>可以不提供 handler 只提供 thread_fn，完全由内核线程来处理中断。</li>
-<li>也可以既提供 handler 也提供
-thread_fn，这就是中断上半部、下半部。</li>
+<li>thread_fn 对应一个内核线程 thread，当 handler 执行完毕，Linux 内核会唤醒对应的内核线程。在内核线程里，会调用 thread_fn 函数。</li>
+<li>可以提供 handler 而不提供 thread_fn，就退化为一般的 request_irq 函数。</li>
+<li>可以不提供 handler 只提供 thread_fn，完全由内核线程来处理中断。 </li>
+<li>也可以既提供 handler 也提供 thread_fn，这就是中断上半部、下半部。</li>
 </ol>
-<p>其次是 dev_id 成员，在 reqeust_irq 时可以传入
-dev_id，它的作用如下：</p>
-<ol type="1">
+<p>其次是 dev_id 成员，在 reqeust_irq 时可以传入 dev_id，它的作用如下：</p>
+<ol>
 <li>中断处理函数执行时，可以使用 dev_id</li>
-<li>卸载中断时要传入 dev_id，这样才能在 action 链表中根据 dev_id
-找到对应项</li>
+<li>卸载中断时要传入 dev_id，这样才能在 action 链表中根据 dev_id 找到对应项</li>
 </ol>
-<h4 id="irq_data-结构体">2.2.3 irq_data 结构体</h4>
-<p>irq_data 结构体在 <code>include/linux/irq.h</code>
-中定义，主要内容如下图：</p>
-<figure>
-<img src="../images/异常和中断/image-20240105204536400.png"
-alt="image-20240105204536400" />
-<figcaption aria-hidden="true">image-20240105204536400</figcaption>
-</figure>
-<p>它就是个中转站，里面有 irq_chip 指针 和 irq_domain
-指针，都是指向别的结构体。</p>
-<h4 id="irq_domain-结构体">2.2.4 irq_domain 结构体</h4>
-<p>irq_domain 结构体在 <code>include/linux/irqdomain.h</code>
-中定义，主要内容如下图：</p>
-<figure>
-<img src="../images/异常和中断/image-20240105205204566.png"
-alt="image-20240105205204566" />
-<figcaption aria-hidden="true">image-20240105205204566</figcaption>
-</figure>
-<p>当我们后面从设备树讲起，如何在设备树中指定中断，设备树的中断如何被
-转换为 irq 时，irq_domain
-将会起到极大的作用，举例来说，假设在设备树中有这样的属性：</p>
+<h4 id="2-2-3-irq-data-结构体"><a href="#2-2-3-irq-data-结构体" class="headerlink" title="2.2.3 irq_data 结构体"></a>2.2.3 irq_data 结构体</h4><p>irq_data 结构体在 <code>include/linux/irq.h</code> 中定义，主要内容如下图：</p>
+<p><img src="/../images/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/image-20240105204536400.png" alt="image-20240105204536400"></p>
+<p>它就是个中转站，里面有 irq_chip 指针 和 irq_domain 指针，都是指向别的结构体。</p>
+<h4 id="2-2-4-irq-domain-结构体"><a href="#2-2-4-irq-domain-结构体" class="headerlink" title="2.2.4 irq_domain 结构体"></a>2.2.4 irq_domain 结构体</h4><p>irq_domain 结构体在 <code>include/linux/irqdomain.h</code> 中定义，主要内容如下图：</p>
+<p><img src="/../images/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/image-20240105205204566.png" alt="image-20240105205204566"></p>
+<p>当我们后面从设备树讲起，如何在设备树中指定中断，设备树的中断如何被 转换为 irq 时，irq_domain 将会起到极大的作用，举例来说，假设在设备树中有这样的属性：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">interrupt-parent = &lt;&amp;gpio1&gt;; </span><br><span class="line">interrupts = &lt;<span class="number">5</span> IRQ_TYPE_EDGE_RISING&gt;;</span><br></pre></td></tr></table></figure>
-<p>它表示要使用 gpio1 里的第 5 号中断，因此，当我们调用 GPIO1
-的中断处理函数，会获取到的 hwirq = 5。但是我们在 irq_desc
-数组中寻址使用的是全局的虚拟中断号 irq。二者之间的转换就是由 GPIO1
-对应的 irq_domain 结构体中的相关成员实现的。具体来说，irq_domain
-结构体中有一个 irq_domain_ops 结构体，里面有各种操作函数：</p>
-<ol type="1">
+
+<p>它表示要使用 gpio1 里的第 5 号中断，因此，当我们调用 GPIO1 的中断处理函数，会获取到的 hwirq &#x3D; 5。但是我们在 irq_desc 数组中寻址使用的是全局的虚拟中断号 irq。二者之间的转换就是由 GPIO1 对应的 irq_domain 结构体中的相关成员实现的。具体来说，irq_domain 结构体中有一个 irq_domain_ops 结构体，里面有各种操作函数：</p>
+<ol>
 <li>xlate：用来解析设备树的中断属性，提取出 hwirq、type 等信息。</li>
 <li>map：把 hwirq 转换为 irq。</li>
 </ol>
-<h4 id="irq_chip-结构体">2.2.5 irq_chip 结构体</h4>
-<p>irq_chip 结构体在 <code>include/linux/irq.h</code>
-中定义，主要内容如下图：</p>
-<figure>
-<img src="../images/异常和中断/image-20240105210040202.png"
-alt="image-20240105210040202" />
-<figcaption aria-hidden="true">image-20240105210040202</figcaption>
-</figure>
-<p>这个结构体封装了主控芯片有关中断的相关硬件操作，例如我们在
-request_irq 后，并不需要手工去使能中断，原因就是系统调用对应的 irq_chip
-里的函数帮我们使能了中断；我们提供的中断处理函数中，也不需要执行主芯片相关的清中断操作，也是系统帮我们调用
-irq_chip 中的相关函数。</p>
+<h4 id="2-2-5-irq-chip-结构体"><a href="#2-2-5-irq-chip-结构体" class="headerlink" title="2.2.5 irq_chip 结构体"></a>2.2.5 irq_chip 结构体</h4><p>irq_chip 结构体在 <code>include/linux/irq.h</code> 中定义，主要内容如下图：</p>
+<p><img src="/../images/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/image-20240105210040202.png" alt="image-20240105210040202"></p>
+<p>这个结构体封装了主控芯片有关中断的相关硬件操作，例如我们在 request_irq 后，并不需要手工去使能中断，原因就是系统调用对应的 irq_chip 里的函数帮我们使能了中断；我们提供的中断处理函数中，也不需要执行主芯片相关的清中断操作，也是系统帮我们调用 irq_chip 中的相关函数。</p>
 <p><strong>但是对于外部设备相关的清中断操作，还是需要我们自己做的，外部设备对应我们编写的驱动程序。</strong></p>
-<h3 id="配置中断资源">2.3 配置中断资源</h3>
-<h4 id="设备树中断节点的语法">2.3.1 设备树中断节点的语法</h4>
-<blockquote>
-<p>参考文档：内核-controller.txt</p>
+<h3 id="2-3-配置中断资源"><a href="#2-3-配置中断资源" class="headerlink" title="2.3 配置中断资源"></a>2.3 配置中断资源</h3><h4 id="2-3-1-设备树中断节点的语法"><a href="#2-3-1-设备树中断节点的语法" class="headerlink" title="2.3.1 设备树中断节点的语法"></a>2.3.1 设备树中断节点的语法</h4><blockquote>
+<p>参考文档：内核\Documentation\devicetree\bindings\interrupt-controller\interrupts.txt</p>
 </blockquote>
-<figure>
-<img src="../images/异常和中断/image-20240106101640026.png"
-alt="image-20240106101640026" />
-<figcaption aria-hidden="true">image-20240106101640026</figcaption>
-</figure>
-<p>上图为 IMX6ULL 的中断体系，比之前多了一个 GPC INTC （General Power
-Controller，Interrupt Controller），我们参考 imx6ull.dtsi
-中有关中断的部分内容来学习设备树中有关中断的语法：</p>
-<h5 id="image-20240106102152360"><img
-src="../images/异常和中断/image-20240106102152360.png"
-alt="image-20240106102152360" /></h5>
-<h5 id="intc">(1) intc</h5>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#interrupt-cells = &lt;3&gt;;</span><br><span class="line">#interrupt-controller;</span><br></pre></td></tr></table></figure>
-<ol type="1">
-<li>凡是包含 <code>#interrupt-controller;</code>
-表明该节点是一个中断控制器节点</li>
-<li><code>#interrupt-cells = &lt;3&gt;;</code>指明想要指定该中断控制器的某个中断源应该使用多少个
-cell 来表示</li>
+<p><img src="/../images/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/image-20240106101640026.png" alt="image-20240106101640026"></p>
+<p>上图为 IMX6ULL 的中断体系，比之前多了一个 GPC INTC （General Power Controller，Interrupt Controller），我们参考 imx6ull.dtsi 中有关中断的部分内容来学习设备树中有关中断的语法：</p>
+<h5 id=""><a href="#" class="headerlink" title=""></a><img src="/../images/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/image-20240106102152360.png" alt="image-20240106102152360"></h5><h5 id="1-intc"><a href="#1-intc" class="headerlink" title="(1) intc"></a>(1) intc</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#interrupt-cells = &lt;3&gt;;</span><br><span class="line">#interrupt-controller;</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>凡是包含 <code>#interrupt-controller;</code> 表明该节点是一个中断控制器节点</li>
+<li><code>#interrupt-cells = &lt;3&gt;;</code>指明想要指定该中断控制器的某个中断源应该使用多少个 cell 来表示</li>
 </ol>
 <p>对于顶层中断控制器 GIC 而言，3 个 cell 分别表示：</p>
-<ol type="1">
-<li>第一个 cell 表示中断类别，可选<code>GIC_PPI,GIC_SPI,GIC_SGI</code>：
-<ul>
-<li>Private Peripheral Interrupt
-(PPI)：以单个特定CPU核为目标的外围中断</li>
-<li>Shared Peripheral Interrrupt
-(SPI)：可以以任意CPU核为目标的外围中断</li>
+<ol>
+<li>第一个 cell 表示中断类别，可选<code>GIC_PPI,GIC_SPI,GIC_SGI</code>：<ul>
+<li>Private Peripheral Interrupt (PPI)：以单个特定CPU核为目标的外围中断</li>
+<li>Shared Peripheral Interrrupt (SPI)：可以以任意CPU核为目标的外围中断</li>
 <li>Software-generated interrupt (SGI)：用于CPU核之间通信的中断</li>
-</ul></li>
+</ul>
+</li>
 <li>第二个 cell 表示中断控制器内的中断序号</li>
 <li>第三个 cell 表示触发条件</li>
 </ol>
 <blockquote>
 <p>详情可参考GIC架构规格书：IHI0069E_gic_architecture_specification.pdf</p>
 </blockquote>
-<h5 id="gpc">(2) gpc</h5>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">#interrupt-controller;</span><br><span class="line">#interrupt-cells = &lt;3&gt;;</span><br><span class="line">interrupts = &lt;GIC_SPI 89 IRQ_TYPE_LEVEL_HIGH&gt;</span><br><span class="line">interrupts-parent = &lt;&amp;intc&gt;;</span><br></pre></td></tr></table></figure>
+<h5 id="2-gpc"><a href="#2-gpc" class="headerlink" title="(2) gpc"></a>(2) gpc</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">#interrupt-controller;</span><br><span class="line">#interrupt-cells = &lt;3&gt;;</span><br><span class="line">interrupts = &lt;GIC_SPI 89 IRQ_TYPE_LEVEL_HIGH&gt;</span><br><span class="line">interrupts-parent = &lt;&amp;intc&gt;;</span><br></pre></td></tr></table></figure>
+
 <p>这也是一个中断控制器，并且它的子节点声明中断时要使用 3 个 cell</p>
-<ol type="1">
+<ol>
 <li><code>interrupts-parent =</code> ：指明该中断设备的父节点</li>
 <li><code>interrupts =</code>：描述本中断节点的中断触发条件</li>
 </ol>
-<h5 id="gpio1">(3) gpio1</h5>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">interrupts = &lt;GIC_SPI 66 IRQ_TYPE_LEVEL_HIGH&gt;, 					     </span><br><span class="line">			 &lt;GIC_SPI 67 IRQ_TYPE_LEVEL_HIGH&gt;; 						</span><br><span class="line">interrupt-controller; 				</span><br><span class="line">#interrupt-cells = &lt;2&gt;;</span><br></pre></td></tr></table></figure>
-<p>这是一个中断控制器，并且它的子节点声明中断时要使用 2 个
-cell。参考内核文档<code>interrupt.txt</code> 可知两个 cell
-分别表示：</p>
-<ol type="1">
-<li><p>第一个 cell 表示中断控制器内的中断序号</p></li>
+<h5 id="3-gpio1"><a href="#3-gpio1" class="headerlink" title="(3) gpio1"></a>(3) gpio1</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">interrupts = &lt;GIC_SPI 66 IRQ_TYPE_LEVEL_HIGH&gt;, 					     </span><br><span class="line">			 &lt;GIC_SPI 67 IRQ_TYPE_LEVEL_HIGH&gt;; 						</span><br><span class="line">interrupt-controller; 				</span><br><span class="line">#interrupt-cells = &lt;2&gt;;</span><br></pre></td></tr></table></figure>
+
+<p>这是一个中断控制器，并且它的子节点声明中断时要使用 2 个 cell。参考内核文档<code>interrupt.txt</code> 可知两个 cell 分别表示：</p>
+<ol>
+<li><p>第一个 cell 表示中断控制器内的中断序号</p>
+</li>
 <li><p>第二个 cell 表示中断触发条件：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">- bits[3:0] trigger type and level flags         </span><br><span class="line">1 = low-to-high edge triggered         </span><br><span class="line">2 = high-to-low edge triggered         </span><br><span class="line">4 = active high level-sensitive         </span><br><span class="line">8 = active low level-sensitive</span><br></pre></td></tr></table></figure></li>
 </ol>
-<p>此外，它的属性中没有指明该节点的中断父节点，因此在该节点直接继承其父节点的
-<code>interrupts-parent</code> 属性表明其中断父节点为 gpc</p>
+<p>此外，它的属性中没有指明该节点的中断父节点，因此在该节点直接继承其父节点的 <code>interrupts-parent</code> 属性表明其中断父节点为 gpc</p>
 <p>此外，通过查询IMX6ULL的数据手册，可知GPIO的共享中断触发源信息：</p>
-<figure>
-<img src="../images/异常和中断/image-20240106114012876.png"
-alt="image-20240106114012876" />
-<figcaption aria-hidden="true">image-20240106114012876</figcaption>
-</figure>
-<h5 id="spidev">(4) spidev</h5>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">interrupt-parent = &lt;&amp;gpio1&gt;;         </span><br><span class="line">interrupts = &lt;1 1&gt;;</span><br></pre></td></tr></table></figure>
-<p>该节点就不是中断控制器了，是设备节点的中断信息。它的中断父节点是
-gpio1，它在 gpio1
-内的中断序号是1，并且中断触发条件是上升沿。这种设备节点的相关信息是要由我们来设置的。</p>
-<h5 id="新写法---interrupts-extended-属性">(5) 新写法 -
-interrupts-extended 属性</h5>
-<p>一个“interrupts-extended”属性就可以既指定“interrupt-parent”，
-也指定“interrupts”，比如：</p>
+<p><img src="/../images/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/image-20240106114012876.png" alt="image-20240106114012876"></p>
+<h5 id="4-spidev"><a href="#4-spidev" class="headerlink" title="(4) spidev"></a>(4) spidev</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">interrupt-parent = &lt;&amp;gpio1&gt;;         </span><br><span class="line">interrupts = &lt;1 1&gt;;</span><br></pre></td></tr></table></figure>
+
+<p>该节点就不是中断控制器了，是设备节点的中断信息。它的中断父节点是 gpio1，它在 gpio1 内的中断序号是1，并且中断触发条件是上升沿。这种设备节点的相关信息是要由我们来设置的。</p>
+<h5 id="5-新写法-interrupts-extended-属性"><a href="#5-新写法-interrupts-extended-属性" class="headerlink" title="(5) 新写法 - interrupts-extended 属性"></a>(5) 新写法 - interrupts-extended 属性</h5><p>一个“interrupts-extended”属性就可以既指定“interrupt-parent”， 也指定“interrupts”，比如：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">interrupts-extended = &lt;&amp;gpio1 5 1&gt;, &lt;&amp;gpio1 1 1&gt;;</span><br></pre></td></tr></table></figure>
-<h4 id="在代码中获得中断">2.3.2 在代码中获得中断</h4>
-<p>在 “使用设备树的LED驱动框架”文章的的 1.4.2 节记录了设备树的哪些
-device_node 会被转换为 platform_device，对于</p>
-<h5 id="对于-platform_device">（1）对于 platform_device</h5>
-<p>一个节点能被转换为
-platform_device，并且它的设备树里指定了中断属性，那么可以从
-platform_device 中获得“中断资源”：</p>
+
+
+
+
+
+<h4 id="2-3-2-在代码中获得中断"><a href="#2-3-2-在代码中获得中断" class="headerlink" title="2.3.2 在代码中获得中断"></a>2.3.2 在代码中获得中断</h4><p>在 “使用设备树的LED驱动框架”文章的的 1.4.2 节记录了设备树的哪些 device_node 会被转换为 platform_device，对于</p>
+<h5 id="（1）对于-platform-device"><a href="#（1）对于-platform-device" class="headerlink" title="（1）对于 platform_device"></a>（1）对于 platform_device</h5><p>一个节点能被转换为 platform_device，并且它的设备树里指定了中断属性，那么可以从 platform_device 中获得“中断资源”：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">/**  </span><br><span class="line">* platform_get_resource - get a resource for a device  </span><br><span class="line">* @dev: platform device  </span><br><span class="line">* @type: resource type    // 取哪类资源？IORESOURCE_MEM、IORESOURCE_REG、IORESOURCE_IRQ 等</span><br><span class="line">* @num: resource index    // 这类资源中的哪一个？</span><br><span class="line">*/ </span><br><span class="line">struct resource *platform_get_resource(struct platform_device *dev, 				       unsigned int type, unsigned int num)</span><br></pre></td></tr></table></figure>
-<h5 id="对于-i2c-设备spi-设备">（2）对于 I2C 设备、SPI 设备</h5>
-<p>对于 I2C 设备节点，I2C 总线驱动在处理设备树里的 I2C
-子节点时，也会处理其中的中断信息。一个 I2C 设备会被转换为一个 i2c_client
-结构体，中断号会保存在 i2c_client 的 irq 成员里，代码如下
-<code>drviers/i2c/i2c-core.c</code>:</p>
+
+
+
+<h5 id="（2）对于-I2C-设备、SPI-设备"><a href="#（2）对于-I2C-设备、SPI-设备" class="headerlink" title="（2）对于 I2C 设备、SPI 设备"></a>（2）对于 I2C 设备、SPI 设备</h5><p>对于 I2C 设备节点，I2C 总线驱动在处理设备树里的 I2C 子节点时，也会处理其中的中断信息。一个 I2C 设备会被转换为一个 i2c_client 结构体，中断号会保存在 i2c_client 的 irq 成员里，代码如下 <code>drviers/i2c/i2c-core.c</code>:</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">i2c_device_probe</span><span class="params">(<span class="keyword">struct</span> device *dev)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">i2c_client</span>	*<span class="title">client</span> =</span> i2c_verify_client(dev);</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">i2c_driver</span>	*<span class="title">driver</span>;</span></span><br><span class="line">	<span class="type">int</span> status;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (!client)</span><br><span class="line">		<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (!client-&gt;irq) &#123;</span><br><span class="line">		<span class="type">int</span> irq = -ENOENT;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (dev-&gt;of_node) &#123;</span><br><span class="line">			irq = of_irq_get_byname(dev-&gt;of_node, <span class="string">&quot;irq&quot;</span>);</span><br><span class="line">			<span class="keyword">if</span> (irq == -EINVAL || irq == -ENODATA)</span><br><span class="line">				irq = of_irq_get(dev-&gt;of_node, <span class="number">0</span>);</span><br><span class="line">		&#125; <span class="keyword">else</span> <span class="keyword">if</span> (ACPI_COMPANION(dev)) &#123;</span><br><span class="line">			irq = acpi_dev_gpio_irq_get(ACPI_COMPANION(dev), <span class="number">0</span>);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span> (irq == -EPROBE_DEFER)</span><br><span class="line">			<span class="keyword">return</span> irq;</span><br><span class="line">		<span class="keyword">if</span> (irq &lt; <span class="number">0</span>)</span><br><span class="line">			irq = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">		client-&gt;irq = irq;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
-<p>对于 SPI 设备节点，SPI 总线驱动在处理设备树里的 SPI
-子节点时，也会处理其中的中断信息。一个 SPI 设备会被转换为一个 spi_device
-结构体，中断号会保存在 spi_device 的 irq 成员里，代码如下
-<code>drivers/spi/spi.c</code>：</p>
+
+<p>对于 SPI 设备节点，SPI 总线驱动在处理设备树里的 SPI 子节点时，也会处理其中的中断信息。一个 SPI 设备会被转换为一个 spi_device 结构体，中断号会保存在 spi_device 的 irq 成员里，代码如下 <code>drivers/spi/spi.c</code>：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">spi_drv_probe</span><span class="params">(<span class="keyword">struct</span> device *dev)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">spi_driver</span>		*<span class="title">sdrv</span> =</span> to_spi_driver(dev-&gt;driver);</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">spi_device</span>		*<span class="title">spi</span> =</span> to_spi_device(dev);</span><br><span class="line">	<span class="type">int</span> ret;</span><br><span class="line"></span><br><span class="line">	ret = of_clk_set_defaults(dev-&gt;of_node, <span class="literal">false</span>);</span><br><span class="line">	<span class="keyword">if</span> (ret)</span><br><span class="line">		<span class="keyword">return</span> ret;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (dev-&gt;of_node) &#123;</span><br><span class="line">		spi-&gt;irq = of_irq_get(dev-&gt;of_node, <span class="number">0</span>);</span><br><span class="line">		<span class="keyword">if</span> (spi-&gt;irq == -EPROBE_DEFER)</span><br><span class="line">			<span class="keyword">return</span> -EPROBE_DEFER;</span><br><span class="line">		<span class="keyword">if</span> (spi-&gt;irq &lt; <span class="number">0</span>)</span><br><span class="line">			spi-&gt;irq = <span class="number">0</span>;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
-<h5 id="调用-of_irq_get-获得中断号">（3）调用 of_irq_get 获得中断号</h5>
-<p>如果你的设备节点既不能转换为 platform_device，它也不是 I2C 设备，
-不是 SPI 设备，那么在驱动程序中可以自行调用 of_irq_get
-函数去解析设备树，得到中断号。</p>
+
+
+
+<h5 id="（3）调用-of-irq-get-获得中断号"><a href="#（3）调用-of-irq-get-获得中断号" class="headerlink" title="（3）调用 of_irq_get 获得中断号"></a>（3）调用 of_irq_get 获得中断号</h5><p>如果你的设备节点既不能转换为 platform_device，它也不是 I2C 设备， 不是 SPI 设备，那么在驱动程序中可以自行调用 of_irq_get 函数去解析设备树，得到中断号。</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * of_irq_get - Decode a node&#x27;s IRQ and return it as a Linux IRQ number</span></span><br><span class="line"><span class="comment"> * @dev: pointer to device tree node</span></span><br><span class="line"><span class="comment"> * @index: zero-based index of the IRQ</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * Returns Linux IRQ number on success, or 0 on the IRQ mapping failure, or</span></span><br><span class="line"><span class="comment"> * -EPROBE_DEFER if the IRQ domain is not yet created, or error code in case</span></span><br><span class="line"><span class="comment"> * of any other failure.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">of_irq_get</span><span class="params">(<span class="keyword">struct</span> device_node *dev, <span class="type">int</span> index)</span></span><br></pre></td></tr></table></figure>
-<h5 id="对于-gpio">（3）对于 GPIO</h5>
-<p>在<code>drivers/input/keyboard/gpio_keys.c</code>，可以使用
-gpio_to_irq 或 gpiod_to_irq 获得中断号：</p>
-<p>首先使用该函数来获取第 i 个引脚的 GPIO 的编号，并将其 flags （例如
-GPIO_ACTIVE_HIGH ）保存下来：</p>
+
+
+
+<h5 id="（3）对于-GPIO"><a href="#（3）对于-GPIO" class="headerlink" title="（3）对于 GPIO"></a>（3）对于 GPIO</h5><p>在<code>drivers/input/keyboard/gpio_keys.c</code>，可以使用 gpio_to_irq 或 gpiod_to_irq 获得中断号：</p>
+<p>首先使用该函数来获取第 i 个引脚的 GPIO 的编号，并将其 flags （例如 GPIO_ACTIVE_HIGH ）保存下来：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">int</span> <span class="title function_">of_get_gpio_flags</span><span class="params">(<span class="keyword">struct</span> device_node *np, <span class="type">int</span> index, <span class="keyword">enum</span> of_gpio_flags *flags)</span></span><br></pre></td></tr></table></figure>
+
 <p>然后根据 GPIO 编号转换为该 GPIO 的描述符：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**  * Convert a GPIO number to its descriptor  */</span> </span><br><span class="line"><span class="keyword">struct</span> gpio_desc *<span class="title function_">gpio_to_desc</span><span class="params">(<span class="type">unsigned</span> gpio)</span></span><br></pre></td></tr></table></figure>
+
 <p>最后使用 gpio_to_irq 或 gpiod_to_irq 获得中断号：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * gpiod_to_irq() - return the IRQ corresponding to a GPIO</span></span><br><span class="line"><span class="comment"> * @desc: gpio whose IRQ will be returned (already requested)</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * Return the IRQ corresponding to the passed GPIO, or an error code in case of</span></span><br><span class="line"><span class="comment"> * error.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">gpiod_to_irq</span><span class="params">(<span class="type">const</span> <span class="keyword">struct</span> gpio_desc *desc)</span></span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line"><span class="meta">#<span class="keyword">define</span> gpio_to_irq	__gpio_to_irq    </span></span><br><span class="line"><span class="type">static</span> <span class="keyword">inline</span> <span class="type">int</span> __<span class="title function_">gpio_to_irq</span><span class="params">(<span class="type">unsigned</span> gpio)</span> </span><br><span class="line">&#123; 	</span><br><span class="line">    <span class="keyword">return</span> gpiod_to_irq(gpio_to_desc(gpio)); </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h2 id="编写-gpio-触发中断">3. 编写 GPIO 触发中断</h2>
-<h4 id="在设备树中添加节点">（1）在设备树中添加节点</h4>
-<figure>
-<img src="../images/异常和中断/image-20240107150811885.png"
-alt="image-20240107150811885" />
-<figcaption aria-hidden="true">image-20240107150811885</figcaption>
-</figure>
+
+
+
+<h2 id="3-编写-GPIO-触发中断"><a href="#3-编写-GPIO-触发中断" class="headerlink" title="3. 编写 GPIO 触发中断"></a>3. 编写 GPIO 触发中断</h2><h4 id="（1）在设备树中添加节点"><a href="#（1）在设备树中添加节点" class="headerlink" title="（1）在设备树中添加节点"></a>（1）在设备树中添加节点</h4><p><img src="/../images/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/image-20240107150811885.png" alt="image-20240107150811885"></p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">krocz_gpio &#123;</span><br><span class="line">    compatible = &quot;krocz,buttondrv&quot;;</span><br><span class="line">    pinctrl-names = &quot;default&quot;;</span><br><span class="line">    pinctrl-0 = &lt;&amp;pinctrl_krocz_button&gt;;</span><br><span class="line">    gpios = &lt;&amp;gpio5 1 GPIO_ACTIVE_HIGH&gt;;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">pinctrl_krocz_button: krocz_buttongrp &#123;        </span><br><span class="line">     fsl,pins = &lt;</span><br><span class="line">		MX6ULL_PAD_SNVS_TAMPER1__GPIO5_IO01        0x000110A0</span><br><span class="line">            &gt;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
-<p>因为在内核中有 <code>gpiod_to_irq</code>
-这个函数，所以不必在设备节点中指定中断。</p>
-<h4 id="编写驱动程序">（2）编写驱动程序</h4>
-<blockquote>
-<p>参考内核源码：drivers/input/keyboard/gpio_keys.c</p>
+
+<p>因为在内核中有 <code>gpiod_to_irq</code> 这个函数，所以不必在设备节点中指定中断。</p>
+<h4 id="（2）编写驱动程序"><a href="#（2）编写驱动程序" class="headerlink" title="（2）编写驱动程序"></a>（2）编写驱动程序</h4><blockquote>
+<p>参考内核源码：drivers&#x2F;input&#x2F;keyboard&#x2F;gpio_keys.c</p>
 </blockquote>
 <p>注册内核模块的代码省略，主要是 platform_driver 的注册：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">gpio_key</span>&#123;</span></span><br><span class="line">	<span class="type">int</span> gpio;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">gpio_desc</span> *<span class="title">gpiod</span>;</span></span><br><span class="line">	<span class="type">int</span> flag;</span><br><span class="line">	<span class="type">int</span> irq;</span><br><span class="line">&#125; ;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">gpio_key</span> *<span class="title">gpio_keys_100ask</span>;</span></span><br><span class="line"><span class="type">static</span> <span class="type">irqreturn_t</span> <span class="title function_">gpio_key_isr</span><span class="params">(<span class="type">int</span> irq, <span class="type">void</span> *dev_id)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">gpio_key</span> *<span class="title">gpio_key</span> =</span> dev_id;</span><br><span class="line">	<span class="type">int</span> val;</span><br><span class="line">	val = gpiod_get_value(gpio_key-&gt;gpiod);</span><br><span class="line">	printk(<span class="string">&quot;key %d %d\n&quot;</span>, gpio_key-&gt;gpio, val);</span><br><span class="line">	reverse_led_status();  <span class="comment">// 每触发一次，翻转一下LED引脚的输出</span></span><br><span class="line">	</span><br><span class="line">	<span class="keyword">return</span> IRQ_HANDLED;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">of_device_id</span> <span class="title">krocz_keys</span>[] =</span> &#123;</span><br><span class="line">    &#123; .compatible = <span class="string">&quot;krocz,buttondrv&quot;</span> &#125;,</span><br><span class="line">    &#123; &#125;,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 1. 定义platform_driver */</span></span><br><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">platform_driver</span> <span class="title">gpio_keys_driver</span> =</span> &#123;</span><br><span class="line">    .probe      = gpio_key_probe,</span><br><span class="line">    .remove     = gpio_key_remove,</span><br><span class="line">    .driver     = &#123;</span><br><span class="line">        .name   = <span class="string">&quot;krocz_button_key&quot;</span>,</span><br><span class="line">        .of_match_table = krocz_keys,</span><br><span class="line">    &#125;,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">gpio_key_probe</span><span class="params">(<span class="keyword">struct</span> platform_device *pdev)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">int</span> err, count, i;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">device_node</span> *<span class="title">node</span> =</span> pdev-&gt;dev.of_node;</span><br><span class="line">	<span class="class"><span class="keyword">enum</span> <span class="title">of_gpio_flags</span> <span class="title">flag</span>;</span></span><br><span class="line">	<span class="type">unsigned</span> flags = GPIOF_IN;</span><br><span class="line">		</span><br><span class="line">	printk(<span class="string">&quot;%s %s line %d\n&quot;</span>, __FILE__, __FUNCTION__, __LINE__);</span><br><span class="line"></span><br><span class="line">	count = of_gpio_count(node);</span><br><span class="line">	<span class="keyword">if</span> (!count)  <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line"></span><br><span class="line">	gpio_keys_100ask = kzalloc(<span class="keyword">sizeof</span>(<span class="keyword">struct</span> gpio_key) * count, GFP_KERNEL);</span><br><span class="line">	<span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; count; i++)</span><br><span class="line">	&#123;</span><br><span class="line">        <span class="comment">// 获取设备节点中第i个gpio引脚及其flag</span></span><br><span class="line">		gpio_keys_100ask[i].gpio = of_get_gpio_flags(node, i, &amp;flag);</span><br><span class="line">		<span class="keyword">if</span> (gpio_keys_100ask[i].gpio &lt; <span class="number">0</span>)    <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">		<span class="comment">// gpio引脚转gpio_desc结构体</span></span><br><span class="line">		gpio_keys_100ask[i].gpiod = gpio_to_desc(gpio_keys_100ask[i].gpio);</span><br><span class="line">		gpio_keys_100ask[i].flag = flag &amp; OF_GPIO_ACTIVE_LOW;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (flag &amp; OF_GPIO_ACTIVE_LOW)  flags |= GPIOF_ACTIVE_LOW;</span><br><span class="line">        <span class="comment">// 看函数描述好像是用来初始化GPIO引脚的</span></span><br><span class="line">		err = devm_gpio_request_one(&amp;pdev-&gt;dev, gpio_keys_100ask[i].gpio, flags, <span class="literal">NULL</span>);</span><br><span class="line">        <span class="comment">// 设置GPIO引脚为输入</span></span><br><span class="line">		err = gpiod_direction_input(gpio_keys_100ask[i].gpiod);</span><br><span class="line">        <span class="comment">// gpio引脚号转虚拟中断号</span></span><br><span class="line">		gpio_keys_100ask[i].irq  = gpio_to_irq(gpio_keys_100ask[i].gpio);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// 注册中断处理函数 gpio_key_isr，触发条件为下降沿</span></span><br><span class="line">	<span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; count; i++)</span><br><span class="line">		err = request_irq(gpio_keys_100ask[i].irq, gpio_key_isr, IRQF_TRIGGER_FALLING, <span class="string">&quot;krocz_gpio_key&quot;</span>, &amp;gpio_keys_100ask[i]);</span><br><span class="line">        </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">gpio_key_remove</span><span class="params">(<span class="keyword">struct</span> platform_device *pdev)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="comment">//int err;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">device_node</span> *<span class="title">node</span> =</span> pdev-&gt;dev.of_node;</span><br><span class="line">	<span class="type">int</span> count, i;</span><br><span class="line"></span><br><span class="line">	count = of_gpio_count(node);</span><br><span class="line">	<span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; count; i++)</span><br><span class="line">		free_irq(gpio_keys_100ask[i].irq, &amp;gpio_keys_100ask[i]);</span><br><span class="line">	kfree(gpio_keys_100ask);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>probe 函数的核心就是将中断处理函数 gpio_key_isr
-进行注册，以便我们在按下按键时能够得到处理，因为硬件设计上有电容用来去抖动，所以不需要其他软件上的处理了。</p>
+
+<p>probe 函数的核心就是将中断处理函数 gpio_key_isr 进行注册，以便我们在按下按键时能够得到处理，因为硬件设计上有电容用来去抖动，所以不需要其他软件上的处理了。</p>
 
     </div>
 
@@ -768,9 +631,7 @@ alt="image-20240107150811885" />
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD"><span class="nav-number">1.</span> <span class="nav-text">1.异常和中断</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD%E7%9A%84%E6%A6%82%E5%BF%B5"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 异常和中断的概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BC%82%E5%B8%B8%E5%90%91%E9%87%8F%E8%A1%A8"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 异常向量表</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#linux-%E4%B8%AD%E6%96%AD%E7%9A%84%E6%BC%94%E8%BF%9B"><span class="nav-number">1.3.</span> <span class="nav-text">2.1 Linux 中断的演进</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%A1%AC%E4%BB%B6%E4%B8%AD%E6%96%AD%E5%92%8C%E8%BD%AF%E4%BB%B6%E4%B8%AD%E6%96%AD"><span class="nav-number">1.3.1.</span> <span class="nav-text">2.1.1 硬件中断和软件中断</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E7%A1%AC%E4%BB%B6%E4%B8%AD%E6%96%AD"><span class="nav-number">1.3.1.1.</span> <span class="nav-text">（1）硬件中断</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%BD%AF%E4%BB%B6%E4%B8%AD%E6%96%AD"><span class="nav-number">1.3.1.2.</span> <span class="nav-text">（2）软件中断</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%80%97%E6%97%B6%E4%B8%AD%E6%96%AD"><span class="nav-number">1.3.2.</span> <span class="nav-text">2.1.2 耗时中断</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%8B%E5%8D%8A%E9%83%A8%E8%80%97%E6%97%B6%E4%B8%8D%E9%95%BF-tasklet"><span class="nav-number">1.3.3.</span> <span class="nav-text">2.1.3 下半部耗时不长-tasklet</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%8B%E5%8D%8A%E9%83%A8%E5%A4%8D%E6%9D%82%E8%80%97%E6%97%B6%E9%95%BF-%E5%B7%A5%E4%BD%9C%E9%98%9F%E5%88%97"><span class="nav-number">1.3.4.</span> <span class="nav-text">2.1.4 下半部复杂耗时长-工作队列</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%B0%E6%8A%80%E6%9C%AF---threaded-irq"><span class="nav-number">1.3.5.</span> <span class="nav-text">2.1.5 新技术 - threaded irq</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#linux-%E4%B8%AD%E6%96%AD%E7%B3%BB%E7%BB%9F%E4%B8%AD%E7%9A%84%E9%87%8D%E8%A6%81%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84"><span class="nav-number">1.4.</span> <span class="nav-text">2.2 Linux
-中断系统中的重要数据结构</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#irq_desc-%E6%95%B0%E7%BB%84"><span class="nav-number">1.4.1.</span> <span class="nav-text">2.2.1 irq_desc 数组</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#irqaction-%E7%BB%93%E6%9E%84%E4%BD%93"><span class="nav-number">1.4.2.</span> <span class="nav-text">2.2.2 irqaction 结构体</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#irq_data-%E7%BB%93%E6%9E%84%E4%BD%93"><span class="nav-number">1.4.3.</span> <span class="nav-text">2.2.3 irq_data 结构体</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#irq_domain-%E7%BB%93%E6%9E%84%E4%BD%93"><span class="nav-number">1.4.4.</span> <span class="nav-text">2.2.4 irq_domain 结构体</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#irq_chip-%E7%BB%93%E6%9E%84%E4%BD%93"><span class="nav-number">1.4.5.</span> <span class="nav-text">2.2.5 irq_chip 结构体</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE%E4%B8%AD%E6%96%AD%E8%B5%84%E6%BA%90"><span class="nav-number">1.5.</span> <span class="nav-text">2.3 配置中断资源</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%AE%BE%E5%A4%87%E6%A0%91%E4%B8%AD%E6%96%AD%E8%8A%82%E7%82%B9%E7%9A%84%E8%AF%AD%E6%B3%95"><span class="nav-number">1.5.1.</span> <span class="nav-text">2.3.1 设备树中断节点的语法</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#image-20240106102152360"><span class="nav-number">1.5.1.1.</span> <span class="nav-text"></span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#intc"><span class="nav-number">1.5.1.2.</span> <span class="nav-text">(1) intc</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#gpc"><span class="nav-number">1.5.1.3.</span> <span class="nav-text">(2) gpc</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#gpio1"><span class="nav-number">1.5.1.4.</span> <span class="nav-text">(3) gpio1</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#spidev"><span class="nav-number">1.5.1.5.</span> <span class="nav-text">(4) spidev</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%96%B0%E5%86%99%E6%B3%95---interrupts-extended-%E5%B1%9E%E6%80%A7"><span class="nav-number">1.5.1.6.</span> <span class="nav-text">(5) 新写法 -
-interrupts-extended 属性</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9C%A8%E4%BB%A3%E7%A0%81%E4%B8%AD%E8%8E%B7%E5%BE%97%E4%B8%AD%E6%96%AD"><span class="nav-number">1.5.2.</span> <span class="nav-text">2.3.2 在代码中获得中断</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%AF%B9%E4%BA%8E-platform_device"><span class="nav-number">1.5.2.1.</span> <span class="nav-text">（1）对于 platform_device</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%AF%B9%E4%BA%8E-i2c-%E8%AE%BE%E5%A4%87spi-%E8%AE%BE%E5%A4%87"><span class="nav-number">1.5.2.2.</span> <span class="nav-text">（2）对于 I2C 设备、SPI 设备</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%B0%83%E7%94%A8-of_irq_get-%E8%8E%B7%E5%BE%97%E4%B8%AD%E6%96%AD%E5%8F%B7"><span class="nav-number">1.5.2.3.</span> <span class="nav-text">（3）调用 of_irq_get 获得中断号</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%AF%B9%E4%BA%8E-gpio"><span class="nav-number">1.5.2.4.</span> <span class="nav-text">（3）对于 GPIO</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BC%96%E5%86%99-gpio-%E8%A7%A6%E5%8F%91%E4%B8%AD%E6%96%AD"><span class="nav-number">2.</span> <span class="nav-text">3. 编写 GPIO 触发中断</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9C%A8%E8%AE%BE%E5%A4%87%E6%A0%91%E4%B8%AD%E6%B7%BB%E5%8A%A0%E8%8A%82%E7%82%B9"><span class="nav-number">2.0.1.</span> <span class="nav-text">（1）在设备树中添加节点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%BC%96%E5%86%99%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F"><span class="nav-number">2.0.2.</span> <span class="nav-text">（2）编写驱动程序</span></a></li></ol></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD"><span class="nav-number">1.</span> <span class="nav-text">1.异常和中断</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD%E7%9A%84%E6%A6%82%E5%BF%B5"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 异常和中断的概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-%E5%BC%82%E5%B8%B8%E5%90%91%E9%87%8F%E8%A1%A8"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 异常向量表</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Linux-%E5%AF%B9%E4%BA%8E%E4%B8%AD%E6%96%AD%E7%9A%84%E5%A4%84%E7%90%86"><span class="nav-number">2.</span> <span class="nav-text">2. Linux 对于中断的处理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-Linux-%E4%B8%AD%E6%96%AD%E7%9A%84%E6%BC%94%E8%BF%9B"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 Linux 中断的演进</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-1-%E7%A1%AC%E4%BB%B6%E4%B8%AD%E6%96%AD%E5%92%8C%E8%BD%AF%E4%BB%B6%E4%B8%AD%E6%96%AD"><span class="nav-number">2.1.1.</span> <span class="nav-text">2.1.1 硬件中断和软件中断</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%EF%BC%881%EF%BC%89%E7%A1%AC%E4%BB%B6%E4%B8%AD%E6%96%AD"><span class="nav-number">2.1.1.1.</span> <span class="nav-text">（1）硬件中断</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%EF%BC%882%EF%BC%89%E8%BD%AF%E4%BB%B6%E4%B8%AD%E6%96%AD"><span class="nav-number">2.1.1.2.</span> <span class="nav-text">（2）软件中断</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-2-%E8%80%97%E6%97%B6%E4%B8%AD%E6%96%AD"><span class="nav-number">2.1.2.</span> <span class="nav-text">2.1.2 耗时中断</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-3-%E4%B8%8B%E5%8D%8A%E9%83%A8%E8%80%97%E6%97%B6%E4%B8%8D%E9%95%BF-tasklet"><span class="nav-number">2.1.3.</span> <span class="nav-text">2.1.3 下半部耗时不长-tasklet</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-4-%E4%B8%8B%E5%8D%8A%E9%83%A8%E5%A4%8D%E6%9D%82%E8%80%97%E6%97%B6%E9%95%BF-%E5%B7%A5%E4%BD%9C%E9%98%9F%E5%88%97"><span class="nav-number">2.1.4.</span> <span class="nav-text">2.1.4 下半部复杂耗时长-工作队列</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-5-%E6%96%B0%E6%8A%80%E6%9C%AF-threaded-irq"><span class="nav-number">2.1.5.</span> <span class="nav-text">2.1.5 新技术 - threaded irq</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-Linux-%E4%B8%AD%E6%96%AD%E7%B3%BB%E7%BB%9F%E4%B8%AD%E7%9A%84%E9%87%8D%E8%A6%81%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 Linux 中断系统中的重要数据结构</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-1-irq-desc-%E6%95%B0%E7%BB%84"><span class="nav-number">2.2.1.</span> <span class="nav-text">2.2.1 irq_desc 数组</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-2-irqaction-%E7%BB%93%E6%9E%84%E4%BD%93"><span class="nav-number">2.2.2.</span> <span class="nav-text">2.2.2 irqaction 结构体</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-3-irq-data-%E7%BB%93%E6%9E%84%E4%BD%93"><span class="nav-number">2.2.3.</span> <span class="nav-text">2.2.3 irq_data 结构体</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-4-irq-domain-%E7%BB%93%E6%9E%84%E4%BD%93"><span class="nav-number">2.2.4.</span> <span class="nav-text">2.2.4 irq_domain 结构体</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-5-irq-chip-%E7%BB%93%E6%9E%84%E4%BD%93"><span class="nav-number">2.2.5.</span> <span class="nav-text">2.2.5 irq_chip 结构体</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-%E9%85%8D%E7%BD%AE%E4%B8%AD%E6%96%AD%E8%B5%84%E6%BA%90"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 配置中断资源</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-1-%E8%AE%BE%E5%A4%87%E6%A0%91%E4%B8%AD%E6%96%AD%E8%8A%82%E7%82%B9%E7%9A%84%E8%AF%AD%E6%B3%95"><span class="nav-number">2.3.1.</span> <span class="nav-text">2.3.1 设备树中断节点的语法</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link"><span class="nav-number">2.3.1.1.</span> <span class="nav-text"></span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#1-intc"><span class="nav-number">2.3.1.2.</span> <span class="nav-text">(1) intc</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-gpc"><span class="nav-number">2.3.1.3.</span> <span class="nav-text">(2) gpc</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-gpio1"><span class="nav-number">2.3.1.4.</span> <span class="nav-text">(3) gpio1</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-spidev"><span class="nav-number">2.3.1.5.</span> <span class="nav-text">(4) spidev</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#5-%E6%96%B0%E5%86%99%E6%B3%95-interrupts-extended-%E5%B1%9E%E6%80%A7"><span class="nav-number">2.3.1.6.</span> <span class="nav-text">(5) 新写法 - interrupts-extended 属性</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-2-%E5%9C%A8%E4%BB%A3%E7%A0%81%E4%B8%AD%E8%8E%B7%E5%BE%97%E4%B8%AD%E6%96%AD"><span class="nav-number">2.3.2.</span> <span class="nav-text">2.3.2 在代码中获得中断</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%EF%BC%881%EF%BC%89%E5%AF%B9%E4%BA%8E-platform-device"><span class="nav-number">2.3.2.1.</span> <span class="nav-text">（1）对于 platform_device</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%EF%BC%882%EF%BC%89%E5%AF%B9%E4%BA%8E-I2C-%E8%AE%BE%E5%A4%87%E3%80%81SPI-%E8%AE%BE%E5%A4%87"><span class="nav-number">2.3.2.2.</span> <span class="nav-text">（2）对于 I2C 设备、SPI 设备</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%EF%BC%883%EF%BC%89%E8%B0%83%E7%94%A8-of-irq-get-%E8%8E%B7%E5%BE%97%E4%B8%AD%E6%96%AD%E5%8F%B7"><span class="nav-number">2.3.2.3.</span> <span class="nav-text">（3）调用 of_irq_get 获得中断号</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%EF%BC%883%EF%BC%89%E5%AF%B9%E4%BA%8E-GPIO"><span class="nav-number">2.3.2.4.</span> <span class="nav-text">（3）对于 GPIO</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E7%BC%96%E5%86%99-GPIO-%E8%A7%A6%E5%8F%91%E4%B8%AD%E6%96%AD"><span class="nav-number">3.</span> <span class="nav-text">3. 编写 GPIO 触发中断</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%EF%BC%881%EF%BC%89%E5%9C%A8%E8%AE%BE%E5%A4%87%E6%A0%91%E4%B8%AD%E6%B7%BB%E5%8A%A0%E8%8A%82%E7%82%B9"><span class="nav-number">3.0.1.</span> <span class="nav-text">（1）在设备树中添加节点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%EF%BC%882%EF%BC%89%E7%BC%96%E5%86%99%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F"><span class="nav-number">3.0.2.</span> <span class="nav-text">（2）编写驱动程序</span></a></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -785,7 +646,7 @@ interrupts-extended 属性</span></a></li></ol></li><li class="nav-item nav-leve
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">26</span>
+          <span class="site-state-item-count">25</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

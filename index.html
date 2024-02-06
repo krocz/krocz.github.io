@@ -198,89 +198,6 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2024/02/06/test-latex/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="Krocz">
-      <meta itemprop="description" content="时间不等人，喜欢就去做">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Krocz's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2024/02/06/test-latex/" class="post-title-link" itemprop="url">test latex</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-              
-
-              <time title="创建时间：2024-02-06 17:23:17 / 修改时间：17:23:38" itemprop="dateCreated datePublished" datetime="2024-02-06T17:23:17+08:00">2024-02-06</time>
-            </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/" itemprop="url" rel="index"><span itemprop="name">Linux应用开发</span></a>
-                </span>
-            </span>
-
-          <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>16</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p><span class="math inline">\(DIr\)</span></p>
-<p><span class="math inline">\(\beta\)</span></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2024/01/12/mmap/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -324,14 +241,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>7.5k</span>
+              <span>7.3k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>14 分钟</span>
+              <span>13 分钟</span>
             </span>
 
         </div>
@@ -343,20 +260,10 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="为什么要使用-mmap">1. 为什么要使用 mmap</h2>
-<p>应用程序和驱动程序之间传递数据时，可以通过 read、write
-函数进行，如下图：</p>
-<figure>
-<img src="../images/mmap/image-20240112114136049.png" alt="image-20240112114136049">
-<figcaption aria-hidden="true">image-20240112114136049</figcaption>
-</figure>
-<p>应用程序不能直接读写驱动程序中的 buffer，需要在用户态 buffer 和内核态
-buffer 之间进行一次数据拷贝。这种方式在数据量比较小时没什么问题；
-但是数据量比较大时效率太低。例如更新 LCD，假设 LCD 采用
-<code>1024 × 600 × 32 bpp</code> 的格式，则一帧数据就有 2.3
-M左右，拷贝的步骤效率太低。</p>
-<p>应该允许程序直接读写驱动程序中的 buffer，这可以通过 mmap 实现(memory
-map)，把内核的 buffer 映射到用户态，让 APP 在用户态直接读写。</p>
+          <h2 id="1-为什么要使用-mmap"><a href="#1-为什么要使用-mmap" class="headerlink" title="1. 为什么要使用 mmap"></a>1. 为什么要使用 mmap</h2><p>应用程序和驱动程序之间传递数据时，可以通过 read、write 函数进行，如下图：</p>
+<p><img src="/../images/mmap/image-20240112114136049.png" alt="image-20240112114136049"></p>
+<p>应用程序不能直接读写驱动程序中的 buffer，需要在用户态 buffer 和内核态 buffer 之间进行一次数据拷贝。这种方式在数据量比较小时没什么问题； 但是数据量比较大时效率太低。例如更新 LCD，假设 LCD 采用 <code>1024 × 600 × 32 bpp</code> 的格式，则一帧数据就有 2.3 M左右，拷贝的步骤效率太低。</p>
+<p>应该允许程序直接读写驱动程序中的 buffer，这可以通过 mmap 实现(memory map)，把内核的 buffer 映射到用户态，让 APP 在用户态直接读写。</p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2024/01/12/mmap/#more" rel="contents">
@@ -451,19 +358,13 @@ map)，把内核的 buffer 映射到用户态，让 APP 在用户态直接读写
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="休眠与唤醒">1. 休眠与唤醒</h2>
-<h3 id="使用示例">1.1 使用示例</h3>
-<p>使用休眠-唤醒机制来编写按键驱动程序：</p>
-<ol type="1">
+          <h2 id="1-休眠与唤醒"><a href="#1-休眠与唤醒" class="headerlink" title="1. 休眠与唤醒"></a>1. 休眠与唤醒</h2><h3 id="1-1-使用示例"><a href="#1-1-使用示例" class="headerlink" title="1.1 使用示例"></a>1.1 使用示例</h3><p>使用休眠-唤醒机制来编写按键驱动程序：</p>
+<ol>
 <li>APP 调用 read 等函数试图读取数据，比如读取按键；</li>
-<li>APP
-进入内核态，也就是调用驱动中的对应函数，发现有数据则复制到用户空间并马上返回；</li>
-<li>如果 APP 在内核态，也就是在驱动程序中发现没有数据，则 APP
-休眠，进程/线程状态改为非 Running；</li>
-<li>当有数据时，比如当按下按键时，驱动程序的中断服务程序被调用，它会记录数据、将
-APP 的进程/线程状态修改为 Running；</li>
-<li>调度器调度 APP
-继续运行它的内核态代码，也就是驱动程序中的函数，复制数据到用户空间并马上返回。</li>
+<li>APP 进入内核态，也就是调用驱动中的对应函数，发现有数据则复制到用户空间并马上返回；</li>
+<li>如果 APP 在内核态，也就是在驱动程序中发现没有数据，则 APP 休眠，进程&#x2F;线程状态改为非 Running；</li>
+<li>当有数据时，比如当按下按键时，驱动程序的中断服务程序被调用，它会记录数据、将 APP 的进程&#x2F;线程状态修改为 Running；</li>
+<li>调度器调度 APP 继续运行它的内核态代码，也就是驱动程序中的函数，复制数据到用户空间并马上返回。</li>
 </ol>
 <p>如下图所示：</p>
           <!--noindex-->
@@ -535,7 +436,7 @@ APP 的进程/线程状态修改为 Running；</li>
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>1.5k</span>
+              <span>1.4k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -554,15 +455,8 @@ APP 的进程/线程状态修改为 Running；</li>
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="app读取按键值">1.APP读取按键值</h2>
-<h3 id="app读取按键的-4-种方法">1.1 APP读取按键的 4 种方法</h3>
-<h4 id="查询方式">1.1.1 查询方式</h4>
-<figure>
-<img src="../images/APP读取按键的几种方式/image-20240102195020502.png" alt="image-20240102195020502">
-<figcaption aria-hidden="true">image-20240102195020502</figcaption>
-</figure>
-<p>驱动程序中构造、注册一个 file_operations 结构体，里面提供有对应的
-open,read 函数。</p>
+          <h2 id="1-APP读取按键值"><a href="#1-APP读取按键值" class="headerlink" title="1.APP读取按键值"></a>1.APP读取按键值</h2><h3 id="1-1-APP读取按键的-4-种方法"><a href="#1-1-APP读取按键的-4-种方法" class="headerlink" title="1.1 APP读取按键的 4 种方法"></a>1.1 APP读取按键的 4 种方法</h3><h4 id="1-1-1-查询方式"><a href="#1-1-1-查询方式" class="headerlink" title="1.1.1 查询方式"></a>1.1.1 查询方式</h4><p><img src="/../images/APP%E8%AF%BB%E5%8F%96%E6%8C%89%E9%94%AE%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F/image-20240102195020502.png" alt="image-20240102195020502"></p>
+<p>驱动程序中构造、注册一个 file_operations 结构体，里面提供有对应的 open,read 函数。</p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2024/01/07/APP%E8%AF%BB%E5%8F%96%E6%8C%89%E9%94%AE%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F/#more" rel="contents">
@@ -657,19 +551,14 @@ open,read 函数。</p>
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="异常和中断">1.异常和中断</h2>
-<h3 id="异常和中断的概念">1.1 异常和中断的概念</h3>
-<p>异常不可屏蔽，中断可以屏蔽，中断一种特殊的异常。</p>
-<figure>
-<img src="../images/异常和中断/image-20240105105633741.png" alt="image-20240105105633741">
-<figcaption aria-hidden="true">image-20240105105633741</figcaption>
-</figure>
-<ol type="1">
+          <h2 id="1-异常和中断"><a href="#1-异常和中断" class="headerlink" title="1.异常和中断"></a>1.异常和中断</h2><h3 id="1-1-异常和中断的概念"><a href="#1-1-异常和中断的概念" class="headerlink" title="1.1 异常和中断的概念"></a>1.1 异常和中断的概念</h3><p>异常不可屏蔽，中断可以屏蔽，中断一种特殊的异常。</p>
+<p><img src="/../images/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/image-20240105105633741.png" alt="image-20240105105633741"></p>
+<ol>
 <li>初始化，设置中断源（设置中断源、设置中断控制器、使能CPU总开关）</li>
 <li>执行程序</li>
 <li>产生中断：中断源 -&gt; 中断控制器 -&gt; CPU</li>
-<li>CPU每执行完一条指令，都会检查有无中断/异常产生</li>
-<li>CPU发现有中断/异常产生，开始处理</li>
+<li>CPU每执行完一条指令，都会检查有无中断&#x2F;异常产生</li>
+<li>CPU发现有中断&#x2F;异常产生，开始处理</li>
 <li>对于不同的异常，跳去不同的地址执行指令（中断向量表），这些指令只是一条跳转指令，跳去执行某个函数</li>
 <li>处理函数：保存现场，<strong>分辨中断源并调用相应的处理函数</strong>，恢复现场</li>
 </ol>
@@ -767,14 +656,9 @@ open,read 函数。</p>
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="gpio-和-pinctrl-子系统的使用">1. GPIO 和 Pinctrl
-子系统的使用</h2>
-<p>在 LED
-驱动程序中，我们使用寄存器操作的方式来配置硬件，这种方式是非常低效的，对于具有大量寄存器的芯片肯定需要将寄存器操作，可以由芯片厂的BSP工程师来封装成库，然后来让驱动开发人员进行调用，这就是今天引入的
-GPIO 和 Pinctrl 子系统。</p>
-<h3 id="pinctrl-子系统">1.1 Pinctrl 子系统</h3>
-<blockquote>
-<p>参考文档：内核目录-bindings.txt</p>
+          <h2 id="1-GPIO-和-Pinctrl-子系统的使用"><a href="#1-GPIO-和-Pinctrl-子系统的使用" class="headerlink" title="1.  GPIO 和 Pinctrl 子系统的使用"></a>1.  GPIO 和 Pinctrl 子系统的使用</h2><p>在 LED 驱动程序中，我们使用寄存器操作的方式来配置硬件，这种方式是非常低效的，对于具有大量寄存器的芯片肯定需要将寄存器操作，可以由芯片厂的BSP工程师来封装成库，然后来让驱动开发人员进行调用，这就是今天引入的 GPIO 和 Pinctrl 子系统。</p>
+<h3 id="1-1-Pinctrl-子系统"><a href="#1-1-Pinctrl-子系统" class="headerlink" title="1.1 Pinctrl 子系统"></a>1.1 Pinctrl 子系统</h3><blockquote>
+<p>参考文档：内核目录\Documentation\devicetree\bindings\pinctrl\pinctrl-bindings.txt</p>
 </blockquote>
 <p>Pinctrl 子系统涉及 2 个对象：pin controller、client device。</p>
           <!--noindex-->
@@ -852,14 +736,14 @@ GPIO 和 Pinctrl 子系统。</p>
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>14k</span>
+              <span>13k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>25 分钟</span>
+              <span>24 分钟</span>
             </span>
 
         </div>
@@ -871,14 +755,9 @@ GPIO 和 Pinctrl 子系统。</p>
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="设备树">1. 设备树</h2>
-<h3 id="设备树的引入">1.1 设备树的引入</h3>
-<p>如果按照上面的方式来让我们的Linux内核支持所有的主控和开发板；也许常用的主控芯片并不是很多，但是基于主控芯片所设计出的开发板就是那就是千千万万了。如果要将所有的开发板的引脚配置编译到内核中，那内核中将充斥大量的高度重复的文件。为此，引入了设备树的概念，<strong>设备树用来给内核里的驱动程序指定硬件的信息</strong>：</p>
-<figure>
-<img src="../images/使用设备树的LED驱动框架/image-20231218155959125.png" alt="image-20231218155959125">
-<figcaption aria-hidden="true">image-20231218155959125</figcaption>
-</figure>
-<h3 id="设备树的语法">1.2 设备树的语法</h3>
+          <h2 id="1-设备树"><a href="#1-设备树" class="headerlink" title="1. 设备树"></a>1. 设备树</h2><h3 id="1-1-设备树的引入"><a href="#1-1-设备树的引入" class="headerlink" title="1.1 设备树的引入"></a>1.1 设备树的引入</h3><p>如果按照上面的方式来让我们的Linux内核支持所有的主控和开发板；也许常用的主控芯片并不是很多，但是基于主控芯片所设计出的开发板就是那就是千千万万了。如果要将所有的开发板的引脚配置编译到内核中，那内核中将充斥大量的高度重复的文件。为此，引入了设备树的概念，<strong>设备树用来给内核里的驱动程序指定硬件的信息</strong>：</p>
+<p><img src="/../images/%E4%BD%BF%E7%94%A8%E8%AE%BE%E5%A4%87%E6%A0%91%E7%9A%84LED%E9%A9%B1%E5%8A%A8%E6%A1%86%E6%9E%B6/image-20231218155959125.png" alt="image-20231218155959125"></p>
+<h3 id="1-2-设备树的语法"><a href="#1-2-设备树的语法" class="headerlink" title="1.2 设备树的语法"></a>1.2 设备树的语法</h3>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2024/01/02/%E4%BD%BF%E7%94%A8%E8%AE%BE%E5%A4%87%E6%A0%91%E7%9A%84LED%E9%A9%B1%E5%8A%A8%E6%A1%86%E6%9E%B6/#more" rel="contents">
@@ -973,14 +852,9 @@ GPIO 和 Pinctrl 子系统。</p>
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="led驱动程序框架设计-分离">1.LED驱动程序框架设计-分离</h2>
-<p>在上一篇博文中编写的驱动程序仅能操作固定开发板上的一个LED灯。考虑现实情况，使用同一款主控芯片，不同厂家可能会设计不同的PCB板，针对硬件使用的芯片引脚各不相同，但是同一款主控针对同一硬件的设置都是相似的。因此，我们考虑针对通用LED驱动程序，主控芯片，开发板来分离出三层，以便我们的LED驱动程序能够支持不同主控不同开发板使用：</p>
-<figure>
-<img src="../images/LED驱动程序框架/image-20231202161816859.png" alt="image-20231202161816859">
-<figcaption aria-hidden="true">image-20231202161816859</figcaption>
-</figure>
-<h3 id="开发板层">1.1 开发板层</h3>
-<p>led_resources.h</p>
+          <h2 id="1-LED驱动程序框架设计-分离"><a href="#1-LED驱动程序框架设计-分离" class="headerlink" title="1.LED驱动程序框架设计-分离"></a>1.LED驱动程序框架设计-分离</h2><p>在上一篇博文中编写的驱动程序仅能操作固定开发板上的一个LED灯。考虑现实情况，使用同一款主控芯片，不同厂家可能会设计不同的PCB板，针对硬件使用的芯片引脚各不相同，但是同一款主控针对同一硬件的设置都是相似的。因此，我们考虑针对通用LED驱动程序，主控芯片，开发板来分离出三层，以便我们的LED驱动程序能够支持不同主控不同开发板使用：</p>
+<p><img src="/../images/LED%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F%E6%A1%86%E6%9E%B6/image-20231202161816859.png" alt="image-20231202161816859"></p>
+<h3 id="1-1-开发板层"><a href="#1-1-开发板层" class="headerlink" title="1.1 开发板层"></a>1.1 开发板层</h3><p>led_resources.h</p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2024/01/02/LED%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F%E6%A1%86%E6%9E%B6/#more" rel="contents">
@@ -1075,10 +949,8 @@ GPIO 和 Pinctrl 子系统。</p>
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="链表">1.链表</h2>
-<h3 id="静态链表数组模拟">1.静态链表（数组模拟）</h3>
-<h4 id="单链表">1.1 单链表</h4>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N = <span class="number">100010</span>;</span><br><span class="line"><span class="type">int</span> e[N], ne[N], idx, head = <span class="number">-1</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">add_head</span><span class="params">(<span class="type">int</span> v)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    e[idx] = v, ne[idx] = head, head = idx++;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">add</span><span class="params">(<span class="type">int</span> k, <span class="type">int</span> v)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    e[idx] = v, ne[idx] = ne[k], ne[k] = idx++;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">remove</span><span class="params">(<span class="type">int</span> k)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(~k) ne[k] = ne[ne[k]];</span><br><span class="line">    <span class="keyword">else</span> head = ne[head];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">int</span> m;</span><br><span class="line">    cin &gt;&gt; m;</span><br><span class="line">    <span class="keyword">while</span>(m --)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="type">int</span> k, v;</span><br><span class="line">        <span class="type">char</span> c;</span><br><span class="line">        cin &gt;&gt; c;</span><br><span class="line">        <span class="keyword">switch</span>(c)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">&#x27;H&#x27;</span>:</span><br><span class="line">                cin &gt;&gt; v;</span><br><span class="line">                <span class="built_in">add_head</span>(v);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="comment">// 题中对于k的计数从1开始，但是存储下标从0开始，因此需要k - 1</span></span><br><span class="line">            <span class="keyword">case</span> <span class="string">&#x27;I&#x27;</span>:</span><br><span class="line">                cin &gt;&gt; k &gt;&gt; v;</span><br><span class="line">                <span class="built_in">add</span>(k - <span class="number">1</span>, v);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">&#x27;D&#x27;</span>:</span><br><span class="line">                cin &gt;&gt; k;</span><br><span class="line">                <span class="built_in">remove</span>(k - <span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i = head; ~i; i = ne[i])</span><br><span class="line">        cout &lt;&lt; e[i] &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+          <h2 id="1-链表"><a href="#1-链表" class="headerlink" title="1.链表"></a>1.链表</h2><h3 id="1-静态链表（数组模拟）"><a href="#1-静态链表（数组模拟）" class="headerlink" title="1.静态链表（数组模拟）"></a>1.静态链表（数组模拟）</h3><h4 id="1-1-单链表"><a href="#1-1-单链表" class="headerlink" title="1.1 单链表"></a>1.1 单链表</h4><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N = <span class="number">100010</span>;</span><br><span class="line"><span class="type">int</span> e[N], ne[N], idx, head = <span class="number">-1</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">add_head</span><span class="params">(<span class="type">int</span> v)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    e[idx] = v, ne[idx] = head, head = idx++;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">add</span><span class="params">(<span class="type">int</span> k, <span class="type">int</span> v)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    e[idx] = v, ne[idx] = ne[k], ne[k] = idx++;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">remove</span><span class="params">(<span class="type">int</span> k)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(~k) ne[k] = ne[ne[k]];</span><br><span class="line">    <span class="keyword">else</span> head = ne[head];</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">int</span> m;</span><br><span class="line">    cin &gt;&gt; m;</span><br><span class="line">    <span class="keyword">while</span>(m --)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="type">int</span> k, v;</span><br><span class="line">        <span class="type">char</span> c;</span><br><span class="line">        cin &gt;&gt; c;</span><br><span class="line">        <span class="keyword">switch</span>(c)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">&#x27;H&#x27;</span>:</span><br><span class="line">                cin &gt;&gt; v;</span><br><span class="line">                <span class="built_in">add_head</span>(v);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="comment">// 题中对于k的计数从1开始，但是存储下标从0开始，因此需要k - 1</span></span><br><span class="line">            <span class="keyword">case</span> <span class="string">&#x27;I&#x27;</span>:</span><br><span class="line">                cin &gt;&gt; k &gt;&gt; v;</span><br><span class="line">                <span class="built_in">add</span>(k - <span class="number">1</span>, v);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">&#x27;D&#x27;</span>:</span><br><span class="line">                cin &gt;&gt; k;</span><br><span class="line">                <span class="built_in">remove</span>(k - <span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i = head; ~i; i = ne[i])</span><br><span class="line">        cout &lt;&lt; e[i] &lt;&lt; <span class="string">&quot; &quot;</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
 <p>注1：为了逻辑清晰代码简洁，无论是静态链表还是动态链表都最好加上头节点，但是仅在数组模拟单链表时没有头节点，因为算法题中使用单链表时一般仅使用在头插入新节点，不涉及其他操作，所以没有必要加入头节点</p>
           <!--noindex-->
             <div class="post-button">
@@ -1174,15 +1046,114 @@ GPIO 和 Pinctrl 子系统。</p>
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="快速排序">1.快速排序</h2>
-<p>时间复杂度：<span class="math inline">\(O(nlogn)\)</span></p>
+          <h2 id="1-快速排序"><a href="#1-快速排序" class="headerlink" title="1.快速排序"></a>1.快速排序</h2><p>时间复杂度：$O(nlogn)$</p>
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="type">void</span> <span class="title">quick_sort</span><span class="params">(<span class="type">int</span> l, <span class="type">int</span> r)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(l &gt;= r) <span class="keyword">return</span>;</span><br><span class="line">    <span class="type">int</span> x = a[l + r &gt;&gt; <span class="number">1</span>], i = l - <span class="number">1</span>, j = r + <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">while</span>(i &lt; j)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">do</span> i++; <span class="keyword">while</span>(a[i] &lt; x);</span><br><span class="line">        <span class="keyword">do</span> j--; <span class="keyword">while</span>(a[j] &gt; x);</span><br><span class="line">        <span class="keyword">if</span>(i &lt; j) <span class="built_in">swap</span>(a[i], a[j]);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">quick_sort</span>(l, j), <span class="built_in">quick_sort</span>(j + <span class="number">1</span>, r);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h3 id="选择第k大的数字quick_select">1.1
-选择第K大的数字(quick_select)</h3>
-<p>时间复杂度：<span class="math inline">\(O(n)\)</span></p>
+
+<h3 id="1-1-选择第K大的数字-quick-select"><a href="#1-1-选择第K大的数字-quick-select" class="headerlink" title="1.1 选择第K大的数字(quick_select)"></a>1.1 选择第K大的数字(quick_select)</h3><p>时间复杂度：$O(n)$</p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2023/10/31/%E7%AE%97%E6%B3%95%E6%A8%A1%E6%9D%BF/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/10/30/LED%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="Krocz">
+      <meta itemprop="description" content="时间不等人，喜欢就去做">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Krocz's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/10/30/LED%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F/" class="post-title-link" itemprop="url">LED驱动程序</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-10-30 19:45:51" itemprop="dateCreated datePublished" datetime="2023-10-30T19:45:51+08:00">2023-10-30</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-01-02 11:10:37" itemprop="dateModified" datetime="2024-01-02T11:10:37+08:00">2024-01-02</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/" itemprop="url" rel="index"><span itemprop="name">Linux应用开发</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>8.2k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>15 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="1-学会看芯片手册"><a href="#1-学会看芯片手册" class="headerlink" title="1.学会看芯片手册"></a>1.学会看芯片手册</h2><h3 id="1-1-GPIO的通用操作方法"><a href="#1-1-GPIO的通用操作方法" class="headerlink" title="1.1 GPIO的通用操作方法"></a>1.1 GPIO的通用操作方法</h3><p>参考stm32的GPIO引脚的使用过程：</p>
+<ol>
+<li>使能GPIOx时钟</li>
+<li>设置GPIOx引脚的工作模式（输入、输出、复用、<strong>重定向</strong>）</li>
+<li>读取&#x2F;设置GOPIOx引脚的电平</li>
+</ol>
+<p>一般的，芯片GPIO引脚使能的操作如下：</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2023/10/30/LED%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -1272,7 +1243,7 @@ GPIO 和 Pinctrl 子系统。</p>
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">26</span>
+          <span class="site-state-item-count">25</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

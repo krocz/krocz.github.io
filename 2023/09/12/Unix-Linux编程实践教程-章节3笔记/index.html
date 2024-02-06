@@ -20,12 +20,12 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="ls 编写ls命令  列出目录的内容 读取并显示文件的属性 给出名字，判断它是目录还是文件  目录  目录是一种特殊的文件，它的内容一条条记录，每一个记录代表一个文件或者目录 目录文件永远不空，至少包含两个特殊项&quot;.&quot;或者&quot;..&quot;">
+  <meta name="description" content="ls编写ls命令  列出目录的内容 读取并显示文件的属性 给出名字，判断它是目录还是文件  目录 目录是一种特殊的文件，它的内容一条条记录，每一个记录代表一个文件或者目录 目录文件永远不空，至少包含两个特殊项”.”或者”..”">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Unix-Linux编程实践教程-章节3笔记">
 <meta property="og:url" content="http://example.com/2023/09/12/Unix-Linux%E7%BC%96%E7%A8%8B%E5%AE%9E%E8%B7%B5%E6%95%99%E7%A8%8B-%E7%AB%A0%E8%8A%823%E7%AC%94%E8%AE%B0/index.html">
 <meta property="og:site_name" content="Krocz&#39;s Blog">
-<meta property="og:description" content="ls 编写ls命令  列出目录的内容 读取并显示文件的属性 给出名字，判断它是目录还是文件  目录  目录是一种特殊的文件，它的内容一条条记录，每一个记录代表一个文件或者目录 目录文件永远不空，至少包含两个特殊项&quot;.&quot;或者&quot;..&quot;">
+<meta property="og:description" content="ls编写ls命令  列出目录的内容 读取并显示文件的属性 给出名字，判断它是目录还是文件  目录 目录是一种特殊的文件，它的内容一条条记录，每一个记录代表一个文件或者目录 目录文件永远不空，至少包含两个特殊项”.”或者”..”">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2023-09-12T07:19:10.000Z">
 <meta property="article:modified_time" content="2023-09-17T03:28:16.787Z">
@@ -273,34 +273,36 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="ls">ls</h2>
-<p>编写ls命令</p>
+        <h2 id="ls"><a href="#ls" class="headerlink" title="ls"></a>ls</h2><p>编写ls命令</p>
 <ul>
 <li>列出目录的内容</li>
 <li>读取并显示文件的属性</li>
 <li>给出名字，判断它是目录还是文件</li>
 </ul>
-<h3 id="目录">目录</h3>
-<ul>
+<h3 id="目录"><a href="#目录" class="headerlink" title="目录"></a>目录</h3><ul>
 <li>目录是一种特殊的文件，它的内容一条条记录，每一个记录代表一个文件或者目录</li>
-<li>目录文件永远不空，至少包含两个特殊项"."或者".."</li>
+<li>目录文件永远不空，至少包含两个特殊项”.”或者”..”</li>
 </ul>
-<h3 id="操作目录的相关函数">操作目录的相关函数</h3>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;sys/types.h&gt;</span><br><span class="line">#include &lt;dirent.h&gt;</span><br><span class="line"></span><br><span class="line">DIR *opendir(const char *name);</span><br><span class="line">struct dirent *readdir(DIR *dirp);</span><br><span class="line">int closedir(DIR *dirp);</span><br><span class="line"></span><br><span class="line">// 目录属性</span><br><span class="line">struct dirent &#123;</span><br><span class="line">    ino_t          d_ino;       /* Inode number */</span><br><span class="line">    off_t          d_off;       /* Not an offset; see below */</span><br><span class="line">    unsigned short d_reclen;    /* Length of this record */</span><br><span class="line">    unsigned char  d_type;      /* Type of file; not supported</span><br><span class="line">                                    by all filesystem types */</span><br><span class="line">    char           d_name[256]; /* Null-terminated filename */</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h3 id="操作目录的相关函数"><a href="#操作目录的相关函数" class="headerlink" title="操作目录的相关函数"></a>操作目录的相关函数</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;sys/types.h&gt;</span><br><span class="line">#include &lt;dirent.h&gt;</span><br><span class="line"></span><br><span class="line">DIR *opendir(const char *name);</span><br><span class="line">struct dirent *readdir(DIR *dirp);</span><br><span class="line">int closedir(DIR *dirp);</span><br><span class="line"></span><br><span class="line">// 目录属性</span><br><span class="line">struct dirent &#123;</span><br><span class="line">    ino_t          d_ino;       /* Inode number */</span><br><span class="line">    off_t          d_off;       /* Not an offset; see below */</span><br><span class="line">    unsigned short d_reclen;    /* Length of this record */</span><br><span class="line">    unsigned char  d_type;      /* Type of file; not supported</span><br><span class="line">                                    by all filesystem types */</span><br><span class="line">    char           d_name[256]; /* Null-terminated filename */</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
 <ul>
-<li><p><code>opendir</code>返回值：成功返回一个目录流，失败返回NULL，同时errno设置为相应值</p></li>
-<li><p><code>readdir</code>返回值：成功返回对应结构体的指针(该结构体被静态分配，不要使用free()释放)；发生错误时返回NULL，同时errno会被相应设置；如果到达目录流的末尾，也会返回NULL(errno提前设置为0，不会发生改变)</p></li>
-<li><p><code>closedir</code>返回值：0表示成功，-1表示发生错误</p></li>
-<li><p>d_type参数：</p></li>
+<li><p><code>opendir</code>返回值：成功返回一个目录流，失败返回NULL，同时errno设置为相应值</p>
+</li>
+<li><p><code>readdir</code>返回值：成功返回对应结构体的指针(该结构体被静态分配，不要使用free()释放)；发生错误时返回NULL，同时errno会被相应设置；如果到达目录流的末尾，也会返回NULL(errno提前设置为0，不会发生改变)</p>
+</li>
+<li><p><code>closedir</code>返回值：0表示成功，-1表示发生错误</p>
+</li>
+<li><p>d_type参数：</p>
+</li>
 </ul>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">DT_BLK      This is a block device.</span><br><span class="line">DT_CHR      This is a character device.</span><br><span class="line">DT_DIR      This is a directory.</span><br><span class="line">DT_FIFO     This is a named pipe (FIFO).</span><br><span class="line">DT_LNK      This is a symbolic link.</span><br><span class="line">DT_REG      This is a regular file.</span><br><span class="line">DT_SOCK     This is a UNIX domain socket.</span><br><span class="line">DT_UNKNOWN  The file type could not be determined.</span><br></pre></td></tr></table></figure>
-<h3 id="编写ls--l">编写ls -l</h3>
-<p>编写该命令，既需要读取目录文件，也需要根据目录文件中的名称来获取对应的文件信息</p>
+
+<h3 id="编写ls-l"><a href="#编写ls-l" class="headerlink" title="编写ls -l"></a>编写ls -l</h3><p>编写该命令，既需要读取目录文件，也需要根据目录文件中的名称来获取对应的文件信息</p>
 <p><code>ls -l</code>显示示例：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">-rw-rw-r-- 1 zhaoyan zhaoyan 1497 11月 12 14:08 a.txt</span><br><span class="line">drwxrwxr-x 3 zhaoyan zhaoyan 4096 10月  9 18:39 C</span><br></pre></td></tr></table></figure>
+
 <ul>
-<li>模式(mode):首位表示文件类型
-<ul>
+<li>模式(mode):首位表示文件类型<ul>
 <li><code>-</code>：普通文件</li>
 <li><code>d</code>：目录</li>
 <li><code>c</code>：字符设备文件</li>
@@ -308,7 +310,8 @@
 <li><code>l</code>：符号链接文件(Symbolic Links)</li>
 <li><code>s</code>：套接字文件</li>
 <li><code>p</code>：管道文件</li>
-</ul></li>
+</ul>
+</li>
 <li>链接数(links):指该文件被引用的次数</li>
 <li>文件所有者(owner):</li>
 <li>组(group):文件所有者所在的组</li>
@@ -316,167 +319,135 @@
 <li>最后修改时间(last-modified)</li>
 <li>文件名(name)</li>
 </ul>
-<h4 id="stat函数">stat()函数</h4>
-<p>进程定义一个<code>struct stat</code>，然后调用stat函数，让内核将文件属性放入这个数据结构中（之前目录结构体dirent是直接返回指针，为什么有这样的区别？）</p>
+<h4 id="stat-函数"><a href="#stat-函数" class="headerlink" title="stat()函数"></a>stat()函数</h4><p>进程定义一个<code>struct stat</code>，然后调用stat函数，让内核将文件属性放入这个数据结构中（之前目录结构体dirent是直接返回指针，为什么有这样的区别？）</p>
 <p>该函数返回关于一个文件的信息</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;sys/types.h&gt;</span><br><span class="line">#include &lt;sys/stat.h&gt;</span><br><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line"></span><br><span class="line">int stat(const char *pathname, struct stat *statbuf);</span><br><span class="line"></span><br><span class="line">// 文件属性</span><br><span class="line">struct stat &#123;</span><br><span class="line">    dev_t     st_dev;         /* ID of device containing file */</span><br><span class="line">    ino_t     st_ino;         /* Inode number */ 索引编号</span><br><span class="line">    mode_t    st_mode;        /* File type and mode */</span><br><span class="line">    nlink_t   st_nlink;       /* Number of hard links */</span><br><span class="line">    uid_t     st_uid;         /* User ID of owner */</span><br><span class="line">    gid_t     st_gid;         /* Group ID of owner */</span><br><span class="line">    dev_t     st_rdev;        /* Device ID (if special file) */</span><br><span class="line">    off_t     st_size;        /* Total size, in bytes */</span><br><span class="line">    blksize_t st_blksize;     /* Block size for filesystem I/O */</span><br><span class="line">    blkcnt_t  st_blocks;      /* Number of 512B blocks allocated */</span><br><span class="line"></span><br><span class="line">    /* Since Linux 2.6, the kernel supports nanosecond</span><br><span class="line">        precision for the following timestamp fields.</span><br><span class="line">        For the details before Linux 2.6, see NOTES. */</span><br><span class="line"></span><br><span class="line">    struct timespec st_atim;  /* Time of last access */</span><br><span class="line">    struct timespec st_mtim;  /* Time of last modification */</span><br><span class="line">    struct timespec st_ctim;  /* Time of last status change */</span><br><span class="line"></span><br><span class="line">#define st_atime st_atim.tv_sec      /* Backward compatibility */</span><br><span class="line">#define st_mtime st_mtim.tv_sec</span><br><span class="line">#define st_ctime st_ctim.tv_sec</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">//检查文件类型</span><br><span class="line">#define	__S_ISTYPE(mode, mask)	(((mode) &amp; __S_IFMT) == (mask))</span><br><span class="line"></span><br><span class="line">#define	S_ISDIR(mode)	 __S_ISTYPE((mode), __S_IFDIR)  //目录</span><br><span class="line">#define	S_ISCHR(mode)	 __S_ISTYPE((mode), __S_IFCHR)  //字符特殊设备</span><br><span class="line">#define	S_ISBLK(mode)	 __S_ISTYPE((mode), __S_IFBLK)  //块特殊设备</span><br><span class="line">#define	S_ISREG(mode)	 __S_ISTYPE((mode), __S_IFREG)  //普通文件</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">#define	S_IRUSR	__S_IREAD	/* Read by owner.  */</span><br><span class="line">#define	S_IWUSR	__S_IWRITE	/* Write by owner.  */</span><br><span class="line">#define	S_IXUSR	__S_IEXEC	/* Execute by owner.  */</span><br><span class="line">#define	S_IRGRP	(S_IRUSR &gt;&gt; 3)	/* Read by group.  */</span><br><span class="line">#define	S_IWGRP	(S_IWUSR &gt;&gt; 3)	/* Write by group.  */</span><br><span class="line">#define	S_IXGRP	(S_IXUSR &gt;&gt; 3)	/* Execute by group.  */</span><br><span class="line">#define	S_IROTH	(S_IRGRP &gt;&gt; 3)	/* Read by others.  */</span><br><span class="line">#define	S_IWOTH	(S_IWGRP &gt;&gt; 3)	/* Write by others.  */</span><br><span class="line">#define	S_IXOTH	(S_IXGRP &gt;&gt; 3)	/* Execute by others.  */</span><br></pre></td></tr></table></figure>
+
 <ul>
 <li>返回值：如果成功返回0，否则返回-1，并且<code>error</code>会设置为相应的错误类型</li>
 </ul>
-<h4 id="如何显示st_mode">如何显示st_mode</h4>
-<ul>
-<li>st_mode是一个16位的二进制数，文件类型和权限被编码在这个数中
+<h4 id="如何显示st-mode"><a href="#如何显示st-mode" class="headerlink" title="如何显示st_mode"></a>如何显示st_mode</h4><ul>
+<li><p>st_mode是一个16位的二进制数，文件类型和权限被编码在这个数中</p>
 <ul>
 <li>高四位：文件类型，最多可以标识16种</li>
 <li>中间3位：文件的特殊属性，1表示有，0表示没有。这三位分别是<code>set-user-ID</code>,<code>set-group-ID</code>和<code>sticky</code></li>
 <li>最后9位是许可权限，分别对应3种用户（文件所有者，同组用户，其他用户）</li>
-</ul></li>
-<li>所以，只需要通过stat.h文件提供的掩码即可获得</li>
 </ul>
-<h4 id="根据用户组id寻找name">根据用户/组ID寻找name</h4>
-<h5 id="etcpasswd文件">/etc/passwd文件</h5>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">zhaoyan:x:1000:1000:zhaoyan,,,:/home/zhaoyan:/bin/bash</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>所以，只需要通过stat.h文件提供的掩码即可获得</p>
+</li>
+</ul>
+<h4 id="根据用户-组ID寻找name"><a href="#根据用户-组ID寻找name" class="headerlink" title="根据用户&#x2F;组ID寻找name"></a>根据用户&#x2F;组ID寻找name</h4><h5 id="etc-passwd文件"><a href="#etc-passwd文件" class="headerlink" title="&#x2F;etc&#x2F;passwd文件"></a>&#x2F;etc&#x2F;passwd文件</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">zhaoyan:x:1000:1000:zhaoyan,,,:/home/zhaoyan:/bin/bash</span><br></pre></td></tr></table></figure>
+
 <ul>
 <li>该文件中每一行代表一个用户，冒号分割不同的字段。</li>
 <li>每一个字段依次为：用户名、密码、用户ID、用户所属组ID、用户的全名、主目录、用户使用shell程序的路径</li>
 <li>该文件并没有包括所有的用户。在分布式系统中，通常在一台所有人都能访问的主机上保存所有的用户信息，该主机称为NIS，所有的主机通过NIS进行用户身份验证。所有需要用户信息的程序也从NIS上获取。本地只保存所有用户的一个子集以备离线操作。</li>
 </ul>
-<h5
-id="通过getpwuid得到完整的用户列表">通过getpwuid得到完整的用户列表</h5>
-<p>通过库函数getpwuid来访问用户信息(从/etc/passwd或者NIS中获取)</p>
+<h5 id="通过getpwuid得到完整的用户列表"><a href="#通过getpwuid得到完整的用户列表" class="headerlink" title="通过getpwuid得到完整的用户列表"></a>通过getpwuid得到完整的用户列表</h5><p>通过库函数getpwuid来访问用户信息(从&#x2F;etc&#x2F;passwd或者NIS中获取)</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;sys/types.h&gt;</span><br><span class="line">#include &lt;pwd.h&gt;</span><br><span class="line">struct passwd *getpwuid(uid_t uid);</span><br><span class="line"></span><br><span class="line">struct passwd &#123;</span><br><span class="line">    char   *pw_name;       /* username */</span><br><span class="line">    char   *pw_passwd;     /* user password */</span><br><span class="line">    uid_t   pw_uid;        /* user ID */</span><br><span class="line">    gid_t   pw_gid;        /* group ID */</span><br><span class="line">    char   *pw_gecos;      /* user information */</span><br><span class="line">    char   *pw_dir;        /* home directory */</span><br><span class="line">    char   *pw_shell;      /* shell program */</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
 <ul>
 <li>返回值：成功返回结构体指针，发生错误或者查询为空返回NULL。调用之前请将errno置为0</li>
 </ul>
-<h5 id="etcgroup文件">/etc/group文件</h5>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">zhaoyan:x:1000:</span><br></pre></td></tr></table></figure>
+<h5 id="etc-group文件"><a href="#etc-group文件" class="headerlink" title="&#x2F;etc&#x2F;group文件"></a>&#x2F;etc&#x2F;group文件</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">zhaoyan:x:1000:</span><br></pre></td></tr></table></figure>
+
 <ul>
-<li><p>每一个字段依次为组名，组密码，组ID，组中的成员列表</p></li>
-<li><p>passwd文件中每个用户所属的组，是用户的主组(primary
-group)。用户还可以是其他组的成员，只需要把它的用户名添加到<code>/etc/group</code>中这个组所在行的最后一个字段即可。</p></li>
+<li><p>每一个字段依次为组名，组密码，组ID，组中的成员列表</p>
+</li>
+<li><p>passwd文件中每个用户所属的组，是用户的主组(primary group)。用户还可以是其他组的成员，只需要把它的用户名添加到<code>/etc/group</code>中这个组所在行的最后一个字段即可。</p>
+</li>
 </ul>
-<h5 id="通过getgrgid访问组列表">通过getgrgid访问组列表</h5>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;sys/types.h&gt;</span><br><span class="line">#include &lt;grp.h&gt;</span><br><span class="line"></span><br><span class="line">struct group *getgrgid(gid_t gid);</span><br><span class="line"></span><br><span class="line">struct group &#123;</span><br><span class="line">    char   *gr_name;        /* group name */</span><br><span class="line">    char   *gr_passwd;      /* group password */</span><br><span class="line">    gid_t   gr_gid;         /* group ID */</span><br><span class="line">    char  **gr_mem;         /* NULL-terminated array of pointers</span><br><span class="line">                                to names of group members */</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h5 id="通过getgrgid访问组列表"><a href="#通过getgrgid访问组列表" class="headerlink" title="通过getgrgid访问组列表"></a>通过getgrgid访问组列表</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;sys/types.h&gt;</span><br><span class="line">#include &lt;grp.h&gt;</span><br><span class="line"></span><br><span class="line">struct group *getgrgid(gid_t gid);</span><br><span class="line"></span><br><span class="line">struct group &#123;</span><br><span class="line">    char   *gr_name;        /* group name */</span><br><span class="line">    char   *gr_passwd;      /* group password */</span><br><span class="line">    gid_t   gr_gid;         /* group ID */</span><br><span class="line">    char  **gr_mem;         /* NULL-terminated array of pointers</span><br><span class="line">                                to names of group members */</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
 <ul>
 <li>返回值：成功返回结构体指针，发生错误或者查询为空返回NULL。调用之前请将errno置为0</li>
 </ul>
-<h3 id="详解st_mode中三个特殊位">详解st_mode中三个特殊位</h3>
-<h4 id="set-user-id位">set-user-ID位</h4>
-<p>普通用户可以通过<code>passwd</code>来修改密码，用户密码存放在<code>/etc/passwd</code>中，但是可以看到普通用户并没有权限来修改该文件。
-所以<code>passwd</code>命令有一个特殊权限<code>s</code>，使得其特殊属性包含set-user-ID位。<strong>SUID位告诉内核，运行这个程序时认为时由该文件所有者在运行这个程序</strong>，在这里是root，而root有权限修改<code>/etc/passwd</code>文件。</p>
+<h3 id="详解st-mode中三个特殊位"><a href="#详解st-mode中三个特殊位" class="headerlink" title="详解st_mode中三个特殊位"></a>详解st_mode中三个特殊位</h3><h4 id="set-user-ID位"><a href="#set-user-ID位" class="headerlink" title="set-user-ID位"></a>set-user-ID位</h4><p>普通用户可以通过<code>passwd</code>来修改密码，用户密码存放在<code>/etc/passwd</code>中，但是可以看到普通用户并没有权限来修改该文件。<br>所以<code>passwd</code>命令有一个特殊权限<code>s</code>，使得其特殊属性包含set-user-ID位。<strong>SUID位告诉内核，运行这个程序时认为时由该文件所有者在运行这个程序</strong>，在这里是root，而root有权限修改<code>/etc/passwd</code>文件。</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">-rw-r--r-- 1 root root 2862 10月  9 17:55 /etc/passwd</span><br><span class="line">-rwsr-xr-x 1 root root 59976  3月 14  2022 /usr/bin/passwd</span><br></pre></td></tr></table></figure>
-<p><strong>对于一些所有用户共享的文件，普通用户只能以受限方式进行修改，那么就将该文件的所有者设置为root,同时受限命令的所有者添加's'权限</strong></p>
-<h4 id="set-group-id位">set-group-ID位</h4>
-<p>类似于SUID，如果SGID置位，那么程序运行时认为是由该文件所属组中的某一个用户运行</p>
-<h4 id="sticky位">sticky位</h4>
-<ul>
+
+<p><strong>对于一些所有用户共享的文件，普通用户只能以受限方式进行修改，那么就将该文件的所有者设置为root,同时受限命令的所有者添加’s’权限</strong></p>
+<h4 id="set-group-ID位"><a href="#set-group-ID位" class="headerlink" title="set-group-ID位"></a>set-group-ID位</h4><p>类似于SUID，如果SGID置位，那么程序运行时认为是由该文件所属组中的某一个用户运行</p>
+<h4 id="sticky位"><a href="#sticky位" class="headerlink" title="sticky位"></a>sticky位</h4><ul>
 <li>对于文件，使用交换(swap)技术会用到该位。现在已经被虚拟内存技术所取代</li>
-<li>对于目录，例如用来存放临时文件的<code>/tmp</code>，每一个用户都可以在该目录中创建/删除文件，sticky位使得该目录中的文件只能被创建者删除</li>
+<li>对于目录，例如用来存放临时文件的<code>/tmp</code>，每一个用户都可以在该目录中创建&#x2F;删除文件，sticky位使得该目录中的文件只能被创建者删除</li>
 </ul>
-<h4 id="特殊属性标识">特殊属性标识</h4>
-<p><strong>许可权限位上所有者的s表示set-user-ID，组用户的s表示set-group-ID；其他组的t表示sticky被设置</strong></p>
-<hr />
-<h2 id="设置和修改文件的属性">设置和修改文件的属性</h2>
-<h3 id="文件类型">文件类型</h3>
-<ul>
-<li>文件类型有普通文件、目录文件、设备文件、socket文件、符号链接文件、命名管道(named
-pipe)文件等。</li>
+<h4 id="特殊属性标识"><a href="#特殊属性标识" class="headerlink" title="特殊属性标识"></a>特殊属性标识</h4><p><strong>许可权限位上所有者的s表示set-user-ID，组用户的s表示set-group-ID；其他组的t表示sticky被设置</strong></p>
+<hr>
+<h2 id="设置和修改文件的属性"><a href="#设置和修改文件的属性" class="headerlink" title="设置和修改文件的属性"></a>设置和修改文件的属性</h2><h3 id="文件类型"><a href="#文件类型" class="headerlink" title="文件类型"></a>文件类型</h3><ul>
+<li>文件类型有普通文件、目录文件、设备文件、socket文件、符号链接文件、命名管道(named pipe)文件等。</li>
 <li>文件类型是在创建文件时设置的，不同的系统调用创建不同类型的文件(如creat创建一个普通文件)</li>
 <li>文件已经创建，其类型就无法修改了</li>
 </ul>
-<h3 id="许可位和特殊属性位">许可位和特殊属性位</h3>
-<p>每个文件都有9位许可权限和3位特殊属性。它们可以被chmod系统调用修改</p>
-<h4 id="建立文件的模式">建立文件的模式</h4>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fd = creat(&quot;newfile&quot; , 0744);</span><br></pre></td></tr></table></figure>
-<p>上述参数只是请求。<strong>程序请求的许可权限还会与上"新建文件掩码"(file-creation-mask)来得到文件的最终模式</strong>。新建文件掩码<code>umask</code>是一个非常有用的系统变量。例如:</p>
+<h3 id="许可位和特殊属性位"><a href="#许可位和特殊属性位" class="headerlink" title="许可位和特殊属性位"></a>许可位和特殊属性位</h3><p>每个文件都有9位许可权限和3位特殊属性。它们可以被chmod系统调用修改</p>
+<h4 id="建立文件的模式"><a href="#建立文件的模式" class="headerlink" title="建立文件的模式"></a>建立文件的模式</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fd = creat(&quot;newfile&quot; , 0744);</span><br></pre></td></tr></table></figure>
+
+<p>上述参数只是请求。<strong>程序请求的许可权限还会与上”新建文件掩码”(file-creation-mask)来得到文件的最终模式</strong>。新建文件掩码<code>umask</code>是一个非常有用的系统变量。例如:</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">open(&quot;a.txt&quot; , O_RDWR | O_CREAT, 0777);</span><br><span class="line"></span><br><span class="line">-rwxrwxr-x 1 zhaoyan zhaoyan     0 11月 14 20:02 a.txt</span><br><span class="line"></span><br><span class="line">&gt;umask -S</span><br><span class="line">u=rwx,g=rwx,o=rx</span><br></pre></td></tr></table></figure>
+
 <p>可以看到open函数所要求的文件权限<code>0777</code>并没有得到满足，正好是和umask相与之后的结果。</p>
-<h4 id="改变文件的模式">改变文件的模式</h4>
-<p>使用系统调用chmod，该命令不会收到umask影响，文件许可和特殊属性都可以通过其进行修改。</p>
+<h4 id="改变文件的模式"><a href="#改变文件的模式" class="headerlink" title="改变文件的模式"></a>改变文件的模式</h4><p>使用系统调用chmod，该命令不会收到umask影响，文件许可和特殊属性都可以通过其进行修改。</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;sys/stat.h&gt;</span><br><span class="line">int chmod(const char *pathname, mode_t mode);</span><br><span class="line"></span><br><span class="line">//mode:建议使用&lt;sys/stat.h&gt;中定义的符号表示，程序可移植性高</span><br><span class="line">chmod(&quot;a.txt&quot; , 04764);  // 100 111 110 100</span><br><span class="line">chmod(&quot;a.txt&quot; , S_ISUID|S_IRWXU|S_IRGRP|S_IWGRP|S_IROTH);</span><br></pre></td></tr></table></figure>
+
 <ul>
 <li>返回值：成功则返回0，发生错误返回-1</li>
 </ul>
-<h3 id="文件的链接数">文件的链接数</h3>
-<p>链接数就是文件被引用的次数(别名的数量)。
-增加文件的别名(使用link)使链接数增加，减少别名(unlink)使得链接数减少。</p>
-<h3 id="文件所有者与组">文件所有者与组</h3>
-<ul>
-<li><p>文件所有者就是创建该文件的用户。如果通过程序创建一个文件，且程序具有SUID位，那么新文件的所有者就是程序文件的所有者</p></li>
-<li><p>通常，新文件组和创建者的组一致。有些情况下，组会被设置为和父目录的组相同。</p></li>
+<h3 id="文件的链接数"><a href="#文件的链接数" class="headerlink" title="文件的链接数"></a>文件的链接数</h3><p>链接数就是文件被引用的次数(别名的数量)。<br>增加文件的别名(使用link)使链接数增加，减少别名(unlink)使得链接数减少。</p>
+<h3 id="文件所有者与组"><a href="#文件所有者与组" class="headerlink" title="文件所有者与组"></a>文件所有者与组</h3><ul>
+<li><p>文件所有者就是创建该文件的用户。如果通过程序创建一个文件，且程序具有SUID位，那么新文件的所有者就是程序文件的所有者</p>
+</li>
+<li><p>通常，新文件组和创建者的组一致。有些情况下，组会被设置为和父目录的组相同。</p>
+</li>
 </ul>
-<h4 id="修改文件所有者和组">修改文件所有者和组</h4>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line">int chown(const char *pathname, uid_t owner, gid_t group);</span><br></pre></td></tr></table></figure>
+<h4 id="修改文件所有者和组"><a href="#修改文件所有者和组" class="headerlink" title="修改文件所有者和组"></a>修改文件所有者和组</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line">int chown(const char *pathname, uid_t owner, gid_t group);</span><br></pre></td></tr></table></figure>
+
 <ul>
 <li>返回值：成功则返回0，失败则返回-1</li>
 </ul>
 <p>或者通过Shell命令<code>chown</code>和<code>chgrp</code>也可以修改文件所有者和组</p>
-<h3 id="文件大小">文件大小</h3>
-<p>不存在能够直接减小文件占用空间的函数</p>
-<h3 id="时间">时间</h3>
-<p>每一个文件都有3个时间：最后修改(modification)时间、最后访问(access)时间和属性最后修改时间。</p>
-<h4 id="修改最后修改和访问时间">修改最后修改和访问时间</h4>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;sys/types.h&gt;</span><br><span class="line">#include &lt;utime.h&gt;</span><br><span class="line">int utime(const char *filename, const struct utimbuf *times);</span><br><span class="line"></span><br><span class="line">struct utimbuf &#123;</span><br><span class="line">    time_t actime;       /* access time */</span><br><span class="line">    time_t modtime;      /* modification time */</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<h3 id="文件大小"><a href="#文件大小" class="headerlink" title="文件大小"></a>文件大小</h3><p>不存在能够直接减小文件占用空间的函数</p>
+<h3 id="时间"><a href="#时间" class="headerlink" title="时间"></a>时间</h3><p>每一个文件都有3个时间：最后修改(modification)时间、最后访问(access)时间和属性最后修改时间。</p>
+<h4 id="修改最后修改和访问时间"><a href="#修改最后修改和访问时间" class="headerlink" title="修改最后修改和访问时间"></a>修改最后修改和访问时间</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;sys/types.h&gt;</span><br><span class="line">#include &lt;utime.h&gt;</span><br><span class="line">int utime(const char *filename, const struct utimbuf *times);</span><br><span class="line"></span><br><span class="line">struct utimbuf &#123;</span><br><span class="line">    time_t actime;       /* access time */</span><br><span class="line">    time_t modtime;      /* modification time */</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
 <ul>
 <li>返回值：成功返回0，发生错误返回-1</li>
 <li>使用Shell命令<code>touch</code>也可以修改这两个时间</li>
 </ul>
-<h3 id="文件名">文件名</h3>
-<p>使用系统调用<code>rename</code>可以修改文件/目录的名字，还可以移动文件的位置。</p>
+<h3 id="文件名"><a href="#文件名" class="headerlink" title="文件名"></a>文件名</h3><p>使用系统调用<code>rename</code>可以修改文件&#x2F;目录的名字，还可以移动文件的位置。</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">int rename(const char *oldpath, const char *newpath);</span><br></pre></td></tr></table></figure>
+
 <ul>
 <li>返回值：成功返回0，遇到错误返回-1</li>
 </ul>
-<h2 id="编程练习">编程练习</h2>
-<h3 id="ls的完善1">ls的完善1</h3>
-<p>1.为ls02添加支持<code>./ls02 /tmp</code>的功能 -
-原始不能支持该功能，因为在使用<code>stat()</code>寻找文件信息时，默认在当前目录下寻找，所以找不到指定目录下的文件信息
-- 修改：对于指定目录下的文件，拼接出绝对路径就好了 -
-<code>strcpy(s1,s2)</code>:字符串拷贝，直接将s2拷贝到s1串的起始位置 -
-<code>strcat(s1,s2)</code>：字符串拼接，先寻找s1串的'\0'字符，然后从该位置开始拼接</p>
-<h3 id="ls的完善2">ls的完善2</h3>
-<p>在文件<code>ls01.c</code>中实现了ls对-a
--l的支持，同时支持排序，分栏显示，颜色显示</p>
-<h4 id="分栏显示">分栏显示</h4>
-<p>系统的ls支持： 1.按序显示
-2.按照排序规则按列从上往下显示，当前列显示完成后转到下一列继续显示
-3.每一列都是左对齐的 4.每一列的宽度都是该列最长文件名长度加2
-5.列的数目要尽量保证每一行都被文件名“填充满”，而又不会导致行中最后一个文件名换行</p>
-<h5 id="实现">实现</h5>
-<p>1.查询屏幕宽度，使用<code>ioctl</code>系统调用</p>
+<h2 id="编程练习"><a href="#编程练习" class="headerlink" title="编程练习"></a>编程练习</h2><h3 id="ls的完善1"><a href="#ls的完善1" class="headerlink" title="ls的完善1"></a>ls的完善1</h3><p>1.为ls02添加支持<code>./ls02 /tmp</code>的功能<br>    - 原始不能支持该功能，因为在使用<code>stat()</code>寻找文件信息时，默认在当前目录下寻找，所以找不到指定目录下的文件信息<br>    - 修改：对于指定目录下的文件，拼接出绝对路径就好了<br>    - <code>strcpy(s1,s2)</code>:字符串拷贝，直接将s2拷贝到s1串的起始位置<br>    - <code>strcat(s1,s2)</code>：字符串拼接，先寻找s1串的’\0’字符，然后从该位置开始拼接</p>
+<h3 id="ls的完善2"><a href="#ls的完善2" class="headerlink" title="ls的完善2"></a>ls的完善2</h3><p>在文件<code>ls01.c</code>中实现了ls对-a -l的支持，同时支持排序，分栏显示，颜色显示</p>
+<h4 id="分栏显示"><a href="#分栏显示" class="headerlink" title="分栏显示"></a>分栏显示</h4><p>系统的ls支持：<br>1.按序显示<br>2.按照排序规则按列从上往下显示，当前列显示完成后转到下一列继续显示<br>3.每一列都是左对齐的<br>4.每一列的宽度都是该列最长文件名长度加2<br>5.列的数目要尽量保证每一行都被文件名“填充满”，而又不会导致行中最后一个文件名换行</p>
+<h5 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h5><p>1.查询屏幕宽度，使用<code>ioctl</code>系统调用</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">struct winsize size;</span><br><span class="line">ioctl(STDIN_FILENO,TIOCGWINSZ,&amp;size);  //获取设备参数</span><br><span class="line">int screen_len = size.ws_col;</span><br></pre></td></tr></table></figure>
-<p>2.统计所有filename的总长度，然后除以屏幕宽度，从而得到一个基础行数
-3.根据行数计算列数，然后求每一列的宽度(该列中最长的filename，用col_len表示)，以及这个最长的filename在第几行(用col_idx表示)。如果所有列总长小于屏幕宽，结束输出行数。否则转4
-4.想要减小列总长，只要两列的最大filename能够移动到同一列，则总列长大概率能够缩小(除非一列中最长的filename有多个)，所以按照这个思路，只需要第一次满足<code>i*add_row_num &gt;= col_idx</code>即可求得增加的行数，然后转3.</p>
-<h4 id="排序">排序</h4>
-<p>自己实现了快排，具体实现中指针的使用还需要学习</p>
-<h4 id="颜色显示">颜色显示</h4>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">man dircolors</span><br><span class="line">dircolors -p &gt; color</span><br><span class="line">vim color</span><br></pre></td></tr></table></figure>
+
+<p>2.统计所有filename的总长度，然后除以屏幕宽度，从而得到一个基础行数<br>3.根据行数计算列数，然后求每一列的宽度(该列中最长的filename，用col_len表示)，以及这个最长的filename在第几行(用col_idx表示)。如果所有列总长小于屏幕宽，结束输出行数。否则转4<br>4.想要减小列总长，只要两列的最大filename能够移动到同一列，则总列长大概率能够缩小(除非一列中最长的filename有多个)，所以按照这个思路，只需要第一次满足<code>i*add_row_num &gt;= col_idx</code>即可求得增加的行数，然后转3.</p>
+<h4 id="排序"><a href="#排序" class="headerlink" title="排序"></a>排序</h4><p>自己实现了快排，具体实现中指针的使用还需要学习</p>
+<h4 id="颜色显示"><a href="#颜色显示" class="headerlink" title="颜色显示"></a>颜色显示</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">man dircolors</span><br><span class="line">dircolors -p &gt; color</span><br><span class="line">vim color</span><br></pre></td></tr></table></figure>
+
 <ul>
 <li>这样在<code>color</code>文件中即可找到每种类型的文件的默认颜色值</li>
-<li><a
-target="_blank" rel="noopener" href="https://blog.csdn.net/judgejames/article/details/82735738">printf打印颜色</a></li>
+<li><a target="_blank" rel="noopener" href="https://blog.csdn.net/judgejames/article/details/82735738">printf打印颜色</a></li>
 </ul>
-<h4 id="教训找了2小时的bug">教训(找了2小时的BUG)</h4>
-<p>C语言指针、数组、二维、内存分配其乐无穷</p>
+<h4 id="教训-找了2小时的BUG"><a href="#教训-找了2小时的BUG" class="headerlink" title="教训(找了2小时的BUG)"></a>教训(找了2小时的BUG)</h4><p>C语言指针、数组、二维、内存分配其乐无穷</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">//改进之前</span><br><span class="line">char *filenames[4096];</span><br><span class="line">filenames[file_cnt++] = direntp-&gt;d_name;</span><br><span class="line"></span><br><span class="line">struct dirent *readdir(DIR *dirp);</span><br><span class="line"></span><br><span class="line">//改进之后</span><br><span class="line">char *filenames[4096];</span><br><span class="line">char *filename = (char *)malloc(sizeof(char)*256);</span><br><span class="line">strcpy(filename , direntp-&gt;d_name);</span><br><span class="line">filenames[file_cnt++] = filename;</span><br><span class="line">for(int i = 0; i &lt; file_cnt; i++)</span><br><span class="line">    free(filenames[i]);</span><br></pre></td></tr></table></figure>
+
 <ul>
 <li>！！问题：在调用<code>getpwuid</code>,<code>getgrgid</code>等函数之后，发现filename[i]中的值神奇的改变了，明明这些系统调用不需要传入filename的。在改进之后问题就消失了。</li>
 <li>猜测：改进之前，name的内存是系统调用分配的，然后在使用其他系统调用，这些内存区被改变了？</li>
-<li>启示：
-1.如果需要持久化系统调用给的内存，最好自己动态内存分配，在copy过来。
-2.学习这种分配字符串数组的方式</li>
+<li>启示：<br>1.如果需要持久化系统调用给的内存，最好自己动态内存分配，在copy过来。<br>2.学习这种分配字符串数组的方式</li>
 </ul>
-<h2 id="参考">参考</h2>
-<ul>
-<li><p><a
-target="_blank" rel="noopener" href="https://blog.csdn.net/liitdar/article/details/80972088">C/C++编程语言中char**
-a和char* a[]的区别</a></p></li>
-<li><p><a
-target="_blank" rel="noopener" href="https://blog.csdn.net/zzyzgg/article/details/89483189">(<em>a)[]与</em>a[]的区别</a></p></li>
-<li><p><a
-target="_blank" rel="noopener" href="https://www.cnblogs.com/lularible/p/14395705.html">ls命令优化版和ls
--l实现</a></p></li>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/liitdar/article/details/80972088">C&#x2F;C++编程语言中char** a和char* a[]的区别</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://blog.csdn.net/zzyzgg/article/details/89483189">(<em>a)[]与</em>a[]的区别</a></p>
+</li>
+<li><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/lularible/p/14395705.html">ls命令优化版和ls -l实现</a></p>
+</li>
 </ul>
 
     </div>
@@ -562,7 +533,7 @@ target="_blank" rel="noopener" href="https://www.cnblogs.com/lularible/p/1439570
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#ls"><span class="nav-number">1.</span> <span class="nav-text">ls</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%AE%E5%BD%95"><span class="nav-number">1.1.</span> <span class="nav-text">目录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%93%8D%E4%BD%9C%E7%9B%AE%E5%BD%95%E7%9A%84%E7%9B%B8%E5%85%B3%E5%87%BD%E6%95%B0"><span class="nav-number">1.2.</span> <span class="nav-text">操作目录的相关函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%96%E5%86%99ls--l"><span class="nav-number">1.3.</span> <span class="nav-text">编写ls -l</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#stat%E5%87%BD%E6%95%B0"><span class="nav-number">1.3.1.</span> <span class="nav-text">stat()函数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E6%98%BE%E7%A4%BAst_mode"><span class="nav-number">1.3.2.</span> <span class="nav-text">如何显示st_mode</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A0%B9%E6%8D%AE%E7%94%A8%E6%88%B7%E7%BB%84id%E5%AF%BB%E6%89%BEname"><span class="nav-number">1.3.3.</span> <span class="nav-text">根据用户&#x2F;组ID寻找name</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#etcpasswd%E6%96%87%E4%BB%B6"><span class="nav-number">1.3.3.1.</span> <span class="nav-text">&#x2F;etc&#x2F;passwd文件</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E9%80%9A%E8%BF%87getpwuid%E5%BE%97%E5%88%B0%E5%AE%8C%E6%95%B4%E7%9A%84%E7%94%A8%E6%88%B7%E5%88%97%E8%A1%A8"><span class="nav-number">1.3.3.2.</span> <span class="nav-text">通过getpwuid得到完整的用户列表</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#etcgroup%E6%96%87%E4%BB%B6"><span class="nav-number">1.3.3.3.</span> <span class="nav-text">&#x2F;etc&#x2F;group文件</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E9%80%9A%E8%BF%87getgrgid%E8%AE%BF%E9%97%AE%E7%BB%84%E5%88%97%E8%A1%A8"><span class="nav-number">1.3.3.4.</span> <span class="nav-text">通过getgrgid访问组列表</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%A6%E8%A7%A3st_mode%E4%B8%AD%E4%B8%89%E4%B8%AA%E7%89%B9%E6%AE%8A%E4%BD%8D"><span class="nav-number">1.4.</span> <span class="nav-text">详解st_mode中三个特殊位</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#set-user-id%E4%BD%8D"><span class="nav-number">1.4.1.</span> <span class="nav-text">set-user-ID位</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#set-group-id%E4%BD%8D"><span class="nav-number">1.4.2.</span> <span class="nav-text">set-group-ID位</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#sticky%E4%BD%8D"><span class="nav-number">1.4.3.</span> <span class="nav-text">sticky位</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%89%B9%E6%AE%8A%E5%B1%9E%E6%80%A7%E6%A0%87%E8%AF%86"><span class="nav-number">1.4.4.</span> <span class="nav-text">特殊属性标识</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BE%E7%BD%AE%E5%92%8C%E4%BF%AE%E6%94%B9%E6%96%87%E4%BB%B6%E7%9A%84%E5%B1%9E%E6%80%A7"><span class="nav-number">2.</span> <span class="nav-text">设置和修改文件的属性</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E7%B1%BB%E5%9E%8B"><span class="nav-number">2.1.</span> <span class="nav-text">文件类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%B8%E5%8F%AF%E4%BD%8D%E5%92%8C%E7%89%B9%E6%AE%8A%E5%B1%9E%E6%80%A7%E4%BD%8D"><span class="nav-number">2.2.</span> <span class="nav-text">许可位和特殊属性位</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BB%BA%E7%AB%8B%E6%96%87%E4%BB%B6%E7%9A%84%E6%A8%A1%E5%BC%8F"><span class="nav-number">2.2.1.</span> <span class="nav-text">建立文件的模式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%94%B9%E5%8F%98%E6%96%87%E4%BB%B6%E7%9A%84%E6%A8%A1%E5%BC%8F"><span class="nav-number">2.2.2.</span> <span class="nav-text">改变文件的模式</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E7%9A%84%E9%93%BE%E6%8E%A5%E6%95%B0"><span class="nav-number">2.3.</span> <span class="nav-text">文件的链接数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E6%89%80%E6%9C%89%E8%80%85%E4%B8%8E%E7%BB%84"><span class="nav-number">2.4.</span> <span class="nav-text">文件所有者与组</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9%E6%96%87%E4%BB%B6%E6%89%80%E6%9C%89%E8%80%85%E5%92%8C%E7%BB%84"><span class="nav-number">2.4.1.</span> <span class="nav-text">修改文件所有者和组</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E5%A4%A7%E5%B0%8F"><span class="nav-number">2.5.</span> <span class="nav-text">文件大小</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%B6%E9%97%B4"><span class="nav-number">2.6.</span> <span class="nav-text">时间</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9%E6%9C%80%E5%90%8E%E4%BF%AE%E6%94%B9%E5%92%8C%E8%AE%BF%E9%97%AE%E6%97%B6%E9%97%B4"><span class="nav-number">2.6.1.</span> <span class="nav-text">修改最后修改和访问时间</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E5%90%8D"><span class="nav-number">2.7.</span> <span class="nav-text">文件名</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BC%96%E7%A8%8B%E7%BB%83%E4%B9%A0"><span class="nav-number">3.</span> <span class="nav-text">编程练习</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ls%E7%9A%84%E5%AE%8C%E5%96%841"><span class="nav-number">3.1.</span> <span class="nav-text">ls的完善1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ls%E7%9A%84%E5%AE%8C%E5%96%842"><span class="nav-number">3.2.</span> <span class="nav-text">ls的完善2</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%86%E6%A0%8F%E6%98%BE%E7%A4%BA"><span class="nav-number">3.2.1.</span> <span class="nav-text">分栏显示</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0"><span class="nav-number">3.2.1.1.</span> <span class="nav-text">实现</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%8E%92%E5%BA%8F"><span class="nav-number">3.2.2.</span> <span class="nav-text">排序</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%A2%9C%E8%89%B2%E6%98%BE%E7%A4%BA"><span class="nav-number">3.2.3.</span> <span class="nav-text">颜色显示</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%95%99%E8%AE%AD%E6%89%BE%E4%BA%862%E5%B0%8F%E6%97%B6%E7%9A%84bug"><span class="nav-number">3.2.4.</span> <span class="nav-text">教训(找了2小时的BUG)</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">4.</span> <span class="nav-text">参考</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#ls"><span class="nav-number">1.</span> <span class="nav-text">ls</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%AE%E5%BD%95"><span class="nav-number">1.1.</span> <span class="nav-text">目录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%93%8D%E4%BD%9C%E7%9B%AE%E5%BD%95%E7%9A%84%E7%9B%B8%E5%85%B3%E5%87%BD%E6%95%B0"><span class="nav-number">1.2.</span> <span class="nav-text">操作目录的相关函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%96%E5%86%99ls-l"><span class="nav-number">1.3.</span> <span class="nav-text">编写ls -l</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#stat-%E5%87%BD%E6%95%B0"><span class="nav-number">1.3.1.</span> <span class="nav-text">stat()函数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%A6%82%E4%BD%95%E6%98%BE%E7%A4%BAst-mode"><span class="nav-number">1.3.2.</span> <span class="nav-text">如何显示st_mode</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%A0%B9%E6%8D%AE%E7%94%A8%E6%88%B7-%E7%BB%84ID%E5%AF%BB%E6%89%BEname"><span class="nav-number">1.3.3.</span> <span class="nav-text">根据用户&#x2F;组ID寻找name</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#etc-passwd%E6%96%87%E4%BB%B6"><span class="nav-number">1.3.3.1.</span> <span class="nav-text">&#x2F;etc&#x2F;passwd文件</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E9%80%9A%E8%BF%87getpwuid%E5%BE%97%E5%88%B0%E5%AE%8C%E6%95%B4%E7%9A%84%E7%94%A8%E6%88%B7%E5%88%97%E8%A1%A8"><span class="nav-number">1.3.3.2.</span> <span class="nav-text">通过getpwuid得到完整的用户列表</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#etc-group%E6%96%87%E4%BB%B6"><span class="nav-number">1.3.3.3.</span> <span class="nav-text">&#x2F;etc&#x2F;group文件</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E9%80%9A%E8%BF%87getgrgid%E8%AE%BF%E9%97%AE%E7%BB%84%E5%88%97%E8%A1%A8"><span class="nav-number">1.3.3.4.</span> <span class="nav-text">通过getgrgid访问组列表</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%A6%E8%A7%A3st-mode%E4%B8%AD%E4%B8%89%E4%B8%AA%E7%89%B9%E6%AE%8A%E4%BD%8D"><span class="nav-number">1.4.</span> <span class="nav-text">详解st_mode中三个特殊位</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#set-user-ID%E4%BD%8D"><span class="nav-number">1.4.1.</span> <span class="nav-text">set-user-ID位</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#set-group-ID%E4%BD%8D"><span class="nav-number">1.4.2.</span> <span class="nav-text">set-group-ID位</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#sticky%E4%BD%8D"><span class="nav-number">1.4.3.</span> <span class="nav-text">sticky位</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%89%B9%E6%AE%8A%E5%B1%9E%E6%80%A7%E6%A0%87%E8%AF%86"><span class="nav-number">1.4.4.</span> <span class="nav-text">特殊属性标识</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%BE%E7%BD%AE%E5%92%8C%E4%BF%AE%E6%94%B9%E6%96%87%E4%BB%B6%E7%9A%84%E5%B1%9E%E6%80%A7"><span class="nav-number">2.</span> <span class="nav-text">设置和修改文件的属性</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E7%B1%BB%E5%9E%8B"><span class="nav-number">2.1.</span> <span class="nav-text">文件类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%B8%E5%8F%AF%E4%BD%8D%E5%92%8C%E7%89%B9%E6%AE%8A%E5%B1%9E%E6%80%A7%E4%BD%8D"><span class="nav-number">2.2.</span> <span class="nav-text">许可位和特殊属性位</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BB%BA%E7%AB%8B%E6%96%87%E4%BB%B6%E7%9A%84%E6%A8%A1%E5%BC%8F"><span class="nav-number">2.2.1.</span> <span class="nav-text">建立文件的模式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%94%B9%E5%8F%98%E6%96%87%E4%BB%B6%E7%9A%84%E6%A8%A1%E5%BC%8F"><span class="nav-number">2.2.2.</span> <span class="nav-text">改变文件的模式</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E7%9A%84%E9%93%BE%E6%8E%A5%E6%95%B0"><span class="nav-number">2.3.</span> <span class="nav-text">文件的链接数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E6%89%80%E6%9C%89%E8%80%85%E4%B8%8E%E7%BB%84"><span class="nav-number">2.4.</span> <span class="nav-text">文件所有者与组</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9%E6%96%87%E4%BB%B6%E6%89%80%E6%9C%89%E8%80%85%E5%92%8C%E7%BB%84"><span class="nav-number">2.4.1.</span> <span class="nav-text">修改文件所有者和组</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E5%A4%A7%E5%B0%8F"><span class="nav-number">2.5.</span> <span class="nav-text">文件大小</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%B6%E9%97%B4"><span class="nav-number">2.6.</span> <span class="nav-text">时间</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9%E6%9C%80%E5%90%8E%E4%BF%AE%E6%94%B9%E5%92%8C%E8%AE%BF%E9%97%AE%E6%97%B6%E9%97%B4"><span class="nav-number">2.6.1.</span> <span class="nav-text">修改最后修改和访问时间</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E5%90%8D"><span class="nav-number">2.7.</span> <span class="nav-text">文件名</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BC%96%E7%A8%8B%E7%BB%83%E4%B9%A0"><span class="nav-number">3.</span> <span class="nav-text">编程练习</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ls%E7%9A%84%E5%AE%8C%E5%96%841"><span class="nav-number">3.1.</span> <span class="nav-text">ls的完善1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ls%E7%9A%84%E5%AE%8C%E5%96%842"><span class="nav-number">3.2.</span> <span class="nav-text">ls的完善2</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%86%E6%A0%8F%E6%98%BE%E7%A4%BA"><span class="nav-number">3.2.1.</span> <span class="nav-text">分栏显示</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0"><span class="nav-number">3.2.1.1.</span> <span class="nav-text">实现</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%8E%92%E5%BA%8F"><span class="nav-number">3.2.2.</span> <span class="nav-text">排序</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%A2%9C%E8%89%B2%E6%98%BE%E7%A4%BA"><span class="nav-number">3.2.3.</span> <span class="nav-text">颜色显示</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%95%99%E8%AE%AD-%E6%89%BE%E4%BA%862%E5%B0%8F%E6%97%B6%E7%9A%84BUG"><span class="nav-number">3.2.4.</span> <span class="nav-text">教训(找了2小时的BUG)</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-number">4.</span> <span class="nav-text">参考</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -577,7 +548,7 @@ target="_blank" rel="noopener" href="https://www.cnblogs.com/lularible/p/1439570
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">26</span>
+          <span class="site-state-item-count">25</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

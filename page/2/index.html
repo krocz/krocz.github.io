@@ -198,109 +198,6 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/10/30/LED%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="Krocz">
-      <meta itemprop="description" content="时间不等人，喜欢就去做">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Krocz's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/10/30/LED%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F/" class="post-title-link" itemprop="url">LED驱动程序</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2023-10-30 19:45:51" itemprop="dateCreated datePublished" datetime="2023-10-30T19:45:51+08:00">2023-10-30</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2024-01-02 11:10:37" itemprop="dateModified" datetime="2024-01-02T11:10:37+08:00">2024-01-02</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/" itemprop="url" rel="index"><span itemprop="name">Linux应用开发</span></a>
-                </span>
-            </span>
-
-          <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>8.5k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>16 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="学会看芯片手册">1.学会看芯片手册</h2>
-<h3 id="gpio的通用操作方法">1.1 GPIO的通用操作方法</h3>
-<p>参考stm32的GPIO引脚的使用过程：</p>
-<ol type="1">
-<li>使能GPIOx时钟</li>
-<li>设置GPIOx引脚的工作模式（输入、输出、复用、<strong>重定向</strong>）</li>
-<li>读取/设置GOPIOx引脚的电平</li>
-</ol>
-<p>一般的，芯片GPIO引脚使能的操作如下：</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2023/10/30/LED%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="http://example.com/2023/10/23/%E7%BC%96%E5%86%99%E7%AC%AC%E4%B8%80%E4%B8%AA%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -369,12 +266,9 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="编写驱动程序的框架">1. 编写驱动程序的框架</h2>
-<h3 id="app-打开的文件在内核中如何表示">1.1 APP
-打开的文件在内核中如何表示</h3>
-<p>APP 打开文件时，可以得到一个整数，这个整数被称为文件句柄。对于 APP
-的每一个文件句柄，在内核里面都有一个<code>struct file</code>结构体与之对应:</p>
+          <h2 id="1-编写驱动程序的框架"><a href="#1-编写驱动程序的框架" class="headerlink" title="1. 编写驱动程序的框架"></a>1. 编写驱动程序的框架</h2><h3 id="1-1-APP-打开的文件在内核中如何表示"><a href="#1-1-APP-打开的文件在内核中如何表示" class="headerlink" title="1.1 APP 打开的文件在内核中如何表示"></a>1.1 APP 打开的文件在内核中如何表示</h3><p>APP 打开文件时，可以得到一个整数，这个整数被称为文件句柄。对于 APP 的每一个文件句柄，在内核里面都有一个<code>struct file</code>结构体与之对应:</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">file</span> &#123;</span></span><br><span class="line">	<span class="class"><span class="keyword">union</span> &#123;</span></span><br><span class="line">		<span class="class"><span class="keyword">struct</span> <span class="title">llist_node</span>	<span class="title">fu_llist</span>;</span></span><br><span class="line">		<span class="class"><span class="keyword">struct</span> <span class="title">rcu_head</span> 	<span class="title">fu_rcuhead</span>;</span></span><br><span class="line">	&#125; f_u;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">path</span>		<span class="title">f_path</span>;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">inode</span>		*<span class="title">f_inode</span>;</span>	<span class="comment">/* cached value */</span></span><br><span class="line">	<span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">file_operations</span>	*<span class="title">f_op</span>;</span></span><br><span class="line">	<span class="comment">/*</span></span><br><span class="line"><span class="comment">	 * Protects f_ep_links, f_flags.</span></span><br><span class="line"><span class="comment">	 * Must not be taken from IRQ context.</span></span><br><span class="line"><span class="comment">	 */</span></span><br><span class="line">	<span class="type">spinlock_t</span>		f_lock;</span><br><span class="line">	<span class="type">atomic_long_t</span>		f_count;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span> 		f_flags;</span><br><span class="line">	<span class="type">fmode_t</span>			f_mode;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">mutex</span>		<span class="title">f_pos_lock</span>;</span></span><br><span class="line">	<span class="type">loff_t</span>			f_pos;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">fown_struct</span>	<span class="title">f_owner</span>;</span></span><br><span class="line">	<span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">cred</span>	*<span class="title">f_cred</span>;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">file_ra_state</span>	<span class="title">f_ra</span>;</span></span><br></pre></td></tr></table></figure>
+
 <p>在APP中调用open函数打开文件时，传入的flags、mode等参数会记录在内核相应的<code>struct file</code>成员<code>f_flags\f_mode</code>中；读写文件的偏移地址也会保存在<code>struct file</code>结构体的<code>f_pos</code>成员中。</p>
           <!--noindex-->
             <div class="post-button">
@@ -451,14 +345,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>12k</span>
+              <span>11k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>22 分钟</span>
+              <span>21 分钟</span>
             </span>
 
         </div>
@@ -470,22 +364,14 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="i2c协议">1. I2C协议</h2>
-<figure>
-<img src="../images/IIC应用编程/image-20231013195434388.png" alt="image-20231013195434388">
-<figcaption aria-hidden="true">image-20231013195434388</figcaption>
-</figure>
+          <h2 id="1-I2C协议"><a href="#1-I2C协议" class="headerlink" title="1. I2C协议"></a>1. I2C协议</h2><p><img src="/../images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231013195434388.png" alt="image-20231013195434388"></p>
 <ul>
 <li>起始信号</li>
 <li>停止信号</li>
 <li>传输1Bit数据时的信号</li>
 <li>应答信号（<strong>0：应答，1：非应答</strong>）</li>
 </ul>
-<h3 id="i2c写操作">1.1 I2C写操作</h3>
-<figure>
-<img src="../images/IIC应用编程/image-20231013200107130.png" alt="image-20231013200107130">
-<figcaption aria-hidden="true">image-20231013200107130</figcaption>
-</figure>
+<h3 id="1-1-I2C写操作"><a href="#1-1-I2C写操作" class="headerlink" title="1.1 I2C写操作"></a>1.1 I2C写操作</h3><p><img src="/../images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231013200107130.png" alt="image-20231013200107130"></p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2023/10/13/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/#more" rel="contents">
@@ -580,20 +466,13 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="tty体系的发展">1.TTY体系的发展</h2>
-<blockquote>
+          <h2 id="1-TTY体系的发展"><a href="#1-TTY体系的发展" class="headerlink" title="1.TTY体系的发展"></a>1.TTY体系的发展</h2><blockquote>
 <p>参考：</p>
-<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/337366679">Linux
-终端(TTY)</a></p>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/337366679">Linux 终端(TTY)</a></p>
 <p><a target="_blank" rel="noopener" href="https://taoshu.in/tty.html">解密 TTY 设备</a></p>
 </blockquote>
-<h3 id="终端机">1.1 终端机</h3>
-<p>从历史上看，终端刚开始就是终端机，配有打印机，键盘，带有一个串口，通过串口传送数据到主机端，然后主机处理完交给终端打印出来。电传打字机(teletype)可以被看作是这类设备的统称，因此终端也被简称为
-TTY(teletype 的缩写)：</p>
-<figure>
-<img src="../images/UART应用编程/image-20231006145708741.png" alt="image-20231006145708741">
-<figcaption aria-hidden="true">image-20231006145708741</figcaption>
-</figure>
+<h3 id="1-1-终端机"><a href="#1-1-终端机" class="headerlink" title="1.1 终端机"></a>1.1 终端机</h3><p>从历史上看，终端刚开始就是终端机，配有打印机，键盘，带有一个串口，通过串口传送数据到主机端，然后主机处理完交给终端打印出来。电传打字机(teletype)可以被看作是这类设备的统称，因此终端也被简称为 TTY(teletype 的缩写)：</p>
+<p><img src="/../images/UART%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231006145708741.png" alt="image-20231006145708741"></p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2023/10/06/UART%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/#more" rel="contents">
@@ -688,11 +567,13 @@ TTY(teletype 的缩写)：</p>
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="线程的标识-pthread_t">1. 线程的标识 pthread_t</h2>
-<p>对于每一个进程都有唯一PID号与之对应，而对于线程而言，也有类似的tid号，即一个pthread_t类型的变量。线程号是表示线程的唯一标识，<strong>但是对于线程号而言，其仅仅在其所属的进程上下文中才有意义。</strong></p>
+          <h2 id="1-线程的标识-pthread-t"><a href="#1-线程的标识-pthread-t" class="headerlink" title="1. 线程的标识 pthread_t"></a>1. 线程的标识 pthread_t</h2><p>对于每一个进程都有唯一PID号与之对应，而对于线程而言，也有类似的tid号，即一个pthread_t类型的变量。线程号是表示线程的唯一标识，<strong>但是对于线程号而言，其仅仅在其所属的进程上下文中才有意义。</strong></p>
 <p>获取当前线程的线程号：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;pthread.h&gt;</span> </span></span><br><span class="line"><span class="type">pthread_t</span> <span class="title function_">pthread_self</span><span class="params">(<span class="type">void</span>)</span>;</span><br></pre></td></tr></table></figure>
-<h2 id="线程的创建">2. 线程的创建</h2>
+
+
+
+<h2 id="2-线程的创建"><a href="#2-线程的创建" class="headerlink" title="2. 线程的创建"></a>2. 线程的创建</h2>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2023/10/03/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%BC%96%E7%A8%8B/#more" rel="contents">
@@ -768,7 +649,7 @@ TTY(teletype 的缩写)：</p>
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>7.1k</span>
+              <span>7k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -787,14 +668,8 @@ TTY(teletype 的缩写)：</p>
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="tcpudp网络通信流程图">1. TCP/UDP网络通信流程图</h2>
-<h3 id="tcp">1.1 TCP</h3>
-<figure>
-<img src="../images/网络编程/image-20230926192207003.png" alt="image-20230926192207003">
-<figcaption aria-hidden="true">image-20230926192207003</figcaption>
-</figure>
-<h4 id="代码">1.1.1 代码</h4>
-<h5 id="server.c">server.c</h5>
+          <h2 id="1-TCP-UDP网络通信流程图"><a href="#1-TCP-UDP网络通信流程图" class="headerlink" title="1. TCP&#x2F;UDP网络通信流程图"></a>1. TCP&#x2F;UDP网络通信流程图</h2><h3 id="1-1-TCP"><a href="#1-1-TCP" class="headerlink" title="1.1 TCP"></a>1.1 TCP</h3><p><img src="/../images/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/image-20230926192207003.png" alt="image-20230926192207003"></p>
+<h4 id="1-1-1-代码"><a href="#1-1-1-代码" class="headerlink" title="1.1.1 代码"></a>1.1.1 代码</h4><h5 id="server-c"><a href="#server-c" class="headerlink" title="server.c"></a>server.c</h5>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2023/09/26/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/#more" rel="contents">
@@ -870,14 +745,14 @@ TTY(teletype 的缩写)：</p>
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>8k</span>
+              <span>7.9k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>15 分钟</span>
+              <span>14 分钟</span>
             </span>
 
         </div>
@@ -889,18 +764,13 @@ TTY(teletype 的缩写)：</p>
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="电阻屏和电容屏定位原理">1. 电阻屏和电容屏定位原理</h2>
-<h3 id="电阻屏">1.1 电阻屏</h3>
-<figure>
-<img src="../images/使用电阻屏和电容屏/image-20230922200403814.png" alt="image-20230922200403814">
-<figcaption aria-hidden="true">image-20230922200403814</figcaption>
-</figure>
+          <h2 id="1-电阻屏和电容屏定位原理"><a href="#1-电阻屏和电容屏定位原理" class="headerlink" title="1. 电阻屏和电容屏定位原理"></a>1. 电阻屏和电容屏定位原理</h2><h3 id="1-1-电阻屏"><a href="#1-1-电阻屏" class="headerlink" title="1.1 电阻屏"></a>1.1 电阻屏</h3><p><img src="/../images/%E4%BD%BF%E7%94%A8%E7%94%B5%E9%98%BB%E5%B1%8F%E5%92%8C%E7%94%B5%E5%AE%B9%E5%B1%8F/image-20230922200403814.png" alt="image-20230922200403814"></p>
 <ul>
 <li>根据分压原理，计算电阻值。假设材料长度和电阻成线性关系，则可以计算出相对距离</li>
 <li>电阻屏分为上下两层薄膜，一层通电时，另一层在按压时作为探针获取分压值，从而进行计算</li>
 <li>电阻屏和LCD使用之前，需要进行五点校准二者的相对位置</li>
 </ul>
-<h4 id="电阻屏数据">1.1.1 电阻屏数据</h4>
+<h4 id="1-1-1-电阻屏数据"><a href="#1-1-1-电阻屏数据" class="headerlink" title="1.1.1 电阻屏数据"></a>1.1.1 电阻屏数据</h4>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2023/09/22/%E4%BD%BF%E7%94%A8%E7%94%B5%E9%98%BB%E5%B1%8F%E5%92%8C%E7%94%B5%E5%AE%B9%E5%B1%8F/#more" rel="contents">
@@ -976,7 +846,7 @@ TTY(teletype 的缩写)：</p>
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>7.8k</span>
+              <span>7.6k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -995,33 +865,31 @@ TTY(teletype 的缩写)：</p>
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="输入系统框架及调试">1. 输入系统框架及调试</h2>
-<h3 id="框架概述">1.1 框架概述</h3>
-<figure>
-<img src="../images/输入系统应用编程/image-20230917174044630.png" alt="image-20230917174044630">
-<figcaption aria-hidden="true">image-20230917174044630</figcaption>
-</figure>
-<ol type="1">
-<li><p>APP 发起读操作，若无数据则休眠；</p></li>
-<li><p>用户操作设备，硬件上产生中断；</p></li>
-<li><p>输入系统驱动层对应的驱动程序处理中断：</p>
-<p>读取到数据，转换为标准的输入事件，向核心层汇报。
-所谓输入事件就是一个<code>input_event</code>结构体。</p></li>
-<li><p>核心层可以决定把输入事件转发给上面哪个 handler 来处理：</p>
+          <h2 id="1-输入系统框架及调试"><a href="#1-输入系统框架及调试" class="headerlink" title="1. 输入系统框架及调试"></a>1. 输入系统框架及调试</h2><h3 id="1-1-框架概述"><a href="#1-1-框架概述" class="headerlink" title="1.1 框架概述"></a>1.1 框架概述</h3><p><img src="/../images/%E8%BE%93%E5%85%A5%E7%B3%BB%E7%BB%9F%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20230917174044630.png" alt="image-20230917174044630"></p>
+<ol>
+<li><p>APP 发起读操作，若无数据则休眠； </p>
+</li>
+<li><p>用户操作设备，硬件上产生中断； </p>
+</li>
+<li><p>输入系统驱动层对应的驱动程序处理中断： </p>
+<p>读取到数据，转换为标准的输入事件，向核心层汇报。 所谓输入事件就是一个<code>input_event</code>结构体。 </p>
+</li>
+<li><p>核心层可以决定把输入事件转发给上面哪个 handler 来处理： </p>
 <ul>
-<li><p>从 handler 的名字来看，它就是用来处输入操作的。有多种 handler，比
-如：evdev_handler、kbd_handler、joydev_handler 等等。</p></li>
-<li><p>最常用的是 evdev_handler：它只是把 input_event
-结构体保存在内核buffer 等，APP 来读取时就原原本本地返回。它支持多个 APP
-同时访问输入设备，每个 APP 都可以获得同一份输入事件。</p></li>
-<li><p>当 APP 正在等待数据时，evdev_handler 会把它唤醒，这样 APP
-就可以返回数据。</p></li>
-</ul></li>
-<li><p>APP 对输入事件的处理：</p></li>
-<li><p>APP获得数据的方法有2种：直接访问设备节点(
-比如<code>/dev/input/event0,1,2,...</code>)，或者通过<code>tslib、libinput</code>这类库来间接访问设备节点。这些库简化了对数据的处理。</p></li>
+<li><p>从 handler 的名字来看，它就是用来处输入操作的。有多种 handler，比 如：evdev_handler、kbd_handler、joydev_handler 等等。 </p>
+</li>
+<li><p>最常用的是 evdev_handler：它只是把 input_event 结构体保存在内核buffer 等，APP 来读取时就原原本本地返回。它支持多个 APP 同时访问输入设备，每个 APP 都可以获得同一份输入事件。 </p>
+</li>
+<li><p>当 APP 正在等待数据时，evdev_handler 会把它唤醒，这样 APP 就可以返回数据。</p>
+</li>
+</ul>
+</li>
+<li><p>APP 对输入事件的处理：</p>
+</li>
+<li><p>APP获得数据的方法有2种：直接访问设备节点( 比如<code>/dev/input/event0,1,2,...</code>)，或者通过<code>tslib、libinput</code>这类库来间接访问设备节点。这些库简化了对数据的处理。</p>
+</li>
 </ol>
-<h3 id="编写app需要掌握的知识">1.2 编写APP需要掌握的知识</h3>
+<h3 id="1-2-编写APP需要掌握的知识"><a href="#1-2-编写APP需要掌握的知识" class="headerlink" title="1.2 编写APP需要掌握的知识"></a>1.2 编写APP需要掌握的知识</h3>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2023/09/17/%E8%BE%93%E5%85%A5%E7%B3%BB%E7%BB%9F%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/#more" rel="contents">
@@ -1097,7 +965,7 @@ TTY(teletype 的缩写)：</p>
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>11k</span>
+              <span>10k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -1116,21 +984,16 @@ TTY(teletype 的缩写)：</p>
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="lcd操作原理">1. LCD操作原理</h2>
-<ol type="1">
-<li>驱动程序：Farmebuffer驱动程序设置好LCD控制器：
-<ol type="1">
-<li>根据 LCD 的参数设置 LCD 控制器的时序、信号极性；</li>
+          <h2 id="1-LCD操作原理"><a href="#1-LCD操作原理" class="headerlink" title="1. LCD操作原理"></a>1. LCD操作原理</h2><ol>
+<li>驱动程序：Farmebuffer驱动程序设置好LCD控制器：<ol>
+<li>根据 LCD 的参数设置 LCD 控制器的时序、信号极性； </li>
 <li>根据 LCD 分辨率、BPP（Bit Per Pixel）分配 Framebuffer。</li>
-</ol></li>
-<li>应用程序：使用 ioctl 获得 LCD 分辨率、BPP；通过 mmap 映射
-Framebuffer，在 Framebuffer 中写入数据</li>
+</ol>
+</li>
+<li>应用程序：使用 ioctl 获得 LCD 分辨率、BPP；通过 mmap 映射 Framebuffer，在 Framebuffer 中写入数据</li>
 <li>LCD控制器周而复始的从内存中取出LCD屏幕上每一个像素点的显示数据</li>
 </ol>
-<figure>
-<img src="../images/使用LCD屏幕/image-20230912204455923.png" alt="image-20230912204455923">
-<figcaption aria-hidden="true">image-20230912204455923</figcaption>
-</figure>
+<p><img src="/../images/%E4%BD%BF%E7%94%A8LCD%E5%B1%8F%E5%B9%95/image-20230912204455923.png" alt="image-20230912204455923"></p>
 <p>计算（x,y）坐标处像素对应Framebuffer地址：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(x，y)像素起始地址 = fb_base + (xres * bpp / 8) * y + x * bpp / 8</span><br></pre></td></tr></table></figure>
           <!--noindex-->
@@ -1231,21 +1094,119 @@ Framebuffer，在 Framebuffer 中写入数据</li>
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="ls">ls</h2>
-<p>编写ls命令</p>
+          <h2 id="ls"><a href="#ls" class="headerlink" title="ls"></a>ls</h2><p>编写ls命令</p>
 <ul>
 <li>列出目录的内容</li>
 <li>读取并显示文件的属性</li>
 <li>给出名字，判断它是目录还是文件</li>
 </ul>
-<h3 id="目录">目录</h3>
-<ul>
+<h3 id="目录"><a href="#目录" class="headerlink" title="目录"></a>目录</h3><ul>
 <li>目录是一种特殊的文件，它的内容一条条记录，每一个记录代表一个文件或者目录</li>
-<li>目录文件永远不空，至少包含两个特殊项"."或者".."</li>
+<li>目录文件永远不空，至少包含两个特殊项”.”或者”..”</li>
 </ul>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2023/09/12/Unix-Linux%E7%BC%96%E7%A8%8B%E5%AE%9E%E8%B7%B5%E6%95%99%E7%A8%8B-%E7%AB%A0%E8%8A%823%E7%AC%94%E8%AE%B0/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/12/Unix-Linux%E7%BC%96%E7%A8%8B%E5%AE%9E%E8%B7%B5%E6%95%99%E7%A8%8B-%E7%AB%A0%E8%8A%822%E7%AC%94%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="Krocz">
+      <meta itemprop="description" content="时间不等人，喜欢就去做">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Krocz's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/09/12/Unix-Linux%E7%BC%96%E7%A8%8B%E5%AE%9E%E8%B7%B5%E6%95%99%E7%A8%8B-%E7%AB%A0%E8%8A%822%E7%AC%94%E8%AE%B0/" class="post-title-link" itemprop="url">Unix-Linux编程实践教程-章节2笔记</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+              
+
+              <time title="创建时间：2023-09-12 15:19:04 / 修改时间：15:34:58" itemprop="dateCreated datePublished" datetime="2023-09-12T15:19:04+08:00">2023-09-12</time>
+            </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">读书笔记</span></a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E3%80%8AUnix-Linux%E7%BC%96%E7%A8%8B%E5%AE%9E%E8%B7%B5%E6%95%99%E7%A8%8B%E3%80%8B/" itemprop="url" rel="index"><span itemprop="name">《Unix-Linux编程实践教程》</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>4.9k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>9 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="who"><a href="#who" class="headerlink" title="who"></a>who</h2><ul>
+<li>把程序的可执行文件放到任意的一个目录中（&#x2F;bin &#x2F;usr&#x2F;bin &#x2F;usr&#x2F;local&#x2F;bin），就可以为系统添加新的命令</li>
+</ul>
+<h3 id="寻找who的踪迹"><a href="#寻找who的踪迹" class="headerlink" title="寻找who的踪迹"></a>寻找who的踪迹</h3><ul>
+<li><code>man who</code>:发现文件utmp,wtmp很关键</li>
+<li><code>man -k utmp</code>:按关键字搜索utmp，发现：</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">utmp (5)            - login records</span><br><span class="line">login (3)            - write utmp and wtmp entries</span><br><span class="line">logout (3)           - write utmp and wtmp entries</span><br></pre></td></tr></table></figure>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2023/09/12/Unix-Linux%E7%BC%96%E7%A8%8B%E5%AE%9E%E8%B7%B5%E6%95%99%E7%A8%8B-%E7%AB%A0%E8%8A%822%E7%AC%94%E8%AE%B0/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -1335,7 +1296,7 @@ Framebuffer，在 Framebuffer 中写入数据</li>
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">26</span>
+          <span class="site-state-item-count">25</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
