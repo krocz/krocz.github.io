@@ -20,21 +20,21 @@
     var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="1. 输入系统框架及调试1.1 框架概述  APP 发起读操作，若无数据则休眠；   用户操作设备，硬件上产生中断；   输入系统驱动层对应的驱动程序处理中断：  读取到数据，转换为标准的输入事件，向核心层汇报。 所谓输入事件就是一个input_event结构体。   核心层可以决定把输入事件转发给上面哪个 handler 来处理：   从 handler 的名字来看，它就是用来处输入操作的。有多">
+  <meta name="description" content="1. 输入系统框架及调试 1.1 框架概述   image-20230917174044630   APP 发起读操作，若无数据则休眠； 用户操作设备，硬件上产生中断； 输入系统驱动层对应的驱动程序处理中断： 读取到数据，转换为标准的输入事件，向核心层汇报。 所谓输入事件就是一个input_event结构体。 核心层可以决定把输入事件转发给上面哪个 handler 来处理：">
 <meta property="og:type" content="article">
 <meta property="og:title" content="输入系统应用编程">
 <meta property="og:url" content="http://example.com/2023/09/17/%E8%BE%93%E5%85%A5%E7%B3%BB%E7%BB%9F%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/index.html">
 <meta property="og:site_name" content="Krocz&#39;s Blog">
-<meta property="og:description" content="1. 输入系统框架及调试1.1 框架概述  APP 发起读操作，若无数据则休眠；   用户操作设备，硬件上产生中断；   输入系统驱动层对应的驱动程序处理中断：  读取到数据，转换为标准的输入事件，向核心层汇报。 所谓输入事件就是一个input_event结构体。   核心层可以决定把输入事件转发给上面哪个 handler 来处理：   从 handler 的名字来看，它就是用来处输入操作的。有多">
+<meta property="og:description" content="1. 输入系统框架及调试 1.1 框架概述   image-20230917174044630   APP 发起读操作，若无数据则休眠； 用户操作设备，硬件上产生中断； 输入系统驱动层对应的驱动程序处理中断： 读取到数据，转换为标准的输入事件，向核心层汇报。 所谓输入事件就是一个input_event结构体。 核心层可以决定把输入事件转发给上面哪个 handler 来处理：">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/images/%E8%BE%93%E5%85%A5%E7%B3%BB%E7%BB%9F%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20230917174044630.png">
-<meta property="og:image" content="http://example.com/images/%E8%BE%93%E5%85%A5%E7%B3%BB%E7%BB%9F%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20230918201156815.png">
-<meta property="og:image" content="http://example.com/images/%E8%BE%93%E5%85%A5%E7%B3%BB%E7%BB%9F%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20230918202331798.png">
-<meta property="og:image" content="http://example.com/images/%E8%BE%93%E5%85%A5%E7%B3%BB%E7%BB%9F%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20230918202559709.png">
-<meta property="og:image" content="http://example.com/images/%E8%BE%93%E5%85%A5%E7%B3%BB%E7%BB%9F%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20230918202823767.png">
-<meta property="og:image" content="http://example.com/images/%E8%BE%93%E5%85%A5%E7%B3%BB%E7%BB%9F%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20230918205712204.png">
-<meta property="og:image" content="http://example.com/images/%E8%BE%93%E5%85%A5%E7%B3%BB%E7%BB%9F%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20230918210100361.png">
-<meta property="og:image" content="http://example.com/images/%E8%BE%93%E5%85%A5%E7%B3%BB%E7%BB%9F%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20230918211408770.png">
+<meta property="og:image" content="http://example.com/2023/09/17/images/%E8%BE%93%E5%85%A5%E7%B3%BB%E7%BB%9F%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20230917174044630.png">
+<meta property="og:image" content="http://example.com/2023/09/17/images/%E8%BE%93%E5%85%A5%E7%B3%BB%E7%BB%9F%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20230918201156815.png">
+<meta property="og:image" content="http://example.com/2023/09/17/images/%E8%BE%93%E5%85%A5%E7%B3%BB%E7%BB%9F%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20230918202331798.png">
+<meta property="og:image" content="http://example.com/2023/09/17/images/%E8%BE%93%E5%85%A5%E7%B3%BB%E7%BB%9F%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20230918202559709.png">
+<meta property="og:image" content="http://example.com/2023/09/17/images/%E8%BE%93%E5%85%A5%E7%B3%BB%E7%BB%9F%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20230918202823767.png">
+<meta property="og:image" content="http://example.com/2023/09/17/images/%E8%BE%93%E5%85%A5%E7%B3%BB%E7%BB%9F%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20230918205712204.png">
+<meta property="og:image" content="http://example.com/2023/09/17/images/%E8%BE%93%E5%85%A5%E7%B3%BB%E7%BB%9F%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20230918210100361.png">
+<meta property="og:image" content="http://example.com/2023/09/17/images/%E8%BE%93%E5%85%A5%E7%B3%BB%E7%BB%9F%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20230918211408770.png">
 <meta property="article:published_time" content="2023-09-17T09:37:46.000Z">
 <meta property="article:modified_time" content="2023-09-20T13:55:54.948Z">
 <meta property="article:author" content="Krocz">
@@ -42,7 +42,7 @@
 <meta property="article:tag" content="Linux">
 <meta property="article:tag" content="C&#x2F;C++">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="http://example.com/images/%E8%BE%93%E5%85%A5%E7%B3%BB%E7%BB%9F%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20230917174044630.png">
+<meta name="twitter:image" content="http://example.com/2023/09/17/images/%E8%BE%93%E5%85%A5%E7%B3%BB%E7%BB%9F%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20230917174044630.png">
 
 <link rel="canonical" href="http://example.com/2023/09/17/%E8%BE%93%E5%85%A5%E7%B3%BB%E7%BB%9F%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/">
 
@@ -260,7 +260,7 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>7.6k</span>
+              <span>7.8k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
@@ -279,242 +279,253 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h2 id="1-输入系统框架及调试"><a href="#1-输入系统框架及调试" class="headerlink" title="1. 输入系统框架及调试"></a>1. 输入系统框架及调试</h2><h3 id="1-1-框架概述"><a href="#1-1-框架概述" class="headerlink" title="1.1 框架概述"></a>1.1 框架概述</h3><p><img src="/../images/%E8%BE%93%E5%85%A5%E7%B3%BB%E7%BB%9F%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20230917174044630.png" alt="image-20230917174044630"></p>
-<ol>
-<li><p>APP 发起读操作，若无数据则休眠； </p>
-</li>
-<li><p>用户操作设备，硬件上产生中断； </p>
-</li>
-<li><p>输入系统驱动层对应的驱动程序处理中断： </p>
-<p>读取到数据，转换为标准的输入事件，向核心层汇报。 所谓输入事件就是一个<code>input_event</code>结构体。 </p>
-</li>
-<li><p>核心层可以决定把输入事件转发给上面哪个 handler 来处理： </p>
+        <h2 id="输入系统框架及调试">1. 输入系统框架及调试</h2>
+<h3 id="框架概述">1.1 框架概述</h3>
+<figure>
+<img src="../images/输入系统应用编程/image-20230917174044630.png"
+alt="image-20230917174044630" />
+<figcaption aria-hidden="true">image-20230917174044630</figcaption>
+</figure>
+<ol type="1">
+<li><p>APP 发起读操作，若无数据则休眠；</p></li>
+<li><p>用户操作设备，硬件上产生中断；</p></li>
+<li><p>输入系统驱动层对应的驱动程序处理中断：</p>
+<p>读取到数据，转换为标准的输入事件，向核心层汇报。
+所谓输入事件就是一个<code>input_event</code>结构体。</p></li>
+<li><p>核心层可以决定把输入事件转发给上面哪个 handler 来处理：</p>
 <ul>
-<li><p>从 handler 的名字来看，它就是用来处输入操作的。有多种 handler，比 如：evdev_handler、kbd_handler、joydev_handler 等等。 </p>
-</li>
-<li><p>最常用的是 evdev_handler：它只是把 input_event 结构体保存在内核buffer 等，APP 来读取时就原原本本地返回。它支持多个 APP 同时访问输入设备，每个 APP 都可以获得同一份输入事件。 </p>
-</li>
-<li><p>当 APP 正在等待数据时，evdev_handler 会把它唤醒，这样 APP 就可以返回数据。</p>
-</li>
-</ul>
-</li>
-<li><p>APP 对输入事件的处理：</p>
-</li>
-<li><p>APP获得数据的方法有2种：直接访问设备节点( 比如<code>/dev/input/event0,1,2,...</code>)，或者通过<code>tslib、libinput</code>这类库来间接访问设备节点。这些库简化了对数据的处理。</p>
-</li>
+<li><p>从 handler 的名字来看，它就是用来处输入操作的。有多种 handler，比
+如：evdev_handler、kbd_handler、joydev_handler 等等。</p></li>
+<li><p>最常用的是 evdev_handler：它只是把 input_event
+结构体保存在内核buffer 等，APP 来读取时就原原本本地返回。它支持多个 APP
+同时访问输入设备，每个 APP 都可以获得同一份输入事件。</p></li>
+<li><p>当 APP 正在等待数据时，evdev_handler 会把它唤醒，这样 APP
+就可以返回数据。</p></li>
+</ul></li>
+<li><p>APP 对输入事件的处理：</p></li>
+<li><p>APP获得数据的方法有2种：直接访问设备节点(
+比如<code>/dev/input/event0,1,2,...</code>)，或者通过<code>tslib、libinput</code>这类库来间接访问设备节点。这些库简化了对数据的处理。</p></li>
 </ol>
-<h3 id="1-2-编写APP需要掌握的知识"><a href="#1-2-编写APP需要掌握的知识" class="headerlink" title="1.2 编写APP需要掌握的知识"></a>1.2 编写APP需要掌握的知识</h3><h4 id="1-2-1-APP可以得到什么数据"><a href="#1-2-1-APP可以得到什么数据" class="headerlink" title="1.2.1 APP可以得到什么数据"></a>1.2.1 APP可以得到什么数据</h4><p><img src="/../images/%E8%BE%93%E5%85%A5%E7%B3%BB%E7%BB%9F%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20230918201156815.png" alt="image-20230918201156815"></p>
+<h3 id="编写app需要掌握的知识">1.2 编写APP需要掌握的知识</h3>
+<h4 id="app可以得到什么数据">1.2.1 APP可以得到什么数据</h4>
+<figure>
+<img src="../images/输入系统应用编程/image-20230918201156815.png"
+alt="image-20230918201156815" />
+<figcaption aria-hidden="true">image-20230918201156815</figcaption>
+</figure>
 <ul>
 <li><p><code>timeval</code>结构体：</p>
 <ul>
 <li><code>tv_sec</code>：表示自1970年1月1日00:00:00（即UNIX纪元起点）以来的秒数</li>
 <li><code>tv_usec</code>：表示微秒数，即秒后面的零头</li>
-</ul>
-</li>
+</ul></li>
 <li><p><code>input_event</code>结构体：</p>
 <ul>
-<li><p><code>type</code>：表示触发了哪类事件；比如<code>EV_KEY</code>表示按键类，<code>EV_REL</code>表示相对位移(例如鼠标)，<code>EV_ABS</code> 表示 绝对位置(比如触摸屏)</p>
-<p><img src="/../images/%E8%BE%93%E5%85%A5%E7%B3%BB%E7%BB%9F%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20230918202331798.png" alt="image-20230918202331798"></p>
-</li>
+<li><p><code>type</code>：表示触发了哪类事件；比如<code>EV_KEY</code>表示按键类，<code>EV_REL</code>表示相对位移(例如鼠标)，<code>EV_ABS</code>
+表示 绝对位置(比如触摸屏)</p>
+<figure>
+<img src="../images/输入系统应用编程/image-20230918202331798.png"
+alt="image-20230918202331798" />
+<figcaption aria-hidden="true">image-20230918202331798</figcaption>
+</figure></li>
 <li><p><code>code</code>：表示该类事件下的哪一个事件；例如<code>EV_KEY</code>表示键盘，键盘上有很多按键，每个分别对应不同事件：</p>
-<p><img src="/../images/%E8%BE%93%E5%85%A5%E7%B3%BB%E7%BB%9F%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20230918202559709.png" alt="image-20230918202559709"></p>
+<figure>
+<img src="../images/输入系统应用编程/image-20230918202559709.png"
+alt="image-20230918202559709" />
+<figcaption aria-hidden="true">image-20230918202559709</figcaption>
+</figure>
 <p>对于<code>EV_ABS</code>事件，触摸屏提供绝对位置信息，包括X，Y还有压力方向的值：</p>
-<p><img src="/../images/%E8%BE%93%E5%85%A5%E7%B3%BB%E7%BB%9F%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20230918202823767.png" alt="image-20230918202823767"></p>
-</li>
-<li><p><code>value</code>：表示事件的值；例如按键的值可以是0(按下)或者1(松开)</p>
-</li>
+<figure>
+<img src="../images/输入系统应用编程/image-20230918202823767.png"
+alt="image-20230918202823767" />
+<figcaption aria-hidden="true">image-20230918202823767</figcaption>
+</figure></li>
+<li><p><code>value</code>：表示事件的值；例如按键的值可以是0(按下)或者1(松开)</p></li>
+</ul></li>
 </ul>
-</li>
-</ul>
-<h5 id="1-使用命令读取设备上报数据"><a href="#1-使用命令读取设备上报数据" class="headerlink" title="(1) 使用命令读取设备上报数据"></a>(1) 使用命令读取设备上报数据</h5><p>调试输入系统时，直接执行类似下面的命令，然后操作对应的输入设备即可读出数据： </p>
+<h5 id="使用命令读取设备上报数据">(1) 使用命令读取设备上报数据</h5>
+<p>调试输入系统时，直接执行类似下面的命令，然后操作对应的输入设备即可读出数据：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hexdump /dev/input/event0</span><br></pre></td></tr></table></figure>
-
 <p>部分输出如下：</p>
-<p><img src="/../images/%E8%BE%93%E5%85%A5%E7%B3%BB%E7%BB%9F%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20230918205712204.png" alt="image-20230918205712204"></p>
+<figure>
+<img src="../images/输入系统应用编程/image-20230918205712204.png"
+alt="image-20230918205712204" />
+<figcaption aria-hidden="true">image-20230918205712204</figcaption>
+</figure>
 <p>根据输出信息，结合<code>input-event-codes.h</code>，即可知道操作触发了那类事件中的那个事件，触发的值是什么</p>
-<h5 id="2-事件的结尾标识"><a href="#2-事件的结尾标识" class="headerlink" title="(2) 事件的结尾标识"></a>(2) 事件的结尾标识</h5><p>APP读取输入事件时，不同设备可能会上报不同数量的事件，但是所有设备的驱动程序都会在上报所有的数据之后，<strong>最后上报一个“同步事件”，表示数据上报完成</strong>。APP读到该事件时知道已经读完当前数据。<strong>“同步事件”也是一个<code>input_event</code>结构体，他的<code>type、code、value</code>属性都为0</strong>，如上图所示。</p>
-<h4 id="1-2-2-查询开发板上有哪些设备节点"><a href="#1-2-2-查询开发板上有哪些设备节点" class="headerlink" title="1.2.2 查询开发板上有哪些设备节点"></a>1.2.2 查询开发板上有哪些设备节点</h4><h5 id="1-使用命令查询设备节点："><a href="#1-使用命令查询设备节点：" class="headerlink" title="(1) 使用命令查询设备节点："></a>(1) 使用命令查询设备节点：</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ls /dev/input/* -l</span><br></pre></td></tr></table></figure>
-
+<h5 id="事件的结尾标识">(2) 事件的结尾标识</h5>
+<p>APP读取输入事件时，不同设备可能会上报不同数量的事件，但是所有设备的驱动程序都会在上报所有的数据之后，<strong>最后上报一个“同步事件”，表示数据上报完成</strong>。APP读到该事件时知道已经读完当前数据。<strong>“同步事件”也是一个<code>input_event</code>结构体，他的<code>type、code、value</code>属性都为0</strong>，如上图所示。</p>
+<h4 id="查询开发板上有哪些设备节点">1.2.2
+查询开发板上有哪些设备节点</h4>
+<h5 id="使用命令查询设备节点">(1) 使用命令查询设备节点：</h5>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ls /dev/input/* -l</span><br></pre></td></tr></table></figure>
 <p>在开发板上输出：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">crw-rw---- 1 root input 13, 64 Jan  1 00:00 /dev/input/event0</span><br><span class="line">crw-rw---- 1 root input 13, 65 Jan  1 00:00 /dev/input/event1</span><br></pre></td></tr></table></figure>
-
-<h5 id="2-使用命令查询设备信息及其对应的设备节点"><a href="#2-使用命令查询设备信息及其对应的设备节点" class="headerlink" title="(2) 使用命令查询设备信息及其对应的设备节点"></a>(2) 使用命令查询设备信息及其对应的设备节点</h5><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat /proc/bus/input/devices</span><br></pre></td></tr></table></figure>
-
+<h5 id="使用命令查询设备信息及其对应的设备节点">(2)
+使用命令查询设备信息及其对应的设备节点</h5>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat /proc/bus/input/devices</span><br></pre></td></tr></table></figure>
 <p>部分输出：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">I: Bus=0018 Vendor=dead Product=beef Version=28bb</span><br><span class="line">N: Name=&quot;goodix-ts&quot;                       //触摸屏</span><br><span class="line">P: Phys=input/ts</span><br><span class="line">S: Sysfs=/devices/virtual/input/input1</span><br><span class="line">U: Uniq=</span><br><span class="line">H: Handlers=event1 evbug                 //设备节点：/dev/input/event1</span><br><span class="line">B: PROP=2</span><br><span class="line">B: EV=b</span><br><span class="line">B: KEY=1c00 0 0 0 0 0 0 0 0 0 0</span><br><span class="line">B: ABS=6e18000 0</span><br></pre></td></tr></table></figure>
-
-<ol>
+<ol type="1">
 <li><p>I：设备ID</p>
 <p>该参数由结构体<code>input_id</code>来描述：</p>
-<p><img src="/../images/%E8%BE%93%E5%85%A5%E7%B3%BB%E7%BB%9F%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20230918210100361.png" alt="image-20230918210100361"></p>
-</li>
-<li><p>N：设备名称</p>
-</li>
-<li><p>P：系统层次结构中设备的物理路径（physical path to the device in the system hierarchy）</p>
-</li>
-<li><p>S：位于 sys 文件系统的路径（sysfs path）</p>
-</li>
-<li><p>U：设备的唯一标识码（unique identification code for the device(if device has it)）</p>
-</li>
-<li><p>H：与设备关联的输入句柄列表（list of input handles associated with the device）</p>
-</li>
+<figure>
+<img src="../images/输入系统应用编程/image-20230918210100361.png"
+alt="image-20230918210100361" />
+<figcaption aria-hidden="true">image-20230918210100361</figcaption>
+</figure></li>
+<li><p>N：设备名称</p></li>
+<li><p>P：系统层次结构中设备的物理路径（physical path to the device in
+the system hierarchy）</p></li>
+<li><p>S：位于 sys 文件系统的路径（sysfs path）</p></li>
+<li><p>U：设备的唯一标识码（unique identification code for the device(if
+device has it)）</p></li>
+<li><p>H：与设备关联的输入句柄列表（list of input handles associated
+with the device）</p></li>
 <li><p>B：位图（bitmaps）</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">PROP:device properties and quirks(设备属性) </span><br><span class="line">EV:types of events supported by the device(设备支持的事件类型) </span><br><span class="line">KEY:keys/buttons this device has(此设备具有的键/按钮) </span><br><span class="line">MSC:miscellaneous events supported by the device(设备支持的其他事件) </span><br><span class="line">LED:leds present on the device(设备上的指示灯)</span><br></pre></td></tr></table></figure></li>
 </ol>
-<h5 id="3-理解位图"><a href="#3-理解位图" class="headerlink" title="(3) 理解位图"></a>(3) 理解位图</h5><p>还是以上面的输出为例：</p>
+<h5 id="理解位图">(3) 理解位图</h5>
+<p>还是以上面的输出为例：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">B: EV=b                             //b:1011</span><br><span class="line">B: KEY=1c00 0 0 0 0 0 0 0 0 0 0</span><br><span class="line">B: ABS=6e18000 0                   //6e18000 0:0110 1110 0001 1000 0000 0000 0000 0000</span><br></pre></td></tr></table></figure>
-
 <ul>
-<li><code>EV=b</code>：根据其二进制第0，1，3位为1，可知其支持值为0，1，3这三类事件，查询<code>input-event-codes.h</code>可知其支持<code>EV_SYN</code>同步事件、<code>EV_KEY</code>按键事件、&#96;EV_ABS绝对位移事件</li>
+<li><code>EV=b</code>：根据其二进制第0，1，3位为1，可知其支持值为0，1，3这三类事件，查询<code>input-event-codes.h</code>可知其支持<code>EV_SYN</code>同步事件、<code>EV_KEY</code>按键事件、`EV_ABS绝对位移事件</li>
 <li><code>ABS=6e18000 0</code>：根据下面<code>input_dev</code>结构体，可知每一个数据都是<code>unsigned long</code>为32位。同理得到其二进制表示，查询<code>input-event-codes.h</code>可知该设备具体支持绝对位移类事件中的哪些子事件</li>
 </ul>
-<h5 id="4-内核如何表示一个输入设备"><a href="#4-内核如何表示一个输入设备" class="headerlink" title="(4) 内核如何表示一个输入设备"></a>(4) 内核如何表示一个输入设备</h5><p>使用 <code>input_dev</code> 结构体来表示输入设备：</p>
-<p><img src="/../images/%E8%BE%93%E5%85%A5%E7%B3%BB%E7%BB%9F%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20230918211408770.png" alt="image-20230918211408770"></p>
+<h5 id="内核如何表示一个输入设备">(4) 内核如何表示一个输入设备</h5>
+<p>使用 <code>input_dev</code> 结构体来表示输入设备：</p>
+<figure>
+<img src="../images/输入系统应用编程/image-20230918211408770.png"
+alt="image-20230918211408770" />
+<figcaption aria-hidden="true">image-20230918211408770</figcaption>
+</figure>
 <p>该数据结构和shell输出的设备信息正好对应。</p>
-<h2 id="2-不使用库读取输入设备信息"><a href="#2-不使用库读取输入设备信息" class="headerlink" title="2. 不使用库读取输入设备信息"></a>2. 不使用库读取输入设备信息</h2><h3 id="2-1-获取输入设备基本信息"><a href="#2-1-获取输入设备基本信息" class="headerlink" title="2.1 获取输入设备基本信息"></a>2.1 获取输入设备基本信息</h3><p>简单了解一下针对输入设备的使用ioctl()获取设备信息：</p>
-<h4 id="2-1-1-获取input-id结构体"><a href="#2-1-1-获取input-id结构体" class="headerlink" title="2.1.1 获取input_id结构体"></a>2.1.1 获取input_id结构体</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">input_id</span> <span class="title">id</span>;</span></span><br><span class="line">err = ioctl(fd, EVIOCGID, &amp;id);</span><br></pre></td></tr></table></figure>
-
+<h2 id="不使用库读取输入设备信息">2. 不使用库读取输入设备信息</h2>
+<h3 id="获取输入设备基本信息">2.1 获取输入设备基本信息</h3>
+<p>简单了解一下针对输入设备的使用ioctl()获取设备信息：</p>
+<h4 id="获取input_id结构体">2.1.1 获取input_id结构体</h4>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">input_id</span> <span class="title">id</span>;</span></span><br><span class="line">err = ioctl(fd, EVIOCGID, &amp;id);</span><br></pre></td></tr></table></figure>
 <p>一般ioctl()函数在成功时返回0，失败时返回-1；在个别情况下，返回值也包含有效信息（例如读取到的字节数）。继续向下寻找<code>EVIOCGID</code>的定义：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* /include/linux/input.h         */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> EVIOCGID		_IOR(<span class="string">&#x27;E&#x27;</span>, 0x02, struct input_id)	<span class="comment">/* get device ID */</span></span></span><br><span class="line"><span class="comment">/* /include/asm-generic/ioctl.h    */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _IOR(type,nr,size)	_IOC(_IOC_READ,(type),(nr),(_IOC_TYPECHECK(size)))</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _IOC(dir,type,nr,size) \</span></span><br><span class="line"><span class="meta">	(((dir)  &lt;&lt; _IOC_DIRSHIFT) | \</span></span><br><span class="line"><span class="meta">	 ((type) &lt;&lt; _IOC_TYPESHIFT) | \</span></span><br><span class="line"><span class="meta">	 ((nr)   &lt;&lt; _IOC_NRSHIFT) | \</span></span><br><span class="line"><span class="meta">	 ((size) &lt;&lt; _IOC_SIZESHIFT))</span></span><br></pre></td></tr></table></figure>
-
 <ul>
 <li><code>dir</code>：为<code>_IOC_READ</code>表示APP要读数据，为<code>_IOC_WRITE</code>表示APP要写数据</li>
 <li><code>size</code>：表示ioctl能传输数据的<strong>最大字节数</strong></li>
 <li><code>type、nr</code> 的含义由具体的驱动程序决定</li>
 </ul>
-<h4 id="2-1-2-获取evbit数组-支持哪几类事件"><a href="#2-1-2-获取evbit数组-支持哪几类事件" class="headerlink" title="2.1.2 获取evbit数组(支持哪几类事件)"></a>2.1.2 获取evbit数组(支持哪几类事件)</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">unsigned</span> <span class="type">int</span> evbit[<span class="number">2</span>];</span><br><span class="line">len = ioctl(fd, EVIOCGBIT(<span class="number">0</span>, <span class="keyword">sizeof</span>(evbit)), &amp;evbit);   <span class="comment">// sizeof返回的是字节数</span></span><br><span class="line"><span class="keyword">if</span> (len &gt; <span class="number">0</span> &amp;&amp; len &lt;= <span class="keyword">sizeof</span>(evbit))</span><br><span class="line">&#123;</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;support ev type: &quot;</span>);</span><br><span class="line">	<span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; len; i++)</span><br><span class="line">	&#123;</span><br><span class="line">		byte = ((<span class="type">unsigned</span> <span class="type">char</span> *)evbit) [i];</span><br><span class="line">		<span class="keyword">for</span> (bit = <span class="number">0</span>; bit &lt; <span class="number">8</span>; bit++)</span><br><span class="line">			<span class="keyword">if</span> (byte &amp; (<span class="number">1</span>&lt;&lt;bit)) </span><br><span class="line">				<span class="built_in">printf</span>(<span class="string">&quot;%s &quot;</span>, ev_names[i*<span class="number">8</span> + bit]);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
+<h4 id="获取evbit数组支持哪几类事件">2.1.2
+获取evbit数组(支持哪几类事件)</h4>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">unsigned</span> <span class="type">int</span> evbit[<span class="number">2</span>];</span><br><span class="line">len = ioctl(fd, EVIOCGBIT(<span class="number">0</span>, <span class="keyword">sizeof</span>(evbit)), &amp;evbit);   <span class="comment">// sizeof返回的是字节数</span></span><br><span class="line"><span class="keyword">if</span> (len &gt; <span class="number">0</span> &amp;&amp; len &lt;= <span class="keyword">sizeof</span>(evbit))</span><br><span class="line">&#123;</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;support ev type: &quot;</span>);</span><br><span class="line">	<span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; len; i++)</span><br><span class="line">	&#123;</span><br><span class="line">		byte = ((<span class="type">unsigned</span> <span class="type">char</span> *)evbit) [i];</span><br><span class="line">		<span class="keyword">for</span> (bit = <span class="number">0</span>; bit &lt; <span class="number">8</span>; bit++)</span><br><span class="line">			<span class="keyword">if</span> (byte &amp; (<span class="number">1</span>&lt;&lt;bit)) </span><br><span class="line">				<span class="built_in">printf</span>(<span class="string">&quot;%s &quot;</span>, ev_names[i*<span class="number">8</span> + bit]);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;\n&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>根据宏定义<code>EV_MAX=0x1f</code>理论上来说，一个int足矣存放下所有事件类型。继续寻找<code>EVIOCGBIT</code>：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> EVIOCGBIT(ev,len)	_IOC(_IOC_READ, <span class="string">&#x27;E&#x27;</span>, 0x20 + (ev), len) <span class="comment">/* get event bits */</span></span></span><br></pre></td></tr></table></figure>
-
 <p>之所以<code>EVIOCGBIT(0, sizeof(evbit))</code>传入参数0，原因在内核驱动代码中，不过做应用只需要按照如下对应关系传入参数即可：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> EV_REL			0x02</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> EV_ABS			0x03</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> EV_MSC			0x04</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> EV_SW			0x05</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> EV_LED			0x11</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> EV_SND			0x12</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> EV_REP			0x14</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> EV_FF			0x15</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> EV_PWR			0x16</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> EV_FF_STATUS		0x17</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> EV_MAX			0x1f</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> EV_CNT			(EV_MAX+1)</span></span><br></pre></td></tr></table></figure>
-
-
-
-
-
-<h3 id="2-2-获取输入设备的事件信息"><a href="#2-2-获取输入设备的事件信息" class="headerlink" title="2.2 获取输入设备的事件信息"></a>2.2 获取输入设备的事件信息</h3><p>获取输入设备事件信息的四种方式：</p>
-<ol>
+<h3 id="获取输入设备的事件信息">2.2 获取输入设备的事件信息</h3>
+<p>获取输入设备事件信息的四种方式：</p>
+<ol type="1">
 <li>查询：</li>
 <li>休眠-唤醒</li>
-<li>POLL&#x2F;SELECT</li>
+<li>POLL/SELECT</li>
 <li>异步通知方式</li>
 </ol>
-<h4 id="2-2-1-查询和休眠-唤醒方式"><a href="#2-2-1-查询和休眠-唤醒方式" class="headerlink" title="2.2.1 查询和休眠-唤醒方式"></a>2.2.1 查询和休眠-唤醒方式</h4><ul>
+<h4 id="查询和休眠-唤醒方式">2.2.1 查询和休眠-唤醒方式</h4>
+<ul>
 <li>所谓查询就是<strong>以非阻塞方式(O_NONBLOCK)打开设备文件</strong>，在死循环中使用<code>read</code>函数不停的读取文件内容；如果读取到就返回数据，否则就返回失败</li>
-<li>而休眠-唤醒则是<strong>以阻塞方式打开设备文件</strong>。如果文件中没有数据，则APP就会在内核态休眠，有数据时驱动程序会把 APP 唤醒，read 函数恢复执行并返回数据给 APP</li>
+<li>而休眠-唤醒则是<strong>以阻塞方式打开设备文件</strong>。如果文件中没有数据，则APP就会在内核态休眠，有数据时驱动程序会把
+APP 唤醒，read 函数恢复执行并返回数据给 APP</li>
 </ul>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">input_event</span> <span class="title">event</span>;</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (argc == <span class="number">3</span> &amp;&amp; !<span class="built_in">strcmp</span>(argv[<span class="number">2</span>], <span class="string">&quot;noblock&quot;</span>))</span><br><span class="line">	fd = open(argv[<span class="number">1</span>], O_RDWR | O_NONBLOCK);</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">	fd = open(argv[<span class="number">1</span>], O_RDWR);</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> (<span class="number">1</span>)</span><br><span class="line">&#123;</span><br><span class="line">	len = read(fd, &amp;event, <span class="keyword">sizeof</span>(event));</span><br><span class="line">	<span class="keyword">if</span> (len == <span class="keyword">sizeof</span>(event))</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;get event: type = 0x%x, code = 0x%x, value = 0x%x\n&quot;</span>, event.type, event.code, event.value);</span><br><span class="line">	<span class="keyword">else</span></span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;read err %d\n&quot;</span>, len);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-<h4 id="2-2-2-POLL-SELECT方式"><a href="#2-2-2-POLL-SELECT方式" class="headerlink" title="2.2.2 POLL&#x2F;SELECT方式"></a>2.2.2 POLL&#x2F;SELECT方式</h4><p>poll()和select()类似，用来等待判断所监视的文件是否准备好了文件I&#x2F;O。</p>
+<h4 id="pollselect方式">2.2.2 POLL/SELECT方式</h4>
+<p>poll()和select()类似，用来等待判断所监视的文件是否准备好了文件I/O。</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;poll.h&gt;</span></span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">pollfd</span> &#123;</span></span><br><span class="line">    <span class="type">int</span>   fd;         <span class="comment">/* file descriptor */</span></span><br><span class="line">    <span class="type">short</span> events;     <span class="comment">/* requested events */</span></span><br><span class="line">    <span class="type">short</span> revents;    <span class="comment">/* returned events */</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="comment">/* Type used for the number of file descriptors.  */</span></span><br><span class="line"><span class="keyword">typedef</span> <span class="type">unsigned</span> <span class="type">long</span> <span class="type">int</span> <span class="type">nfds_t</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">poll</span><span class="params">(<span class="keyword">struct</span> pollfd *fds, <span class="type">nfds_t</span> nfds, <span class="type">int</span> timeout)</span>;</span><br></pre></td></tr></table></figure>
-
 <ul>
-<li><p>当成功时返回一个正数，表示具有非零revents字段的数量（每个事件对应revents中的1bit）。返回0表示超时；出现错误时返回-1，并设置errno</p>
-</li>
-<li><p>poll可以监视的文件事件类型有：</p>
-</li>
+<li><p>当成功时返回一个正数，表示具有非零revents字段的数量（每个事件对应revents中的1bit）。返回0表示超时；出现错误时返回-1，并设置errno</p></li>
+<li><p>poll可以监视的文件事件类型有：</p></li>
 </ul>
 <table>
+<colgroup>
+<col style="width: 15%" />
+<col style="width: 84%" />
+</colgroup>
 <thead>
-<tr>
+<tr class="header">
 <th>事件类型</th>
 <th>说明</th>
 </tr>
 </thead>
-<tbody><tr>
+<tbody>
+<tr class="odd">
 <td><strong>POLLIN</strong></td>
 <td>有数据可读</td>
 </tr>
-<tr>
+<tr class="even">
 <td>POLLRDNORM</td>
 <td>等同于 POLLIN</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>POLLRDBAND</td>
-<td>Priority band data can be read，有优先级较较高的“band data”可读 Linux 系统中很少使用这个事件</td>
+<td>Priority band data can be read，有优先级较较高的“band data”可读
+Linux 系统中很少使用这个事件</td>
 </tr>
-<tr>
+<tr class="even">
 <td>POLLPRI</td>
 <td>高优先级数据可读</td>
 </tr>
-<tr>
+<tr class="odd">
 <td><strong>POLLOUT</strong></td>
 <td>可以写数据</td>
 </tr>
-<tr>
+<tr class="even">
 <td>POLLWRNORM</td>
 <td>等同于 POLLOUT</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>POLLWRBAND</td>
 <td>Priority data may be written</td>
 </tr>
-<tr>
+<tr class="even">
 <td>POLLERR</td>
 <td>发生了错误</td>
 </tr>
-<tr>
+<tr class="odd">
 <td>POLLHUP</td>
 <td>挂起</td>
 </tr>
-<tr>
+<tr class="even">
 <td>POLLNVAL</td>
 <td>无效的请求，一般是 fd 未 open</td>
 </tr>
-</tbody></table>
+</tbody>
+</table>
 <p>核心代码：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">pollfd</span> <span class="title">fds</span>[1];</span></span><br><span class="line"><span class="type">nfds_t</span> nfds = <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">fds[<span class="number">0</span>].fd = fd;</span><br><span class="line">fds[<span class="number">0</span>].events  = POLLIN;</span><br><span class="line">fds[<span class="number">0</span>].revents = <span class="number">0</span>;   <span class="comment">// 先置位，防止随机值干扰</span></span><br><span class="line">ret = poll(fds, nfds, <span class="number">5000</span>);</span><br><span class="line"><span class="keyword">if</span> (ret &gt; <span class="number">0</span>)</span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">if</span> (fds[<span class="number">0</span>].revents == POLLIN)</span><br><span class="line">		<span class="keyword">while</span> (read(fd, &amp;event, <span class="keyword">sizeof</span>(event)) == <span class="keyword">sizeof</span>(event))</span><br><span class="line">			<span class="built_in">printf</span>(<span class="string">&quot;get event: type = 0x%x, code = 0x%x, value = 0x%x\n&quot;</span>, event.type, event.code, event.value);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">else</span> <span class="keyword">if</span> (ret == <span class="number">0</span>)</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;time out\n&quot;</span>);</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;poll err\n&quot;</span>);</span><br></pre></td></tr></table></figure>
-
-
-
-<h4 id="2-2-3-异步通知方式"><a href="#2-2-3-异步通知方式" class="headerlink" title="2.2.3 异步通知方式"></a>2.2.3 异步通知方式</h4><p>上面三种方式都是<strong>同步方式</strong>，APP只能等待驱动程序发送数据，这期间不能做其他事情。而<strong>异步通知方式</strong>就是APP可以做其他事情，驱动有数据之后会给APP发信号，APP收到信息执行相应的信号处理函数，类似于中断</p>
+<h4 id="异步通知方式">2.2.3 异步通知方式</h4>
+<p>上面三种方式都是<strong>同步方式</strong>，APP只能等待驱动程序发送数据，这期间不能做其他事情。而<strong>异步通知方式</strong>就是APP可以做其他事情，驱动有数据之后会给APP发信号，APP收到信息执行相应的信号处理函数，类似于中断</p>
 <p>考虑异步通知的实现细节：</p>
-<ol>
+<ol type="1">
 <li><p>信号的类型是什么？</p>
 <p>在<code>include/uapi/asm-generic/signal.h</code>中：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> SIGHUP		 1</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SIGINT		 2</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SIGQUIT		 3</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SIGILL		 4</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SIGTRAP		 5</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SIGABRT		 6</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SIGIOT		 6</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SIGBUS		 7</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SIGFPE		 8</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SIGKILL		 9</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SIGUSR1		10</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SIGSEGV		11</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SIGUSR2		12</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SIGPIPE		13</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SIGALRM		14</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SIGTERM		15</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SIGSTKFLT	16</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SIGCHLD		17</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SIGCONT		18</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SIGSTOP		19</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SIGTSTP		20</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SIGTTIN		21</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SIGTTOU		22</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SIGURG		23</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SIGXCPU		24</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SIGXFSZ		25</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SIGVTALRM	26</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SIGPROF		27</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SIGWINCH	28</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SIGIO		29</span></span><br></pre></td></tr></table></figure>
-
-<p>一般IO事件常用信号类型是<code>SIGIO</code>，表示有IO事件需要处理</p>
-</li>
+<p>一般IO事件常用信号类型是<code>SIGIO</code>，表示有IO事件需要处理</p></li>
 <li><p>APP收到信号之后，应该调用什么函数进行处理？</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;signal.h&gt;</span></span></span><br><span class="line"><span class="keyword">typedef</span> <span class="title function_">void</span> <span class="params">(*<span class="type">sighandler_t</span>)</span><span class="params">(<span class="type">int</span>)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">sighandler_t</span> <span class="title function_">signal</span><span class="params">(<span class="type">int</span> signum, <span class="type">sighandler_t</span> handler)</span>;</span><br></pre></td></tr></table></figure>
-
-<p>使用signal()函数将将信号关联到信号处理程序</p>
-</li>
+<p>使用signal()函数将将信号关联到信号处理程序</p></li>
 <li><p>APP和驱动程序之间如何建立联系？</p>
 <p>APP中可以打开设备文件；驱动程序需要得知APP的进程号</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line">#include &lt;fcntl.h&gt;</span><br><span class="line"></span><br><span class="line">int fcntl(int fd, int cmd, ... /* arg */ );</span><br></pre></td></tr></table></figure>
-
 <ul>
 <li>fcntl()用来执行由<code>cmd</code>参数描述的一种针对文件fd的操作。arg参数是否需要，是什么类型由<code>cmd</code>决定</li>
-<li>例如<code>cmd</code>的值为<code>  F_SETOWN (int)</code>，表示设置文件fd上的<code>SIGIO</code>和<code>SIGURG</code>信号的进程ID&#x2F;进程组ID为arg的值。最常用的做法是调用进程将自己指定为所有者<code>getpid()</code></li>
+<li>例如<code>cmd</code>的值为<code>F_SETOWN (int)</code>，表示设置文件fd上的<code>SIGIO</code>和<code>SIGURG</code>信号的进程ID/进程组ID为arg的值。最常用的做法是调用进程将自己指定为所有者<code>getpid()</code></li>
 <li>返回值：对于<code>F_SENTOWN</code>成功返回0，错误返回-1</li>
-</ul>
-</li>
+</ul></li>
 <li><p>驱动程序使能异步通知功能</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">define</span> FASYNC  O_ASYNC</span></span><br><span class="line"></span><br><span class="line">flags = fcntl(fd, F_GETFL);</span><br><span class="line">fcntl(fd, F_SETFL, flags | FASYNC);  <span class="comment">// 设置FASYNC位，使能异步通知功能</span></span><br></pre></td></tr></table></figure>
-
 <ul>
 <li><code>F_GETFL (void)</code>：将文件访问模式和文件状态标志作为返回值进行返回，<code>arg</code>参数为void</li>
 <li><code>F_SETFL (int)</code>：将文件状态标志设置为arg参数的值。忽略访问模式位<code>O_RDONLY, O_WRONLY, O_RDWR</code>和文件创建标志位<code>O_CREAT,O_EXCL,O_NOCTTY,O_TRUNC</code>，该命令仅能修改<code>O_APPEND, O_ASYNC, O_DIRECT, O_NOATIME, O_NONBLOCK</code></li>
-</ul>
-</li>
+</ul></li>
 </ol>
 <p>核心代码：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">my_sig_handler</span><span class="params">(<span class="type">int</span> sig)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">input_event</span> <span class="title">event</span>;</span></span><br><span class="line">	<span class="keyword">while</span> (read(fd, &amp;event, <span class="keyword">sizeof</span>(event)) == <span class="keyword">sizeof</span>(event))</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;get event: type = 0x%x, code = 0x%x, value = 0x%x\n&quot;</span>, event.type, event.code, event.value);		</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 注册信号处理函数 */</span></span><br><span class="line">signal(SIGIO, my_sig_handler);</span><br><span class="line"><span class="comment">/* 打开驱动程序 */</span></span><br><span class="line">fd = open(argv[<span class="number">1</span>], O_RDWR | O_NONBLOCK);	</span><br><span class="line"><span class="comment">/* 把APP的进程号告诉驱动程序 */</span></span><br><span class="line">fcntl(fd, F_SETOWN, getpid());</span><br><span class="line"><span class="comment">/* 使能&quot;异步通知&quot; */</span></span><br><span class="line">flags = fcntl(fd, F_GETFL);</span><br><span class="line">fcntl(fd, F_SETFL, flags | FASYNC);</span><br><span class="line"><span class="keyword">while</span> (<span class="number">1</span>)</span><br><span class="line">&#123;</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">&quot;main loop count = %d\n&quot;</span>, count++);</span><br><span class="line">	sleep(<span class="number">2</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-
-
-
-
-
-
 
     </div>
 
@@ -600,7 +611,10 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E8%BE%93%E5%85%A5%E7%B3%BB%E7%BB%9F%E6%A1%86%E6%9E%B6%E5%8F%8A%E8%B0%83%E8%AF%95"><span class="nav-number">1.</span> <span class="nav-text">1. 输入系统框架及调试</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E6%A1%86%E6%9E%B6%E6%A6%82%E8%BF%B0"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 框架概述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-%E7%BC%96%E5%86%99APP%E9%9C%80%E8%A6%81%E6%8E%8C%E6%8F%A1%E7%9A%84%E7%9F%A5%E8%AF%86"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 编写APP需要掌握的知识</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-1-APP%E5%8F%AF%E4%BB%A5%E5%BE%97%E5%88%B0%E4%BB%80%E4%B9%88%E6%95%B0%E6%8D%AE"><span class="nav-number">1.2.1.</span> <span class="nav-text">1.2.1 APP可以得到什么数据</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-%E4%BD%BF%E7%94%A8%E5%91%BD%E4%BB%A4%E8%AF%BB%E5%8F%96%E8%AE%BE%E5%A4%87%E4%B8%8A%E6%8A%A5%E6%95%B0%E6%8D%AE"><span class="nav-number">1.2.1.1.</span> <span class="nav-text">(1) 使用命令读取设备上报数据</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-%E4%BA%8B%E4%BB%B6%E7%9A%84%E7%BB%93%E5%B0%BE%E6%A0%87%E8%AF%86"><span class="nav-number">1.2.1.2.</span> <span class="nav-text">(2) 事件的结尾标识</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-2-%E6%9F%A5%E8%AF%A2%E5%BC%80%E5%8F%91%E6%9D%BF%E4%B8%8A%E6%9C%89%E5%93%AA%E4%BA%9B%E8%AE%BE%E5%A4%87%E8%8A%82%E7%82%B9"><span class="nav-number">1.2.2.</span> <span class="nav-text">1.2.2 查询开发板上有哪些设备节点</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-%E4%BD%BF%E7%94%A8%E5%91%BD%E4%BB%A4%E6%9F%A5%E8%AF%A2%E8%AE%BE%E5%A4%87%E8%8A%82%E7%82%B9%EF%BC%9A"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">(1) 使用命令查询设备节点：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-%E4%BD%BF%E7%94%A8%E5%91%BD%E4%BB%A4%E6%9F%A5%E8%AF%A2%E8%AE%BE%E5%A4%87%E4%BF%A1%E6%81%AF%E5%8F%8A%E5%85%B6%E5%AF%B9%E5%BA%94%E7%9A%84%E8%AE%BE%E5%A4%87%E8%8A%82%E7%82%B9"><span class="nav-number">1.2.2.2.</span> <span class="nav-text">(2) 使用命令查询设备信息及其对应的设备节点</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-%E7%90%86%E8%A7%A3%E4%BD%8D%E5%9B%BE"><span class="nav-number">1.2.2.3.</span> <span class="nav-text">(3) 理解位图</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-%E5%86%85%E6%A0%B8%E5%A6%82%E4%BD%95%E8%A1%A8%E7%A4%BA%E4%B8%80%E4%B8%AA%E8%BE%93%E5%85%A5%E8%AE%BE%E5%A4%87"><span class="nav-number">1.2.2.4.</span> <span class="nav-text">(4) 内核如何表示一个输入设备</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E4%B8%8D%E4%BD%BF%E7%94%A8%E5%BA%93%E8%AF%BB%E5%8F%96%E8%BE%93%E5%85%A5%E8%AE%BE%E5%A4%87%E4%BF%A1%E6%81%AF"><span class="nav-number">2.</span> <span class="nav-text">2. 不使用库读取输入设备信息</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E8%8E%B7%E5%8F%96%E8%BE%93%E5%85%A5%E8%AE%BE%E5%A4%87%E5%9F%BA%E6%9C%AC%E4%BF%A1%E6%81%AF"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 获取输入设备基本信息</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-1-%E8%8E%B7%E5%8F%96input-id%E7%BB%93%E6%9E%84%E4%BD%93"><span class="nav-number">2.1.1.</span> <span class="nav-text">2.1.1 获取input_id结构体</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-2-%E8%8E%B7%E5%8F%96evbit%E6%95%B0%E7%BB%84-%E6%94%AF%E6%8C%81%E5%93%AA%E5%87%A0%E7%B1%BB%E4%BA%8B%E4%BB%B6"><span class="nav-number">2.1.2.</span> <span class="nav-text">2.1.2 获取evbit数组(支持哪几类事件)</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E8%8E%B7%E5%8F%96%E8%BE%93%E5%85%A5%E8%AE%BE%E5%A4%87%E7%9A%84%E4%BA%8B%E4%BB%B6%E4%BF%A1%E6%81%AF"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 获取输入设备的事件信息</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-1-%E6%9F%A5%E8%AF%A2%E5%92%8C%E4%BC%91%E7%9C%A0-%E5%94%A4%E9%86%92%E6%96%B9%E5%BC%8F"><span class="nav-number">2.2.1.</span> <span class="nav-text">2.2.1 查询和休眠-唤醒方式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-2-POLL-SELECT%E6%96%B9%E5%BC%8F"><span class="nav-number">2.2.2.</span> <span class="nav-text">2.2.2 POLL&#x2F;SELECT方式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-3-%E5%BC%82%E6%AD%A5%E9%80%9A%E7%9F%A5%E6%96%B9%E5%BC%8F"><span class="nav-number">2.2.3.</span> <span class="nav-text">2.2.3 异步通知方式</span></a></li></ol></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BE%93%E5%85%A5%E7%B3%BB%E7%BB%9F%E6%A1%86%E6%9E%B6%E5%8F%8A%E8%B0%83%E8%AF%95"><span class="nav-number">1.</span> <span class="nav-text">1. 输入系统框架及调试</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A1%86%E6%9E%B6%E6%A6%82%E8%BF%B0"><span class="nav-number">1.1.</span> <span class="nav-text">1.1 框架概述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%96%E5%86%99app%E9%9C%80%E8%A6%81%E6%8E%8C%E6%8F%A1%E7%9A%84%E7%9F%A5%E8%AF%86"><span class="nav-number">1.2.</span> <span class="nav-text">1.2 编写APP需要掌握的知识</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#app%E5%8F%AF%E4%BB%A5%E5%BE%97%E5%88%B0%E4%BB%80%E4%B9%88%E6%95%B0%E6%8D%AE"><span class="nav-number">1.2.1.</span> <span class="nav-text">1.2.1 APP可以得到什么数据</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%91%BD%E4%BB%A4%E8%AF%BB%E5%8F%96%E8%AE%BE%E5%A4%87%E4%B8%8A%E6%8A%A5%E6%95%B0%E6%8D%AE"><span class="nav-number">1.2.1.1.</span> <span class="nav-text">(1) 使用命令读取设备上报数据</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%BA%8B%E4%BB%B6%E7%9A%84%E7%BB%93%E5%B0%BE%E6%A0%87%E8%AF%86"><span class="nav-number">1.2.1.2.</span> <span class="nav-text">(2) 事件的结尾标识</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9F%A5%E8%AF%A2%E5%BC%80%E5%8F%91%E6%9D%BF%E4%B8%8A%E6%9C%89%E5%93%AA%E4%BA%9B%E8%AE%BE%E5%A4%87%E8%8A%82%E7%82%B9"><span class="nav-number">1.2.2.</span> <span class="nav-text">1.2.2
+查询开发板上有哪些设备节点</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%91%BD%E4%BB%A4%E6%9F%A5%E8%AF%A2%E8%AE%BE%E5%A4%87%E8%8A%82%E7%82%B9"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">(1) 使用命令查询设备节点：</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%91%BD%E4%BB%A4%E6%9F%A5%E8%AF%A2%E8%AE%BE%E5%A4%87%E4%BF%A1%E6%81%AF%E5%8F%8A%E5%85%B6%E5%AF%B9%E5%BA%94%E7%9A%84%E8%AE%BE%E5%A4%87%E8%8A%82%E7%82%B9"><span class="nav-number">1.2.2.2.</span> <span class="nav-text">(2)
+使用命令查询设备信息及其对应的设备节点</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E7%90%86%E8%A7%A3%E4%BD%8D%E5%9B%BE"><span class="nav-number">1.2.2.3.</span> <span class="nav-text">(3) 理解位图</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%86%85%E6%A0%B8%E5%A6%82%E4%BD%95%E8%A1%A8%E7%A4%BA%E4%B8%80%E4%B8%AA%E8%BE%93%E5%85%A5%E8%AE%BE%E5%A4%87"><span class="nav-number">1.2.2.4.</span> <span class="nav-text">(4) 内核如何表示一个输入设备</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8D%E4%BD%BF%E7%94%A8%E5%BA%93%E8%AF%BB%E5%8F%96%E8%BE%93%E5%85%A5%E8%AE%BE%E5%A4%87%E4%BF%A1%E6%81%AF"><span class="nav-number">2.</span> <span class="nav-text">2. 不使用库读取输入设备信息</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E8%BE%93%E5%85%A5%E8%AE%BE%E5%A4%87%E5%9F%BA%E6%9C%AC%E4%BF%A1%E6%81%AF"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 获取输入设备基本信息</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96input_id%E7%BB%93%E6%9E%84%E4%BD%93"><span class="nav-number">2.1.1.</span> <span class="nav-text">2.1.1 获取input_id结构体</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96evbit%E6%95%B0%E7%BB%84%E6%94%AF%E6%8C%81%E5%93%AA%E5%87%A0%E7%B1%BB%E4%BA%8B%E4%BB%B6"><span class="nav-number">2.1.2.</span> <span class="nav-text">2.1.2
+获取evbit数组(支持哪几类事件)</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E8%BE%93%E5%85%A5%E8%AE%BE%E5%A4%87%E7%9A%84%E4%BA%8B%E4%BB%B6%E4%BF%A1%E6%81%AF"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 获取输入设备的事件信息</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9F%A5%E8%AF%A2%E5%92%8C%E4%BC%91%E7%9C%A0-%E5%94%A4%E9%86%92%E6%96%B9%E5%BC%8F"><span class="nav-number">2.2.1.</span> <span class="nav-text">2.2.1 查询和休眠-唤醒方式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#pollselect%E6%96%B9%E5%BC%8F"><span class="nav-number">2.2.2.</span> <span class="nav-text">2.2.2 POLL&#x2F;SELECT方式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BC%82%E6%AD%A5%E9%80%9A%E7%9F%A5%E6%96%B9%E5%BC%8F"><span class="nav-number">2.2.3.</span> <span class="nav-text">2.2.3 异步通知方式</span></a></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
