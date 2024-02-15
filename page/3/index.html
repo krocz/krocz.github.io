@@ -78,7 +78,8 @@
   <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
   <script src="/live2d-widget/autoload.js"></script>
- <style>mjx-container[jax="SVG"] {
+ <link rel="alternate" href="/atom.xml" title="Krocz's Blog" type="application/atom+xml">
+<style>mjx-container[jax="SVG"] {
   direction: ltr;
 }
 
@@ -190,8 +191,7 @@ mjx-container[display="true"] {
 mjx-container[display="true"] + br {
   display: none;
 }
-</style><link rel="alternate" href="/atom.xml" title="Krocz's Blog" type="application/atom+xml">
-</head>
+</style></head>
 
 <body itemscope itemtype="http://schema.org/WebPage">
 
@@ -306,114 +306,6 @@ mjx-container[display="true"] + br {
 
           <div class="content index posts-expand">
             
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/12/Unix-Linux%E7%BC%96%E7%A8%8B%E5%AE%9E%E8%B7%B5%E6%95%99%E7%A8%8B-%E7%AB%A0%E8%8A%823%E7%AC%94%E8%AE%B0/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="Krocz">
-      <meta itemprop="description" content="时间不等人，喜欢就去做">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Krocz's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/09/12/Unix-Linux%E7%BC%96%E7%A8%8B%E5%AE%9E%E8%B7%B5%E6%95%99%E7%A8%8B-%E7%AB%A0%E8%8A%823%E7%AC%94%E8%AE%B0/" class="post-title-link" itemprop="url">Unix-Linux编程实践教程-章节3笔记</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2023-09-12 15:19:10" itemprop="dateCreated datePublished" datetime="2023-09-12T15:19:10+08:00">2023-09-12</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-09-17 11:28:16" itemprop="dateModified" datetime="2023-09-17T11:28:16+08:00">2023-09-17</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">读书笔记</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E3%80%8AUnix-Linux%E7%BC%96%E7%A8%8B%E5%AE%9E%E8%B7%B5%E6%95%99%E7%A8%8B%E3%80%8B/" itemprop="url" rel="index"><span itemprop="name">《Unix-Linux编程实践教程》</span></a>
-                </span>
-            </span>
-
-          <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>8.1k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>15 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="ls"><a href="#ls" class="headerlink" title="ls"></a>ls</h2><p>编写ls命令</p>
-<ul>
-<li>列出目录的内容</li>
-<li>读取并显示文件的属性</li>
-<li>给出名字，判断它是目录还是文件</li>
-</ul>
-<h3 id="目录"><a href="#目录" class="headerlink" title="目录"></a>目录</h3><ul>
-<li>目录是一种特殊的文件，它的内容一条条记录，每一个记录代表一个文件或者目录</li>
-<li>目录文件永远不空，至少包含两个特殊项”.”或者”..”</li>
-</ul>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2023/09/12/Unix-Linux%E7%BC%96%E7%A8%8B%E5%AE%9E%E8%B7%B5%E6%95%99%E7%A8%8B-%E7%AB%A0%E8%8A%823%E7%AC%94%E8%AE%B0/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
       
   
   
@@ -1124,6 +1016,104 @@ mjx-container[display="true"] + br {
   
   
 
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2022/11/10/%E5%A5%87%E5%BC%82%E4%BA%BA%E7%94%9F%E5%90%8E%E8%AE%B0/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="Krocz">
+      <meta itemprop="description" content="时间不等人，喜欢就去做">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Krocz's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2022/11/10/%E5%A5%87%E5%BC%82%E4%BA%BA%E7%94%9F%E5%90%8E%E8%AE%B0/" class="post-title-link" itemprop="url">奇异人生后记</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-11-10 19:40:14" itemprop="dateCreated datePublished" datetime="2022-11-10T19:40:14+08:00">2022-11-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-02-15 17:04:28" itemprop="dateModified" datetime="2024-02-15T17:04:28+08:00">2024-02-15</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%B8%B8%E6%88%8F%E9%9A%8F%E6%83%B3%E5%BD%95/" itemprop="url" rel="index"><span itemprop="name">游戏随想录</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>1.4k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>3 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="《奇异人生1》后记——记录一段真挚的友谊"><a href="#《奇异人生1》后记——记录一段真挚的友谊" class="headerlink" title="《奇异人生1》后记——记录一段真挚的友谊"></a>《奇异人生1》后记——记录一段真挚的友谊</h3><p><img src="/../images/%E5%A5%87%E5%BC%82%E4%BA%BA%E7%94%9F%E5%90%8E%E8%AE%B0/Snipaste_2024-02-15_11-39-07.png" alt="Snipaste_2024-02-15_11-39-07"></p>
+<p>当我拍下那只蓝色的蝴蝶时，我完全没有想到这只蝴蝶扇动的翅膀将会在阿卡迪亚湾掀起一场飓风。</p>
+<p>在卫生间里，面对被枪杀的蓝发少女，麦克斯下意识地伸出手想要阻止事情的发生。令人意外的，麦克斯发现自己居然能够回溯时间，回到枪响之前，救下那位少女。很巧，这位蓝发少女正是麦克斯已经阔别了五年的好朋友克洛伊。显然，五年过去克洛伊已经变成了一个朋克少女，巨大的外表变化让麦克斯一时间并没有认出这位昔日的好友。</p>
+<p>麦克斯和克洛伊就像一对紧密契合的齿轮；即使相隔了五年的距离，当命运的推手又将她们交叠在一起时，她们还是迅速咬合上了对方的节奏。她们一起欢笑，一起在劲爆的音乐中跳舞，一起在“海盗乐园”中玩耍，就像她们在小时候做的那样。真希望这样的时光能够一直下去。<br><img src="/../images/%E5%A5%87%E5%BC%82%E4%BA%BA%E7%94%9F%E5%90%8E%E8%AE%B0/%E6%9C%AA%E5%91%BD%E5%90%8D%E5%9B%BE%E7%89%8713.jpg" alt="未命名图片13"></p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2022/11/10/%E5%A5%87%E5%BC%82%E4%BA%BA%E7%94%9F%E5%90%8E%E8%AE%B0/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
 
   
   <nav class="pagination">
@@ -1205,7 +1195,7 @@ mjx-container[display="true"] + br {
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
-        <span class="site-state-item-count">7</span>
+        <span class="site-state-item-count">8</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

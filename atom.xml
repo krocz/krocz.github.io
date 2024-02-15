@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2024-02-15T03:40:09.657Z</updated>
+  <updated>2024-01-12T11:23:10.156Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -15,27 +15,6 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
-  
-  <entry>
-    <title></title>
-    <link href="http://example.com/2024/02/15/%E5%A5%87%E5%BC%82%E4%BA%BA%E7%94%9F%E5%90%8E%E8%AE%B0/"/>
-    <id>http://example.com/2024/02/15/%E5%A5%87%E5%BC%82%E4%BA%BA%E7%94%9F%E5%90%8E%E8%AE%B0/</id>
-    <published>2024-02-15T03:03:23.851Z</published>
-    <updated>2024-02-15T03:40:09.657Z</updated>
-    
-    
-    <summary type="html">&lt;figure class=&quot;highlight plaintext&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;4&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;5&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;6&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;7&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;title: 奇异人生后记&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;tags:&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;  - 奇异人生&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;categories: 游戏随想录&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;date: 2022-11-10 19:40:14&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;keywords:&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;description:&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
-
-
-
-&lt;h3 id=&quot;《奇异人生1》后记——记录一段真挚的友谊&quot;&gt;&lt;a href=&quot;#《奇异人生1》后记——记录一段真挚的友谊&quot; class=&quot;headerlink&quot; title=&quot;《奇异人生1》后记——记录一段真挚的友谊&quot;&gt;&lt;/a&gt;《奇异人生1》后记——记录一段真挚的友谊&lt;/h3&gt;&lt;p&gt;&lt;img src=&quot;/../images/%E5%A5%87%E5%BC%82%E4%BA%BA%E7%94%9F%E5%90%8E%E8%AE%B0/Snipaste_2024-02-15_11-39-07.png&quot; alt=&quot;Snipaste_2024-02-15_11-39-07&quot;&gt;&lt;/p&gt;
-&lt;p&gt;当我拍下那只蓝色的蝴蝶时，我完全没有想到这只蝴蝶扇动的翅膀将会在阿卡迪亚湾掀起一场飓风。&lt;/p&gt;
-&lt;p&gt;在卫生间里，面对被枪杀的蓝发少女，麦克斯下意识地伸出手想要阻止事情的发生。令人意外的，麦克斯发现自己居然能够回溯时间，回到枪响之前，救下那位少女。很巧，这位蓝发少女正是麦克斯已经阔别了五年的好朋友克洛伊。显然，五年过去克洛伊已经变成了一个朋克少女，巨大的外表变化让麦克斯一时间并没有认出这位昔日的好友。&lt;/p&gt;</summary>
-    
-    
-    
-    
-  </entry>
   
   <entry>
     <title>mmap</title>
@@ -567,6 +546,38 @@
     
     
     <category term="嵌入式" scheme="http://example.com/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/"/>
+    
+    <category term="Linux" scheme="http://example.com/tags/Linux/"/>
+    
+    <category term="C/C++" scheme="http://example.com/tags/C-C/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Unix-Linux编程实践教程-章节3笔记</title>
+    <link href="http://example.com/2023/09/12/Unix-Linux%E7%BC%96%E7%A8%8B%E5%AE%9E%E8%B7%B5%E6%95%99%E7%A8%8B-%E7%AB%A0%E8%8A%823%E7%AC%94%E8%AE%B0/"/>
+    <id>http://example.com/2023/09/12/Unix-Linux%E7%BC%96%E7%A8%8B%E5%AE%9E%E8%B7%B5%E6%95%99%E7%A8%8B-%E7%AB%A0%E8%8A%823%E7%AC%94%E8%AE%B0/</id>
+    <published>2023-09-12T07:19:10.000Z</published>
+    <updated>2023-09-17T03:28:16.787Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;ls&quot;&gt;&lt;a href=&quot;#ls&quot; class=&quot;headerlink&quot; title=&quot;ls&quot;&gt;&lt;/a&gt;ls&lt;/h2&gt;&lt;p&gt;编写ls命令&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;列出目录的内容&lt;/li&gt;
+&lt;li&gt;读取并显示文件的属性&lt;/li&gt;
+&lt;li&gt;给出名字，判断它是目录还是文件&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&quot;目录&quot;&gt;&lt;a href=&quot;#目录&quot; class=&quot;headerlink&quot; title=&quot;目录&quot;&gt;&lt;/a&gt;目录&lt;/h3&gt;&lt;ul&gt;
+&lt;li&gt;目录是一种特殊的文件，它的内容一条条记录，每一个记录代表一个文件或者目录&lt;/li&gt;
+&lt;li&gt;目录文件永远不空，至少包含两个特殊项”.”或者”..”&lt;/li&gt;
+&lt;/ul&gt;</summary>
+    
+    
+    
+    <category term="读书笔记" scheme="http://example.com/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/"/>
+    
+    <category term="《Unix-Linux编程实践教程》" scheme="http://example.com/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E3%80%8AUnix-Linux%E7%BC%96%E7%A8%8B%E5%AE%9E%E8%B7%B5%E6%95%99%E7%A8%8B%E3%80%8B/"/>
+    
     
     <category term="Linux" scheme="http://example.com/tags/Linux/"/>
     
