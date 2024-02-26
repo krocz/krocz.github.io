@@ -29,7 +29,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/images/Linux%E7%B3%BB%E7%BB%9F%E5%9F%BA%E6%9C%AC%E7%9F%A5%E8%AF%86/image-20230905211714592.png">
 <meta property="article:published_time" content="2023-09-01T11:43:29.000Z">
-<meta property="article:modified_time" content="2024-01-12T11:14:35.733Z">
+<meta property="article:modified_time" content="2024-02-22T11:11:13.587Z">
 <meta property="article:author" content="Krocz">
 <meta property="article:tag" content="嵌入式">
 <meta property="article:tag" content="Linux">
@@ -235,7 +235,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2024-01-12 19:14:35" itemprop="dateModified" datetime="2024-01-12T19:14:35+08:00">2024-01-12</time>
+                <time title="修改时间：2024-02-22 19:11:13" itemprop="dateModified" datetime="2024-02-22T19:11:13+08:00">2024-02-22</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -253,14 +253,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>8.5k</span>
+              <span>10k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>15 分钟</span>
+              <span>18 分钟</span>
             </span>
 
         </div>
@@ -649,6 +649,66 @@
 </ul>
 </li>
 </ul>
+<h2 id="6-动态链接器"><a href="#6-动态链接器" class="headerlink" title="6. 动态链接器"></a>6. 动态链接器</h2><p>动态链接器是一个独立于应用程序的进程, 属于操作系统, 当用户的程序需要加载动态库的时候动态连接器就开始工作了，很显然动态连接器根本就不知道用户通过 gcc 编译程序的时候通过参数 <code>-L</code> 指定的路径。</p>
+<p>那么动态链接器是如何搜索某一个动态库的呢，在它内部有一个默认的搜索顺序，按照优先级从高到低的顺序分别是：</p>
+<ol>
+<li><p>可执行文件内部的 DT_RPATH 段</p>
+</li>
+<li><p>系统的环境变量 LD_LIBRARY_PATH</p>
+</li>
+<li><p>系统动态库的缓存文件 &#x2F;etc&#x2F;ld.so.cache</p>
+</li>
+<li><p>存储动态库&#x2F;静态库的系统目录 &#x2F;lib&#x2F;, &#x2F;usr&#x2F;lib等</p>
+</li>
+</ol>
+<p>按照以上四个顺序, 依次搜索, 找到之后结束遍历, 最终还是没找到, 动态连接器就会提示动态库找不到的错误信息。</p>
+<h3 id="6-1-配置动态库路径"><a href="#6-1-配置动态库路径" class="headerlink" title="6.1 配置动态库路径"></a>6.1 配置动态库路径</h3><blockquote>
+<p>可执行程序生成之后, 根据动态链接器的搜索路径, 我们可以提供三种解决方案，我们只需要将动态库的路径放到对应的环境变量或者系统配置文件中，同样也可以将动态库拷贝到系统库目录（或者是将动态库的软链接文件放到这些系统库目录中）。</p>
+</blockquote>
+<p><strong>方案1: 将库路径添加到环境变量 LD_LIBRARY_PATH 中</strong></p>
+<ol>
+<li>找到相关的配置文件</li>
+</ol>
+<ul>
+<li><code>用户级别: ~/.bashrc</code> —&gt; 设置对当前用户有效</li>
+<li><code>系统级别: /etc/profile</code> —&gt; 设置对所有用户有效</li>
+</ul>
+<ol start="2">
+<li><p>使用 vim 打开配置文件, 在文件最后添加这样一句话</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 自己把路径写进去就行了</span></span><br><span class="line"><span class="keyword">export</span> LD_LIBRARY_PATH =$LD_LIBRARY_PATH:动态库的绝对路径</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>让修改的配置文件生效</p>
+<ul>
+<li><p>修改了用户级别的配置文件, 关闭当前终端, 打开一个新的终端配置就生效了</p>
+</li>
+<li><p>修改了系统级别的配置文件, 注销或关闭系统, 再开机配置就生效了</p>
+</li>
+<li><p>不想执行上边的操作, 可以执行一个命令让配置重新被加载</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">修改的是哪一个就执行对应的那个命令</span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash"><span class="built_in">source</span> 可以简写为一个 . , 作用是让文件内容被重新加载</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash"><span class="built_in">source</span> ~/.bashrc          (. ~/.bashrc)</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash"><span class="built_in">source</span> /etc/profile       (. /etc/profile)</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ol>
+<p><strong>方案2: 更新 &#x2F;etc&#x2F;ld.so.cache 文件</strong></p>
+<ol>
+<li><p>找到动态库所在的绝对路径（不包括库的名字）比如：<code>/home/robin/Library/</code></p>
+</li>
+<li><p>使用vim 修改 <code>/etc/ld.so.conf</code> 这个文件, 将上边的路径添加到文件中(独自占一行)</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">1. 打开文件</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">sudo vim /etc/ld.so.conf</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">2. 添加动态库路径, 并保存退出</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>更新 <code>/etc/ld.so.conf</code> 中的数据到 <code>/etc/ld.so.cache</code> 中</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">必须使用管理员权限执行这个命令</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">sudo ldconfig</span>   </span><br></pre></td></tr></table></figure></li>
+</ol>
+<p><strong>方案3: 拷贝动态库文件到系统库目录 <code>/lib/</code> 或者 <code>/usr/lib</code> 中 (或者将库的软链接文件放进去)</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">库拷贝</span></span><br><span class="line">sudo cp /xxx/xxx/libxxx.so /usr/lib</span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">创建软连接</span></span><br><span class="line">sudo ln -s /xxx/xxx/libxxx.so /usr/lib/libxxx.so</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>验证是否能加载到对应动态库</strong></p>
+<blockquote>
+<p>在启动可执行程序之前, 或者在设置了动态库路径之后, 我们可以通过一个命令检测程序能不能够通过动态链接器加载到对应的动态库, 这个命令叫做 <code>ldd</code></p>
+</blockquote>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">语法:</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">ldd 可执行程序名</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">举例:</span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">ldd app</span></span><br><span class="line">	linux-vdso.so.1 =&gt;  (0x00007ffe8fbd6000)</span><br><span class="line">    libcalc.so =&gt; /home/robin/Linux/3Day/calc/test/libcalc.so (0x00007f5d85dd4000)</span><br><span class="line">    libc.so.6 =&gt; /lib/x86_64-linux-gnu/libc.so.6 (0x00007f5d85a0a000)</span><br><span class="line">    /lib64/ld-linux-x86-64.so.2 (0x00007f5d85fd6000)  ==&gt; 动态链接器, 操作系统提供</span><br></pre></td></tr></table></figure>
+
 
     </div>
 
@@ -734,7 +794,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E6%A0%B9%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84%EF%BC%88FSH%E6%A0%87%E5%87%86%EF%BC%89"><span class="nav-text">1.根目录结构（FSH标准）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-Shell%E7%9A%84%E6%89%A7%E8%A1%8C"><span class="nav-text">1.1 Shell的执行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-%E4%B8%BA%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8FPATH%E6%B7%BB%E5%8A%A0%E6%96%B0%E8%B7%AF%E5%BE%84"><span class="nav-text">1.2 为环境变量PATH添加新路径</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-1-%E6%9F%A5%E7%9C%8BPATH"><span class="nav-text">1.2.1 查看PATH</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-2-%E8%AE%BE%E7%BD%AE"><span class="nav-text">1.2.2 设置</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E6%96%87%E4%BB%B6%E7%9A%84%E7%9B%AE%E5%BD%95%E5%B1%9E%E6%80%A7"><span class="nav-text">2.文件的目录属性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E5%BC%8F-mode-%E9%A6%96%E4%BD%8D%E8%A1%A8%E7%A4%BA%E6%96%87%E4%BB%B6%E7%B1%BB%E5%9E%8B-%EF%BC%9A%E6%99%AE%E9%80%9A%E6%96%87%E4%BB%B6-d%EF%BC%9A%E7%9B%AE%E5%BD%95-c%EF%BC%9A%E5%AD%97%E7%AC%A6%E8%AE%BE%E5%A4%87%E6%96%87%E4%BB%B6-b%EF%BC%9A%E5%9D%97%E8%AE%BE%E5%A4%87%E6%96%87%E4%BB%B6-l%EF%BC%9A%E9%93%BE%E6%8E%A5%E6%96%87%E4%BB%B6-s%EF%BC%9A%E5%A5%97%E6%8E%A5%E5%AD%97%E6%96%87%E4%BB%B6-p%EF%BC%9A%E7%AE%A1%E9%81%93%E6%96%87%E4%BB%B6"><span class="nav-text">模式(mode):首位表示文件类型  - -：普通文件  - d：目录  - c：字符设备文件  - b：块设备文件  - l：链接文件  - s：套接字文件  - p：管道文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4"><span class="nav-text">3.常用命令</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-%E5%8E%8B%E7%BC%A9-%E8%A7%A3%E5%8E%8B%E7%BC%A9%E5%91%BD%E4%BB%A4"><span class="nav-text">3.1 压缩&#x2F;解压缩命令</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-1-gzip-bzip2"><span class="nav-text">3.1.1 gzip&#x2F;bzip2</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-2-tar"><span class="nav-text">3.1.2 tar</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-%E6%9F%A5%E6%89%BE-%E6%90%9C%E7%B4%A2%E5%91%BD%E4%BB%A4"><span class="nav-text">3.2 查找&#x2F;搜索命令</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-1-%E6%9F%A5%E6%89%BE%E6%96%87%E4%BB%B6-find"><span class="nav-text">3.2.1 查找文件-find</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-2-%E6%90%9C%E7%B4%A2%E6%96%87%E4%BB%B6%E5%86%85%E5%AE%B9-grep"><span class="nav-text">3.2.2 搜索文件内容-grep</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-%E6%94%B9%E5%8F%98%E6%96%87%E4%BB%B6%E6%9D%83%E9%99%90-chmod"><span class="nav-text">3.3 改变文件权限-chmod</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-%E6%96%87%E4%BB%B6%E4%BC%A0%E8%BE%93-scp"><span class="nav-text">3.4 文件传输-scp</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-4-1-%E5%9F%BA%E6%9C%AC%E7%94%A8%E6%B3%95"><span class="nav-text">3.4.1 基本用法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-4-2-%E4%B8%BE%E4%BE%8B"><span class="nav-text">3.4.2 举例</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-5-%E8%BF%9B%E7%A8%8B%E7%8A%B6%E6%80%81-ps"><span class="nav-text">3.5 进程状态-ps</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-5-1-%E4%B8%BE%E4%BE%8B"><span class="nav-text">3.5.1 举例</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-6-%E7%BB%88%E6%AD%A2%E8%BF%9B%E7%A8%8B%E5%91%BD%E4%BB%A4-kill"><span class="nav-text">3.6 终止进程命令-kill</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-7-%E7%BC%96%E8%AF%91%E5%91%BD%E4%BB%A4-make"><span class="nav-text">3.7 编译命令-make</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-8-%E5%86%85%E6%A0%B8%E6%A8%A1%E5%9D%97%E5%91%BD%E4%BB%A4"><span class="nav-text">3.8 内核模块命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-9-%E6%9F%A5%E7%9C%8B%E8%BF%9B%E7%A8%8B%E7%9A%84%E5%86%85%E5%AD%98%E6%98%A0%E5%B0%84%E5%8C%BA%E5%9F%9F"><span class="nav-text">3.9 查看进程的内存映射区域</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E8%AE%B0%E5%BD%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E8%BF%87%E7%A8%8B"><span class="nav-text">4. 记录环境搭建过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-Linux%E7%B3%BB%E7%BB%9F%E7%9A%84%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F"><span class="nav-text">5. Linux系统的环境变量</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-%E9%85%8D%E7%BD%AE%E5%91%BD%E4%BB%A4%E8%A7%A3%E8%AF%BB"><span class="nav-text">5.1 配置命令解读</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-%E4%BA%A4%E5%8F%89%E7%BC%96%E8%AF%91%E5%B7%A5%E5%85%B7%E9%93%BE"><span class="nav-text">5.2 交叉编译工具链</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-3-Linux%E4%B8%AD%E5%B8%B8%E7%94%A8%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F"><span class="nav-text">5.3 Linux中常用环境变量</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E6%A0%B9%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84%EF%BC%88FSH%E6%A0%87%E5%87%86%EF%BC%89"><span class="nav-text">1.根目录结构（FSH标准）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-Shell%E7%9A%84%E6%89%A7%E8%A1%8C"><span class="nav-text">1.1 Shell的执行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-%E4%B8%BA%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8FPATH%E6%B7%BB%E5%8A%A0%E6%96%B0%E8%B7%AF%E5%BE%84"><span class="nav-text">1.2 为环境变量PATH添加新路径</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-1-%E6%9F%A5%E7%9C%8BPATH"><span class="nav-text">1.2.1 查看PATH</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-2-%E8%AE%BE%E7%BD%AE"><span class="nav-text">1.2.2 设置</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E6%96%87%E4%BB%B6%E7%9A%84%E7%9B%AE%E5%BD%95%E5%B1%9E%E6%80%A7"><span class="nav-text">2.文件的目录属性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E5%BC%8F-mode-%E9%A6%96%E4%BD%8D%E8%A1%A8%E7%A4%BA%E6%96%87%E4%BB%B6%E7%B1%BB%E5%9E%8B-%EF%BC%9A%E6%99%AE%E9%80%9A%E6%96%87%E4%BB%B6-d%EF%BC%9A%E7%9B%AE%E5%BD%95-c%EF%BC%9A%E5%AD%97%E7%AC%A6%E8%AE%BE%E5%A4%87%E6%96%87%E4%BB%B6-b%EF%BC%9A%E5%9D%97%E8%AE%BE%E5%A4%87%E6%96%87%E4%BB%B6-l%EF%BC%9A%E9%93%BE%E6%8E%A5%E6%96%87%E4%BB%B6-s%EF%BC%9A%E5%A5%97%E6%8E%A5%E5%AD%97%E6%96%87%E4%BB%B6-p%EF%BC%9A%E7%AE%A1%E9%81%93%E6%96%87%E4%BB%B6"><span class="nav-text">模式(mode):首位表示文件类型  - -：普通文件  - d：目录  - c：字符设备文件  - b：块设备文件  - l：链接文件  - s：套接字文件  - p：管道文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4"><span class="nav-text">3.常用命令</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-%E5%8E%8B%E7%BC%A9-%E8%A7%A3%E5%8E%8B%E7%BC%A9%E5%91%BD%E4%BB%A4"><span class="nav-text">3.1 压缩&#x2F;解压缩命令</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-1-gzip-bzip2"><span class="nav-text">3.1.1 gzip&#x2F;bzip2</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-2-tar"><span class="nav-text">3.1.2 tar</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-%E6%9F%A5%E6%89%BE-%E6%90%9C%E7%B4%A2%E5%91%BD%E4%BB%A4"><span class="nav-text">3.2 查找&#x2F;搜索命令</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-1-%E6%9F%A5%E6%89%BE%E6%96%87%E4%BB%B6-find"><span class="nav-text">3.2.1 查找文件-find</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-2-%E6%90%9C%E7%B4%A2%E6%96%87%E4%BB%B6%E5%86%85%E5%AE%B9-grep"><span class="nav-text">3.2.2 搜索文件内容-grep</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-%E6%94%B9%E5%8F%98%E6%96%87%E4%BB%B6%E6%9D%83%E9%99%90-chmod"><span class="nav-text">3.3 改变文件权限-chmod</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-%E6%96%87%E4%BB%B6%E4%BC%A0%E8%BE%93-scp"><span class="nav-text">3.4 文件传输-scp</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-4-1-%E5%9F%BA%E6%9C%AC%E7%94%A8%E6%B3%95"><span class="nav-text">3.4.1 基本用法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-4-2-%E4%B8%BE%E4%BE%8B"><span class="nav-text">3.4.2 举例</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-5-%E8%BF%9B%E7%A8%8B%E7%8A%B6%E6%80%81-ps"><span class="nav-text">3.5 进程状态-ps</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-5-1-%E4%B8%BE%E4%BE%8B"><span class="nav-text">3.5.1 举例</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-6-%E7%BB%88%E6%AD%A2%E8%BF%9B%E7%A8%8B%E5%91%BD%E4%BB%A4-kill"><span class="nav-text">3.6 终止进程命令-kill</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-7-%E7%BC%96%E8%AF%91%E5%91%BD%E4%BB%A4-make"><span class="nav-text">3.7 编译命令-make</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-8-%E5%86%85%E6%A0%B8%E6%A8%A1%E5%9D%97%E5%91%BD%E4%BB%A4"><span class="nav-text">3.8 内核模块命令</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-9-%E6%9F%A5%E7%9C%8B%E8%BF%9B%E7%A8%8B%E7%9A%84%E5%86%85%E5%AD%98%E6%98%A0%E5%B0%84%E5%8C%BA%E5%9F%9F"><span class="nav-text">3.9 查看进程的内存映射区域</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E8%AE%B0%E5%BD%95%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA%E8%BF%87%E7%A8%8B"><span class="nav-text">4. 记录环境搭建过程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-Linux%E7%B3%BB%E7%BB%9F%E7%9A%84%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F"><span class="nav-text">5. Linux系统的环境变量</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-%E9%85%8D%E7%BD%AE%E5%91%BD%E4%BB%A4%E8%A7%A3%E8%AF%BB"><span class="nav-text">5.1 配置命令解读</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-%E4%BA%A4%E5%8F%89%E7%BC%96%E8%AF%91%E5%B7%A5%E5%85%B7%E9%93%BE"><span class="nav-text">5.2 交叉编译工具链</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-3-Linux%E4%B8%AD%E5%B8%B8%E7%94%A8%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F"><span class="nav-text">5.3 Linux中常用环境变量</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E5%8A%A8%E6%80%81%E9%93%BE%E6%8E%A5%E5%99%A8"><span class="nav-text">6. 动态链接器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#6-1-%E9%85%8D%E7%BD%AE%E5%8A%A8%E6%80%81%E5%BA%93%E8%B7%AF%E5%BE%84"><span class="nav-text">6.1 配置动态库路径</span></a></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 

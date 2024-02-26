@@ -395,7 +395,7 @@
     <link href="http://example.com/2023/10/03/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%BC%96%E7%A8%8B/"/>
     <id>http://example.com/2023/10/03/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%BC%96%E7%A8%8B/</id>
     <published>2023-10-03T11:13:53.000Z</published>
-    <updated>2023-10-04T12:14:07.319Z</updated>
+    <updated>2024-02-26T10:14:59.062Z</updated>
     
     
     <summary type="html">&lt;h2 id=&quot;1-线程的标识-pthread-t&quot;&gt;&lt;a href=&quot;#1-线程的标识-pthread-t&quot; class=&quot;headerlink&quot; title=&quot;1. 线程的标识 pthread_t&quot;&gt;&lt;/a&gt;1. 线程的标识 pthread_t&lt;/h2&gt;&lt;p&gt;对于每一个进程都有唯一PID号与之对应，而对于线程而言，也有类似的tid号，即一个pthread_t类型的变量。线程号是表示线程的唯一标识，&lt;strong&gt;但是对于线程号而言，其仅仅在其所属的进程上下文中才有意义。&lt;/strong&gt;&lt;/p&gt;
