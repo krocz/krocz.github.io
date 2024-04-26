@@ -1,0 +1,1112 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="1. Objects1.1 父部件和子部件子部件的位置是相对父部件的，父部件移动子部件跟着移动 12345lv_obj_t * parent &#x3D; lv_obj_create(lv_scr_act());   &#x2F;*Create a parent object on the current screen*&#x2F;lv_obj_set_size(parent, 100, 80);">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LVGL学习记录">
+<meta property="og:url" content="http://example.com/2024/03/01/LVGL/LVGL%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/index.html">
+<meta property="og:site_name" content="Krocz&#39;s Blog">
+<meta property="og:description" content="1. Objects1.1 父部件和子部件子部件的位置是相对父部件的，父部件移动子部件跟着移动 12345lv_obj_t * parent &#x3D; lv_obj_create(lv_scr_act());   &#x2F;*Create a parent object on the current screen*&#x2F;lv_obj_set_size(parent, 100, 80);">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/images/LVGL%E9%80%9F%E6%88%90/image-20240418170400427.png">
+<meta property="og:image" content="http://example.com/images/LVGL%E9%80%9F%E6%88%90/image-20240418170332715.png">
+<meta property="og:image" content="http://example.com/images/LVGL%E9%80%9F%E6%88%90/image-20240319211022193.png">
+<meta property="article:published_time" content="2024-03-01T13:20:30.000Z">
+<meta property="article:modified_time" content="2024-04-26T13:29:17.539Z">
+<meta property="article:author" content="Krocz">
+<meta property="article:tag" content="LVGL">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/LVGL%E9%80%9F%E6%88%90/image-20240418170400427.png">
+
+<link rel="canonical" href="http://example.com/2024/03/01/LVGL/LVGL%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>LVGL学习记录 | Krocz's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+  <script src="/live2d-widget/autoload.js"></script>
+ <style>mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+.MathJax path {
+  stroke-width: 3;
+}
+
+mjx-container[display="true"] {
+  overflow: auto hidden;
+}
+
+mjx-container[display="true"] + br {
+  display: none;
+}
+</style><link rel="alternate" href="/atom.xml" title="Krocz's Blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+
+   <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 1; pointer-events: none;" ></canvas> 
+   <script type="text/javascript" src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script> 
+   <script type="text/javascript" src="/js/cursor/fireworks.js"></script>
+
+
+
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Krocz's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">望云登坡</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-首页">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-归档">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-标签">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-分类">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/03/01/LVGL/LVGL%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="Krocz">
+      <meta itemprop="description" content="时间不等人，喜欢就去做">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Krocz's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          LVGL学习记录
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-03-01 21:20:30" itemprop="dateCreated datePublished" datetime="2024-03-01T21:20:30+08:00">2024-03-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-04-26 21:29:17" itemprop="dateModified" datetime="2024-04-26T21:29:17+08:00">2024-04-26</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/LVGL/" itemprop="url" rel="index"><span itemprop="name">LVGL</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>18k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>33 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="1-Objects"><a href="#1-Objects" class="headerlink" title="1. Objects"></a>1. Objects</h2><h3 id="1-1-父部件和子部件"><a href="#1-1-父部件和子部件" class="headerlink" title="1.1 父部件和子部件"></a>1.1 父部件和子部件</h3><p>子部件的位置是相对父部件的，父部件移动子部件跟着移动</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">lv_obj_t</span> * parent = lv_obj_create(lv_scr_act());   <span class="comment">/*Create a parent object on the current screen*/</span></span><br><span class="line">lv_obj_set_size(parent, <span class="number">100</span>, <span class="number">80</span>);	                 <span class="comment">/*Set the size of the parent*/</span></span><br><span class="line"></span><br><span class="line"><span class="type">lv_obj_t</span> * obj1 = lv_obj_create(parent);	         <span class="comment">/*Create an object on the previously created parent object*/</span></span><br><span class="line">lv_obj_set_pos(obj1, <span class="number">10</span>, <span class="number">10</span>);	                     <span class="comment">/*Set the position of the new object*/</span></span><br></pre></td></tr></table></figure>
+
+<p>部件可以动态创建和删除，删除父部件会递归删除子部件：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">lv_obj_t</span> * lv_&lt;widget&gt;_create(<span class="type">lv_obj_t</span> * parent, &lt;other parameters <span class="keyword">if</span> any&gt;);</span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">lv_obj_del</span><span class="params">(<span class="type">lv_obj_t</span> * obj)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>在子部件中删除父部件：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lv_obj_del_async(obj)  lv_timer_handler()  LV_EVENT_DELETE</span><br></pre></td></tr></table></figure>
+
+<p>其他删除函数：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">lv_obj_clean(obj)              <span class="comment">// 移除某一父部件的所有子部件</span></span><br><span class="line"></span><br><span class="line">lv_obj_del_delayed(obj, <span class="number">1000</span>)  <span class="comment">// 延时删除</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="1-1-1-从父部件中获取子部件"><a href="#1-1-1-从父部件中获取子部件" class="headerlink" title="1.1.1 从父部件中获取子部件"></a>1.1.1 从父部件中获取子部件</h4><p><strong>对于子部件使用</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">lv_obj_set_parent(obj, new_parent)  <span class="comment">// 为子部件设置新的父部件</span></span><br><span class="line">lv_obj_get_parent(obj)              <span class="comment">// 获取父部件</span></span><br><span class="line">lv_obj_get_index(obj)               <span class="comment">// 获取子部件在其父部件中的index</span></span><br><span class="line">lv_obj_move_to_index(obj, index)    <span class="comment">// 改变子部件在父部件中顺序</span></span><br><span class="line">lv_obj_swap(obj1, obj2)             <span class="comment">// 交换两个子部件</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>对于父部件使用</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">lv_obj_get_child(parent, idx)      <span class="comment">// 在父部件中获取子部件</span></span><br><span class="line">lv_obj_get_child_cnt(parent)       <span class="comment">// 获取子部件的个数</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>idx 表示子部件加入父部件时的顺序，第一个为 0，第二个为 1，最后一个为 -1</li>
+</ul>
+<blockquote>
+<p>示例：<a target="_blank" rel="noopener" href="https://docs.lvgl.io/8.3/widgets/extra/list.html#sorting-a-list-using-up-and-down-buttons">https://docs.lvgl.io/8.3/widgets/extra/list.html#sorting-a-list-using-up-and-down-buttons</a></p>
+</blockquote>
+<h3 id="2-Screen"><a href="#2-Screen" class="headerlink" title="2.Screen"></a>2.Screen</h3><p>屏幕没有父对象</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lv_scr_act()</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="2-1-Layers"><a href="#2-1-Layers" class="headerlink" title="2.1 Layers"></a>2.1 Layers</h4><p>层的概念：如果两个部件部分重叠，那么就产生了“层”的概念，上层部件会显示，下层部件会被遮盖，有以下几种方式来改变部件的层：</p>
+<ol>
+<li><p><code>lv_obj_move_foreground(obj)</code></p>
+</li>
+<li><p><code>lv_obj_move_background(obj)</code></p>
+</li>
+<li><p><code>lv_obj_move_to_index(obj, idx)</code>，从 <code>0</code> 到 <code>child_num-1</code> 对应背景到前景，支持 idx 为负数</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lv_obj_move_to_index(obj, lv_obj_get_index(obj) - <span class="number">1</span>)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><code>lv_obj_swap(obj1, obj2)</code></p>
+</li>
+<li><p><code>lv_obj_set_parent(obj, new_parent)</code>，为 obj 设置新的父部件，obj 将会成为新的父部件的前景</p>
+</li>
+</ol>
+<p>两个自动创建的层：</p>
+<ul>
+<li>top layer：总是在所有对象之上，可以用来显示提示窗口，全局菜单</li>
+<li>system layer：在 top layer 之上，强制用来显示系统层面的东西，例如如鼠标指针</li>
+</ul>
+<p>吸收点击焦点，只能点击 top_layer 上的控件</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lv_obj_add_flag(lv_layer_top(), LV_OBJ_FLAG_CLICKABLE);</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="3-Parts"><a href="#3-Parts" class="headerlink" title="3.Parts"></a>3.Parts</h3><h3 id="4-States"><a href="#4-States" class="headerlink" title="4.States"></a>4.States</h3><h3 id="5-snapshot"><a href="#5-snapshot" class="headerlink" title="5.snapshot"></a>5.snapshot</h3><p>将一个 LVGL对象中转换为快照图片，或者将快照图片描绘在一个对象上</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/** Take snapshot for object with its children.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @param obj    The object to generate snapshot.</span></span><br><span class="line"><span class="comment"> * @param cf     color format for generated image.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * @return a pointer to an image descriptor, or NULL if failed.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">lv_img_dsc_t</span> * <span class="title function_">lv_snapshot_take</span><span class="params">(<span class="type">lv_obj_t</span> * obj, <span class="type">lv_img_cf_t</span> cf)</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Set the image data to display on the object</span></span><br><span class="line"><span class="comment"> * @param obj       pointer to an image object</span></span><br><span class="line"><span class="comment"> * @param src_img   1) pointer to an ::lv_img_dsc_t descriptor (converted by LVGL's image converter) (e.g. &amp;my_img) or</span></span><br><span class="line"><span class="comment"> *                  2) path to an image file (e.g. "S:/dir/img.bin")or</span></span><br><span class="line"><span class="comment"> *                  3) a SYMBOL (e.g. LV_SYMBOL_OK)</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="type">void</span> <span class="title function_">lv_img_set_src</span><span class="params">(<span class="type">lv_obj_t</span> * obj, <span class="type">const</span> <span class="type">void</span> * src)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>目前仅支持以下几种颜色格式：</p>
+<ul>
+<li>LV_IMG_CF_TRUE_COLOR_ALPHA</li>
+<li>LV_IMG_CF_ALPHA_1BIT</li>
+<li>LV_IMG_CF_ALPHA_2BIT</li>
+<li>LV_IMG_CF_ALPHA_4BIT</li>
+<li>LV_IMG_CF_ALPHA_8BIT</li>
+</ul>
+<p>注意，如果想要为对象更换一张新的图片，需要先手动释放该对象上的原图片：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">update_snapshot</span><span class="params">(<span class="type">lv_obj_t</span> * obj, <span class="type">lv_obj_t</span> * img_snapshot)</span></span><br><span class="line">{</span><br><span class="line">    <span class="comment">// 获取原图片并释放</span></span><br><span class="line">    <span class="type">lv_img_dsc_t</span>* snapshot = (<span class="type">void</span>*)lv_img_get_src(img_snapshot);</span><br><span class="line">    <span class="keyword">if</span>(snapshot) {</span><br><span class="line">        lv_snapshot_free(snapshot);</span><br><span class="line">    }</span><br><span class="line">    <span class="comment">// 添加新的图片</span></span><br><span class="line">    snapshot = lv_snapshot_take(obj, LV_IMG_CF_TRUE_COLOR_ALPHA);</span><br><span class="line">    lv_img_set_src(img_snapshot, snapshot);</span><br><span class="line">}</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h2 id="2-Positions-sizes-layouts"><a href="#2-Positions-sizes-layouts" class="headerlink" title="2. Positions, sizes, layouts"></a>2. Positions, sizes, layouts</h2><p><img src="/../../images/LVGL%E9%80%9F%E6%88%90/image-20240418170400427.png" alt="image-20240418170400427"></p>
+<h3 id="2-1-设置位置大小"><a href="#2-1-设置位置大小" class="headerlink" title="2.1 设置位置大小"></a>2.1 设置位置大小</h3><p>设置位置的几种方法：</p>
+<ol>
+<li><code>lv_obj_set_x(btn, 10)</code>：指定坐标</li>
+<li><code>lv_obj_set_x(btn, lv_pct(50))</code>：按照父部件的百分比设置</li>
+<li><code>lv_obj_set_pos(btn, 10 , 50)</code></li>
+</ol>
+<h3 id="2-2-改变对齐原点-Align"><a href="#2-2-改变对齐原点-Align" class="headerlink" title="2.2 改变对齐原点 Align"></a>2.2 改变对齐原点 Align</h3><h4 id="（1）嵌套内情况"><a href="#（1）嵌套内情况" class="headerlink" title="（1）嵌套内情况"></a>（1）嵌套内情况</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">lv_obj_set_align(obj, align);</span><br><span class="line">lv_obj_align(obj, align, x, y);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>LV_ALIGN_TOP_LEFT</code></li>
+<li><code>LV_ALIGN_TOP_MID</code></li>
+<li><code>LV_ALIGN_TOP_RIGHT</code></li>
+<li><code>LV_ALIGN_BOTTOM_LEFT</code></li>
+<li><code>LV_ALIGN_BOTTOM_MID</code></li>
+<li><code>LV_ALIGN_BOTTOM_RIGHT</code></li>
+<li><code>LV_ALIGN_LEFT_MID</code></li>
+<li><code>LV_ALIGN_RIGHT_MID</code></li>
+<li><code>LV_ALIGN_CENTER</code></li>
+</ul>
+<p><img src="/../../images/LVGL%E9%80%9F%E6%88%90/image-20240418170332715.png" alt="image-20240418170332715"></p>
+<p>特殊的，设置子部件位于父部件的中心：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">lv_obj_center(obj);</span><br><span class="line"></span><br><span class="line"><span class="comment">//Has the same effect</span></span><br><span class="line">lv_obj_align(obj, LV_ALIGN_CENTER, <span class="number">0</span>, <span class="number">0</span>);</span><br></pre></td></tr></table></figure>
+
+<p>如果父部件的大小改变，则使用相对位置的子部件的位置也会自动改变</p>
+<h4 id="（2）嵌套外情况"><a href="#（2）嵌套外情况" class="headerlink" title="（2）嵌套外情况"></a>（2）嵌套外情况</h4><p>例如，想要一个标签对齐一个图片，这就是嵌套外情况，可以使用：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lv_obj_align_to(obj_to_align, reference_obj, align, x, y);</span><br></pre></td></tr></table></figure>
+
+<p>可选参考点：</p>
+<ul>
+<li><code>LV_ALIGN_OUT_TOP_LEFT</code></li>
+<li><code>LV_ALIGN_OUT_TOP_MID</code></li>
+<li><code>LV_ALIGN_OUT_TOP_RIGHT</code></li>
+<li><code>LV_ALIGN_OUT_BOTTOM_LEFT</code></li>
+<li><code>LV_ALIGN_OUT_BOTTOM_MID</code></li>
+<li><code>LV_ALIGN_OUT_BOTTOM_RIGHT</code></li>
+<li><code>LV_ALIGN_OUT_LEFT_TOP</code></li>
+<li><code>LV_ALIGN_OUT_LEFT_MID</code></li>
+<li><code>LV_ALIGN_OUT_LEFT_BOTTOM</code></li>
+<li><code>LV_ALIGN_OUT_RIGHT_TOP</code></li>
+<li><code>LV_ALIGN_OUT_RIGHT_MID</code></li>
+<li><code>LV_ALIGN_OUT_RIGHT_BOTTOM</code></li>
+</ul>
+<blockquote>
+<p>使用 <code>lv_obj_align_to</code> 不会因大小改变而自动对齐</p>
+</blockquote>
+<h3 id="2-2-大小"><a href="#2-2-大小" class="headerlink" title="2.2 大小"></a>2.2 大小</h3><p>设置大小的几种方法：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">lv_obj_set_width(obj, <span class="number">200</span>); </span><br><span class="line">lv_obj_set_height(obj, <span class="number">100</span>);</span><br><span class="line">lv_obj_set_size(obj, lv_pct(<span class="number">100</span>), LV_SIZE_CONTENT); </span><br></pre></td></tr></table></figure>
+
+<p>可以指定大小，可以按照比例，也可以使用<code>LV_SIZE_CONTENT</code>，让部件按照其子部件大小来适当的调整自己的大小。</p>
+<p>上面是设置边框大小，也可以设置内容大小，边框和内容之间会自动 padding：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">lv_obj_set_content_width(obj, <span class="number">50</span>); <span class="comment">//The actual width: padding left + 50 + padding right</span></span><br><span class="line">lv_obj_set_content_height(obj, <span class="number">30</span>); <span class="comment">//The actual width: padding top + 30 + padding bottom</span></span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h3 id="2-3-使用-styles"><a href="#2-3-使用-styles" class="headerlink" title="2.3 使用 styles"></a>2.3 使用 styles</h3><p>使用风格有很多好处，上面都是用部件的本地风格去设置的，额外的创建风格，加到部件上：</p>
+<ol>
+<li>统一设置，统一修改</li>
+</ol>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">lv_style_t</span> style;</span><br><span class="line">lv_style_init(&amp;style);</span><br><span class="line">lv_style_set_width(&amp;style, <span class="number">100</span>);</span><br><span class="line"></span><br><span class="line"><span class="type">lv_obj_t</span> * btn = lv_btn_create(lv_scr_act());</span><br><span class="line">lv_obj_add_style(btn, &amp;style, LV_PART_MAIN);</span><br></pre></td></tr></table></figure>
+
+<p>留坑</p>
+<h3 id="2-4-平移-Translation"><a href="#2-4-平移-Translation" class="headerlink" title="2.4 平移-Translation"></a>2.4 平移-Translation</h3><p>如果想要使得按键在被按下时向上移动一段距离，可以使用：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">lv_style_t</span> style_normal;</span><br><span class="line">lv_style_init(&amp;style_normal);</span><br><span class="line">lv_style_set_y(&amp;style_normal, <span class="number">100</span>);</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">lv_style_t</span> style_pressed;</span><br><span class="line">lv_style_init(&amp;style_pressed);</span><br><span class="line">lv_style_set_translate_y(&amp;style_pressed, <span class="number">-20</span>);   <span class="comment">// 也可用lv_pct(50)，这里是是指50% * height</span></span><br><span class="line"></span><br><span class="line">lv_obj_add_style(btn1, &amp;style_normal, LV_STATE_DEFAULT);</span><br><span class="line">lv_obj_add_style(btn1, &amp;style_pressed, LV_STATE_PRESSED);</span><br><span class="line"></span><br><span class="line">lv_obj_add_style(btn2, &amp;style_normal, LV_STATE_DEFAULT);</span><br><span class="line">lv_obj_add_style(btn2, &amp;style_pressed, LV_STATE_PRESSED);</span><br><span class="line"></span><br><span class="line">lv_obj_add_style(btn3, &amp;style_normal, LV_STATE_DEFAULT);</span><br><span class="line">lv_obj_add_style(btn3, &amp;style_pressed, LV_STATE_PRESSED);</span><br></pre></td></tr></table></figure>
+
+<p>这种移动是真的移动，相关位置会变化的</p>
+<h3 id="2-5-变化-Transformation"><a href="#2-5-变化-Transformation" class="headerlink" title="2.5 变化-Transformation"></a>2.5 变化-Transformation</h3><p>如果想要使得按键在被按下时变大，可以使用：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">lv_style_t</span> style_pressed;</span><br><span class="line">lv_style_init(&amp;style_pressed);</span><br><span class="line">lv_style_set_transform_width(&amp;style_pressed, <span class="number">10</span>);</span><br><span class="line">lv_style_set_transform_height(&amp;style_pressed, <span class="number">10</span>);</span><br><span class="line"></span><br><span class="line">lv_obj_add_style(btn, &amp;style_pressed, LV_STATE_PRESSED);</span><br></pre></td></tr></table></figure>
+
+<p>transform 会在原有尺寸上两侧各加上 10pt；<strong>注意，这种变化是一种视觉变化，并不是真的变大了</strong></p>
+<h3 id="2-6-布局-Layout"><a href="#2-6-布局-Layout" class="headerlink" title="2.6 布局-Layout"></a>2.6 布局-Layout</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lv_obj_set_layout(obj, &lt;LAYOUT_NAME&gt;)</span><br></pre></td></tr></table></figure>
+
+<p>将部件添加到一个布局中，会覆盖掉部件本身的大小、位置。</p>
+<p>LVGL 支持量子布局：</p>
+<ul>
+<li>Flexbox</li>
+<li>Grid</li>
+</ul>
+<h4 id="1-object-的-Flags"><a href="#1-object-的-Flags" class="headerlink" title="(1) object 的 Flags"></a>(1) object 的 Flags</h4><ul>
+<li><code>LV_OBJ_FLAG_HIDDEN</code> 添加隐藏属性，该 object 会被布局忽略</li>
+<li><code>LV_OBJ_FLAG_IGNORE_LAYOUT</code> 该部件会被布局忽略</li>
+<li><code>LV_OBJ_FLAG_FLOATING</code> 部件会被布局忽略，并且不受 <code>LV_SIZE_CONTENT</code> 的改变</li>
+</ul>
+<h2 id="3-style"><a href="#3-style" class="headerlink" title="3. style"></a>3. style</h2><ul>
+<li>多个样式可以赋给同一个部件，多个部件也可以使用相同的 style</li>
+<li>LVGL 会搜索一个特性，直到某个 style 定义了它，如果没有就使用默认值</li>
+<li>如果未定义子部件的属性，子部件会从父部件继承该属性，这比默认值优先级更高</li>
+<li>可以设置 state 改变时，改变 style</li>
+</ul>
+<h3 id="3-1-States"><a href="#3-1-States" class="headerlink" title="3.1 States"></a>3.1 States</h3><p>所有可能的状态如下：</p>
+<p><a target="_blank" rel="noopener" href="https://docs.lvgl.io/8.3/overview/style.html#states">Styles — LVGL documentation</a></p>
+<p>state 应用规则：</p>
+<ul>
+<li>数值越大，优先级越高，优先级越高，就显示对应 state 的 style</li>
+<li>例如 <code>LV_STATE_FOCUSED | LV_STATE_PRESSED</code> 则对应数值为二者之和</li>
+<li>如果优先级最高的 state 没有设置 style 则显示默认状态的 style</li>
+</ul>
+<p>为部件添加以及获取 States 的函数如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">lv_obj_add_state</span><span class="params">(<span class="type">lv_obj_t</span> * obj, <span class="type">lv_state_t</span> state)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">lv_state_t</span> <span class="title function_">lv_obj_get_state</span><span class="params">(<span class="type">const</span> <span class="type">lv_obj_t</span> * obj)</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">bool</span> <span class="title function_">lv_obj_has_state</span><span class="params">(<span class="type">const</span> <span class="type">lv_obj_t</span> * obj, <span class="type">lv_state_t</span> state)</span></span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h3 id="3-2-Parts"><a href="#3-2-Parts" class="headerlink" title="3.2 Parts"></a>3.2 Parts</h3><p>基本组成部分：<a target="_blank" rel="noopener" href="https://docs.lvgl.io/8.3/overview/style.html#parts">Styles — LVGL documentation</a></p>
+<h3 id="3-3-使用-Style"><a href="#3-3-使用-Style" class="headerlink" title="3.3 使用 Style"></a>3.3 使用 Style</h3><h4 id="1-Style-本身"><a href="#1-Style-本身" class="headerlink" title="(1) Style 本身"></a>(1) Style 本身</h4><p>Style 必须是 static 或者动态内存分配的，不能是局部变量；并且使用之前需要调用<code>lv_style_init</code>初始化：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">lv_style_t</span> style_btn;</span><br><span class="line">lv_style_init(&amp;style_btn);</span><br><span class="line">lv_style_set_bg_color(&amp;style_btn, lv_color_hex(<span class="number">0x115588</span>));</span><br><span class="line">lv_style_set_bg_opa(&amp;style_btn, LV_OPA_50);</span><br><span class="line">lv_style_set_border_width(&amp;style_btn, <span class="number">2</span>);</span><br><span class="line">lv_style_set_border_color(&amp;style_btn, lv_color_black());</span><br></pre></td></tr></table></figure>
+
+<p>移除 Style 中的某个属性：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lv_style_remove_prop(&amp;style, LV_STYLE_BG_COLOR);</span><br></pre></td></tr></table></figure>
+
+<p>获取 Style 中的某个属性：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">lv_style_value_t</span> v;</span><br><span class="line"><span class="type">lv_res_t</span> res = lv_style_get_prop(&amp;style, LV_STYLE_BG_COLOR, &amp;v);</span><br><span class="line"><span class="keyword">if</span>(res == LV_RES_OK) {	<span class="comment">/*Found*/</span></span><br><span class="line">	do_something(v.color);</span><br><span class="line">}</span><br></pre></td></tr></table></figure>
+
+<p>重置 Style（会释放其中所有属性的内存）：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lv_style_reset(&amp;style);</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="2-Style-和-obj"><a href="#2-Style-和-obj" class="headerlink" title="(2) Style 和 obj"></a>(2) Style 和 obj</h4><p>给某个部件的 part 在某种 state 下添加 style:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lv_obj_add_style(btn, &amp;btn_red, LV_PART_INDICATOR | LV_STATE_PRESSED | LV_STATE_CHECKED);</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>part 和 state 都是 <code>selector</code> 可以设置的参数</li>
+</ul>
+<p>移除某个部件的所有 Style：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lv_obj_remove_style_all(obj)</span><br></pre></td></tr></table></figure>
+
+<p>具体移除某个部件的 Style：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lv_obj_remove_style(obj, style, selector)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>移除 <code>style</code>必须在函数的 <code>selector</code> 匹配设置 <code>style</code>时使用的 <code>selector</code></li>
+<li><code>style</code> 设置为 NULL，则仅进行 <code>selector</code>的匹配 </li>
+<li><code>selector</code> 可以使用 <code>LV_STATE_ANY</code> 和 <code>LV_PART_ANY</code> 来匹配任意 state 和 part</li>
+</ul>
+<p>获取 obj 的某个 property 的值：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">lv_obj_get_style_&lt;property_name&gt;(obj, &lt;part&gt;)</span><br><span class="line">    </span><br><span class="line">PS：<span class="type">lv_color_t</span> color = lv_obj_get_style_bg_color(btn, LV_PART_MAIN);</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>更新了 Style ，那已经设置好的 obj 怎么更新：<a target="_blank" rel="noopener" href="https://docs.lvgl.io/8.3/overview/style.html#report-style-changes">Styles — LVGL documentation</a></p>
+</blockquote>
+<h4 id="3-转换效果-Transitions"><a href="#3-转换效果-Transitions" class="headerlink" title="(3) 转换效果-Transitions"></a>(3) 转换效果-Transitions</h4><p>当 obj 的 state 改变时，可以添加一个转场效果，主要设置如下：</p>
+<ul>
+<li>转场所需时间</li>
+<li>延迟多少 ms 之后开始转场</li>
+<li>转场动画路径</li>
+<li>哪些属性需要动画改变</li>
+</ul>
+<p>示例如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*Only its pointer is saved so must static, global or dynamically allocated */</span></span><br><span class="line"><span class="type">static</span> <span class="type">const</span> <span class="type">lv_style_prop_t</span> trans_props[] = {</span><br><span class="line">    LV_STYLE_BG_OPA, LV_STYLE_BG_COLOR,</span><br><span class="line">    <span class="number">0</span>, <span class="comment">/*End marker*/</span></span><br><span class="line">};</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">lv_style_transition_dsc_t</span> trans1;</span><br><span class="line">lv_style_transition_dsc_init(&amp;trans1, trans_props, lv_anim_path_ease_out, duration_ms, delay_ms);</span><br><span class="line">lv_style_set_transition(&amp;style1, &amp;trans1);</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="4-透明度-opa-、混合模式-blend-mode-、角度-angle-、缩放-zoom"><a href="#4-透明度-opa-、混合模式-blend-mode-、角度-angle-、缩放-zoom" class="headerlink" title="(4) 透明度(opa)、混合模式(blend mode)、角度(angle)、缩放(zoom)"></a>(4) 透明度(opa)、混合模式(blend mode)、角度(angle)、缩放(zoom)</h4><p>这些属性设置时，LVGL会创建父部件及其子部件的 snapshot，这涉及是否有足够内存来使用，参考：<a target="_blank" rel="noopener" href="https://docs.lvgl.io/8.3/overview/style.html#opacity-blend-modes-and-transformations">Styles — LVGL documentation</a></p>
+<p>设置选择角度或者缩放比例：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">lv_obj_set_style_transform_angle(btn, <span class="number">150</span>, <span class="number">0</span>);        <span class="comment">/*15 deg*/</span></span><br><span class="line">lv_obj_set_style_transform_zoom(btn, <span class="number">256</span> + <span class="number">64</span>, <span class="number">0</span>);   <span class="comment">/*1.25x*/</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>角度：<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.452ex;" xmlns="http://www.w3.org/2000/svg" width="21.406ex" height="2.149ex" role="img" focusable="false" viewBox="0 -750 9461.6 950"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D463" d="M173 380Q173 405 154 405Q130 405 104 376T61 287Q60 286 59 284T58 281T56 279T53 278T49 278T41 278H27Q21 284 21 287Q21 294 29 316T53 368T97 419T160 441Q202 441 225 417T249 361Q249 344 246 335Q246 329 231 291T200 202T182 113Q182 86 187 69Q200 26 250 26Q287 26 319 60T369 139T398 222T409 277Q409 300 401 317T383 343T365 361T357 383Q357 405 376 424T417 443Q436 443 451 425T467 367Q467 340 455 284T418 159T347 40T241 -11Q177 -11 139 22Q102 54 102 117Q102 148 110 181T151 298Q173 362 173 380Z"></path></g><g data-mml-node="mi" transform="translate(485,0)"><path data-c="1D44E" d="M33 157Q33 258 109 349T280 441Q331 441 370 392Q386 422 416 422Q429 422 439 414T449 394Q449 381 412 234T374 68Q374 43 381 35T402 26Q411 27 422 35Q443 55 463 131Q469 151 473 152Q475 153 483 153H487Q506 153 506 144Q506 138 501 117T481 63T449 13Q436 0 417 -8Q409 -10 393 -10Q359 -10 336 5T306 36L300 51Q299 52 296 50Q294 48 292 46Q233 -10 172 -10Q117 -10 75 30T33 157ZM351 328Q351 334 346 350T323 385T277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q217 26 254 59T298 110Q300 114 325 217T351 328Z"></path></g><g data-mml-node="mi" transform="translate(1014,0)"><path data-c="1D459" d="M117 59Q117 26 142 26Q179 26 205 131Q211 151 215 152Q217 153 225 153H229Q238 153 241 153T246 151T248 144Q247 138 245 128T234 90T214 43T183 6T137 -11Q101 -11 70 11T38 85Q38 97 39 102L104 360Q167 615 167 623Q167 626 166 628T162 632T157 634T149 635T141 636T132 637T122 637Q112 637 109 637T101 638T95 641T94 647Q94 649 96 661Q101 680 107 682T179 688Q194 689 213 690T243 693T254 694Q266 694 266 686Q266 675 193 386T118 83Q118 81 118 75T117 65V59Z"></path></g><g data-mml-node="mi" transform="translate(1312,0)"><path data-c="1D462" d="M21 287Q21 295 30 318T55 370T99 420T158 442Q204 442 227 417T250 358Q250 340 216 246T182 105Q182 62 196 45T238 27T291 44T328 78L339 95Q341 99 377 247Q407 367 413 387T427 416Q444 431 463 431Q480 431 488 421T496 402L420 84Q419 79 419 68Q419 43 426 35T447 26Q469 29 482 57T512 145Q514 153 532 153Q551 153 551 144Q550 139 549 130T540 98T523 55T498 17T462 -8Q454 -10 438 -10Q372 -10 347 46Q345 45 336 36T318 21T296 6T267 -6T233 -11Q189 -11 155 7Q103 38 103 113Q103 170 138 262T173 379Q173 380 173 381Q173 390 173 393T169 400T158 404H154Q131 404 112 385T82 344T65 302T57 280Q55 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mi" transform="translate(1884,0)"><path data-c="1D452" d="M39 168Q39 225 58 272T107 350T174 402T244 433T307 442H310Q355 442 388 420T421 355Q421 265 310 237Q261 224 176 223Q139 223 138 221Q138 219 132 186T125 128Q125 81 146 54T209 26T302 45T394 111Q403 121 406 121Q410 121 419 112T429 98T420 82T390 55T344 24T281 -1T205 -11Q126 -11 83 42T39 168ZM373 353Q367 405 305 405Q272 405 244 391T199 357T170 316T154 280T149 261Q149 260 169 260Q282 260 327 284T373 353Z"></path></g><g data-mml-node="mo" transform="translate(2627.8,0)"><path data-c="3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path></g><g data-mml-node="mi" transform="translate(3683.6,0)"><text data-variant="normal" transform="scale(1,-1)" font-size="884px" font-family="serif">旋</text></g><g data-mml-node="mi" transform="translate(4683.6,0)"><text data-variant="normal" transform="scale(1,-1)" font-size="884px" font-family="serif">转</text></g><g data-mml-node="mi" transform="translate(5683.6,0)"><text data-variant="normal" transform="scale(1,-1)" font-size="884px" font-family="serif">角</text></g><g data-mml-node="mi" transform="translate(6683.6,0)"><text data-variant="normal" transform="scale(1,-1)" font-size="884px" font-family="serif">度</text></g><g data-mml-node="mi" transform="translate(7683.6,0)"><path data-c="D7" d="M630 29Q630 9 609 9Q604 9 587 25T493 118L389 222L284 117Q178 13 175 11Q171 9 168 9Q160 9 154 15T147 29Q147 36 161 51T255 146L359 250L255 354Q174 435 161 449T147 471Q147 480 153 485T168 490Q173 490 175 489Q178 487 284 383L389 278L493 382Q570 459 587 475T609 491Q630 491 630 471Q630 464 620 453T522 355L418 250L522 145Q606 61 618 48T630 29Z"></path></g><g data-mml-node="mn" transform="translate(8461.6,0)"><path data-c="31" d="M213 578L200 573Q186 568 160 563T102 556H83V602H102Q149 604 189 617T245 641T273 663Q275 666 285 666Q294 666 302 660V361L303 61Q310 54 315 52T339 48T401 46H427V0H416Q395 3 257 3Q121 3 100 0H88V46H114Q136 46 152 46T177 47T193 50T201 52T207 57T213 61V578Z"></path><path data-c="30" d="M96 585Q152 666 249 666Q297 666 345 640T423 548Q460 465 460 320Q460 165 417 83Q397 41 362 16T301 -15T250 -22Q224 -22 198 -16T137 16T82 83Q39 165 39 320Q39 494 96 585ZM321 597Q291 629 250 629Q208 629 178 597Q153 571 145 525T137 333Q137 175 145 125T181 46Q209 16 250 16Q290 16 318 46Q347 76 354 130T362 333Q362 478 354 524T321 597Z" transform="translate(500,0)"></path></g></g></g></svg></mjx-container></li>
+<li>缩放：<mjx-container class="MathJax" jax="SVG"><svg style="vertical-align: -0.464ex;" xmlns="http://www.w3.org/2000/svg" width="23.158ex" height="2.059ex" role="img" focusable="false" viewBox="0 -705 10236 910"><g stroke="currentColor" fill="currentColor" stroke-width="0" transform="scale(1,-1)"><g data-mml-node="math"><g data-mml-node="mi"><path data-c="1D463" d="M173 380Q173 405 154 405Q130 405 104 376T61 287Q60 286 59 284T58 281T56 279T53 278T49 278T41 278H27Q21 284 21 287Q21 294 29 316T53 368T97 419T160 441Q202 441 225 417T249 361Q249 344 246 335Q246 329 231 291T200 202T182 113Q182 86 187 69Q200 26 250 26Q287 26 319 60T369 139T398 222T409 277Q409 300 401 317T383 343T365 361T357 383Q357 405 376 424T417 443Q436 443 451 425T467 367Q467 340 455 284T418 159T347 40T241 -11Q177 -11 139 22Q102 54 102 117Q102 148 110 181T151 298Q173 362 173 380Z"></path></g><g data-mml-node="mi" transform="translate(485,0)"><path data-c="1D44E" d="M33 157Q33 258 109 349T280 441Q331 441 370 392Q386 422 416 422Q429 422 439 414T449 394Q449 381 412 234T374 68Q374 43 381 35T402 26Q411 27 422 35Q443 55 463 131Q469 151 473 152Q475 153 483 153H487Q506 153 506 144Q506 138 501 117T481 63T449 13Q436 0 417 -8Q409 -10 393 -10Q359 -10 336 5T306 36L300 51Q299 52 296 50Q294 48 292 46Q233 -10 172 -10Q117 -10 75 30T33 157ZM351 328Q351 334 346 350T323 385T277 405Q242 405 210 374T160 293Q131 214 119 129Q119 126 119 118T118 106Q118 61 136 44T179 26Q217 26 254 59T298 110Q300 114 325 217T351 328Z"></path></g><g data-mml-node="mi" transform="translate(1014,0)"><path data-c="1D459" d="M117 59Q117 26 142 26Q179 26 205 131Q211 151 215 152Q217 153 225 153H229Q238 153 241 153T246 151T248 144Q247 138 245 128T234 90T214 43T183 6T137 -11Q101 -11 70 11T38 85Q38 97 39 102L104 360Q167 615 167 623Q167 626 166 628T162 632T157 634T149 635T141 636T132 637T122 637Q112 637 109 637T101 638T95 641T94 647Q94 649 96 661Q101 680 107 682T179 688Q194 689 213 690T243 693T254 694Q266 694 266 686Q266 675 193 386T118 83Q118 81 118 75T117 65V59Z"></path></g><g data-mml-node="mi" transform="translate(1312,0)"><path data-c="1D462" d="M21 287Q21 295 30 318T55 370T99 420T158 442Q204 442 227 417T250 358Q250 340 216 246T182 105Q182 62 196 45T238 27T291 44T328 78L339 95Q341 99 377 247Q407 367 413 387T427 416Q444 431 463 431Q480 431 488 421T496 402L420 84Q419 79 419 68Q419 43 426 35T447 26Q469 29 482 57T512 145Q514 153 532 153Q551 153 551 144Q550 139 549 130T540 98T523 55T498 17T462 -8Q454 -10 438 -10Q372 -10 347 46Q345 45 336 36T318 21T296 6T267 -6T233 -11Q189 -11 155 7Q103 38 103 113Q103 170 138 262T173 379Q173 380 173 381Q173 390 173 393T169 400T158 404H154Q131 404 112 385T82 344T65 302T57 280Q55 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mi" transform="translate(1884,0)"><path data-c="1D452" d="M39 168Q39 225 58 272T107 350T174 402T244 433T307 442H310Q355 442 388 420T421 355Q421 265 310 237Q261 224 176 223Q139 223 138 221Q138 219 132 186T125 128Q125 81 146 54T209 26T302 45T394 111Q403 121 406 121Q410 121 419 112T429 98T420 82T390 55T344 24T281 -1T205 -11Q126 -11 83 42T39 168ZM373 353Q367 405 305 405Q272 405 244 391T199 357T170 316T154 280T149 261Q149 260 169 260Q282 260 327 284T373 353Z"></path></g><g data-mml-node="mo" transform="translate(2627.8,0)"><path data-c="3D" d="M56 347Q56 360 70 367H707Q722 359 722 347Q722 336 708 328L390 327H72Q56 332 56 347ZM56 153Q56 168 72 173H708Q722 163 722 153Q722 140 707 133H70Q56 140 56 153Z"></path></g><g data-mml-node="mi" transform="translate(3683.6,0)"><path data-c="1D45D" d="M23 287Q24 290 25 295T30 317T40 348T55 381T75 411T101 433T134 442Q209 442 230 378L240 387Q302 442 358 442Q423 442 460 395T497 281Q497 173 421 82T249 -10Q227 -10 210 -4Q199 1 187 11T168 28L161 36Q160 35 139 -51T118 -138Q118 -144 126 -145T163 -148H188Q194 -155 194 -157T191 -175Q188 -187 185 -190T172 -194Q170 -194 161 -194T127 -193T65 -192Q-5 -192 -24 -194H-32Q-39 -187 -39 -183Q-37 -156 -26 -148H-6Q28 -147 33 -136Q36 -130 94 103T155 350Q156 355 156 364Q156 405 131 405Q109 405 94 377T71 316T59 280Q57 278 43 278H29Q23 284 23 287ZM178 102Q200 26 252 26Q282 26 310 49T356 107Q374 141 392 215T411 325V331Q411 405 350 405Q339 405 328 402T306 393T286 380T269 365T254 350T243 336T235 326L232 322Q232 321 229 308T218 264T204 212Q178 106 178 102Z"></path></g><g data-mml-node="mi" transform="translate(4186.6,0)"><path data-c="1D45F" d="M21 287Q22 290 23 295T28 317T38 348T53 381T73 411T99 433T132 442Q161 442 183 430T214 408T225 388Q227 382 228 382T236 389Q284 441 347 441H350Q398 441 422 400Q430 381 430 363Q430 333 417 315T391 292T366 288Q346 288 334 299T322 328Q322 376 378 392Q356 405 342 405Q286 405 239 331Q229 315 224 298T190 165Q156 25 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 114 189T154 366Q154 405 128 405Q107 405 92 377T68 316T57 280Q55 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mi" transform="translate(4637.6,0)"><path data-c="1D452" d="M39 168Q39 225 58 272T107 350T174 402T244 433T307 442H310Q355 442 388 420T421 355Q421 265 310 237Q261 224 176 223Q139 223 138 221Q138 219 132 186T125 128Q125 81 146 54T209 26T302 45T394 111Q403 121 406 121Q410 121 419 112T429 98T420 82T390 55T344 24T281 -1T205 -11Q126 -11 83 42T39 168ZM373 353Q367 405 305 405Q272 405 244 391T199 357T170 316T154 280T149 261Q149 260 169 260Q282 260 327 284T373 353Z"></path></g><g data-mml-node="mi" transform="translate(5103.6,0)"><path data-c="1D450" d="M34 159Q34 268 120 355T306 442Q362 442 394 418T427 355Q427 326 408 306T360 285Q341 285 330 295T319 325T330 359T352 380T366 386H367Q367 388 361 392T340 400T306 404Q276 404 249 390Q228 381 206 359Q162 315 142 235T121 119Q121 73 147 50Q169 26 205 26H209Q321 26 394 111Q403 121 406 121Q410 121 419 112T429 98T420 83T391 55T346 25T282 0T202 -11Q127 -11 81 37T34 159Z"></path></g><g data-mml-node="mi" transform="translate(5536.6,0)"><path data-c="1D452" d="M39 168Q39 225 58 272T107 350T174 402T244 433T307 442H310Q355 442 388 420T421 355Q421 265 310 237Q261 224 176 223Q139 223 138 221Q138 219 132 186T125 128Q125 81 146 54T209 26T302 45T394 111Q403 121 406 121Q410 121 419 112T429 98T420 82T390 55T344 24T281 -1T205 -11Q126 -11 83 42T39 168ZM373 353Q367 405 305 405Q272 405 244 391T199 357T170 316T154 280T149 261Q149 260 169 260Q282 260 327 284T373 353Z"></path></g><g data-mml-node="mi" transform="translate(6002.6,0)"><path data-c="1D45B" d="M21 287Q22 293 24 303T36 341T56 388T89 425T135 442Q171 442 195 424T225 390T231 369Q231 367 232 367L243 378Q304 442 382 442Q436 442 469 415T503 336T465 179T427 52Q427 26 444 26Q450 26 453 27Q482 32 505 65T540 145Q542 153 560 153Q580 153 580 145Q580 144 576 130Q568 101 554 73T508 17T439 -10Q392 -10 371 17T350 73Q350 92 386 193T423 345Q423 404 379 404H374Q288 404 229 303L222 291L189 157Q156 26 151 16Q138 -11 108 -11Q95 -11 87 -5T76 7T74 17Q74 30 112 180T152 343Q153 348 153 366Q153 405 129 405Q91 405 66 305Q60 285 60 284Q58 278 41 278H27Q21 284 21 287Z"></path></g><g data-mml-node="mi" transform="translate(6602.6,0)"><path data-c="1D461" d="M26 385Q19 392 19 395Q19 399 22 411T27 425Q29 430 36 430T87 431H140L159 511Q162 522 166 540T173 566T179 586T187 603T197 615T211 624T229 626Q247 625 254 615T261 596Q261 589 252 549T232 470L222 433Q222 431 272 431H323Q330 424 330 420Q330 398 317 385H210L174 240Q135 80 135 68Q135 26 162 26Q197 26 230 60T283 144Q285 150 288 151T303 153H307Q322 153 322 145Q322 142 319 133Q314 117 301 95T267 48T216 6T155 -11Q125 -11 98 4T59 56Q57 64 57 83V101L92 241Q127 382 128 383Q128 385 77 385H26Z"></path></g><g data-mml-node="mo" transform="translate(7185.8,0)"><path data-c="2217" d="M229 286Q216 420 216 436Q216 454 240 464Q241 464 245 464T251 465Q263 464 273 456T283 436Q283 419 277 356T270 286L328 328Q384 369 389 372T399 375Q412 375 423 365T435 338Q435 325 425 315Q420 312 357 282T289 250L355 219L425 184Q434 175 434 161Q434 146 425 136T401 125Q393 125 383 131T328 171L270 213Q283 79 283 63Q283 53 276 44T250 35Q231 35 224 44T216 63Q216 80 222 143T229 213L171 171Q115 130 110 127Q106 124 100 124Q87 124 76 134T64 161Q64 166 64 169T67 175T72 181T81 188T94 195T113 204T138 215T170 230T210 250L74 315Q65 324 65 338Q65 353 74 363T98 374Q106 374 116 368T171 328L229 286Z"></path></g><g data-mml-node="mn" transform="translate(7908,0)"><path data-c="32" d="M109 429Q82 429 66 447T50 491Q50 562 103 614T235 666Q326 666 387 610T449 465Q449 422 429 383T381 315T301 241Q265 210 201 149L142 93L218 92Q375 92 385 97Q392 99 409 186V189H449V186Q448 183 436 95T421 3V0H50V19V31Q50 38 56 46T86 81Q115 113 136 137Q145 147 170 174T204 211T233 244T261 278T284 308T305 340T320 369T333 401T340 431T343 464Q343 527 309 573T212 619Q179 619 154 602T119 569T109 550Q109 549 114 549Q132 549 151 535T170 489Q170 464 154 447T109 429Z"></path><path data-c="2E" d="M78 60Q78 84 95 102T138 120Q162 120 180 104T199 61Q199 36 182 18T139 0T96 17T78 60Z" transform="translate(500,0)"></path><path data-c="35" d="M164 157Q164 133 148 117T109 101H102Q148 22 224 22Q294 22 326 82Q345 115 345 210Q345 313 318 349Q292 382 260 382H254Q176 382 136 314Q132 307 129 306T114 304Q97 304 95 310Q93 314 93 485V614Q93 664 98 664Q100 666 102 666Q103 666 123 658T178 642T253 634Q324 634 389 662Q397 666 402 666Q410 666 410 648V635Q328 538 205 538Q174 538 149 544L139 546V374Q158 388 169 396T205 412T256 420Q337 420 393 355T449 201Q449 109 385 44T229 -22Q148 -22 99 32T50 154Q50 178 61 192T84 210T107 214Q132 214 148 197T164 157Z" transform="translate(778,0)"></path><path data-c="35" d="M164 157Q164 133 148 117T109 101H102Q148 22 224 22Q294 22 326 82Q345 115 345 210Q345 313 318 349Q292 382 260 382H254Q176 382 136 314Q132 307 129 306T114 304Q97 304 95 310Q93 314 93 485V614Q93 664 98 664Q100 666 102 666Q103 666 123 658T178 642T253 634Q324 634 389 662Q397 666 402 666Q410 666 410 648V635Q328 538 205 538Q174 538 149 544L139 546V374Q158 388 169 396T205 412T256 420Q337 420 393 355T449 201Q449 109 385 44T229 -22Q148 -22 99 32T50 154Q50 178 61 192T84 210T107 214Q132 214 148 197T164 157Z" transform="translate(1278,0)"></path></g><g data-mml-node="mi" transform="translate(9686,0)"><path data-c="1D453" d="M118 -162Q120 -162 124 -164T135 -167T147 -168Q160 -168 171 -155T187 -126Q197 -99 221 27T267 267T289 382V385H242Q195 385 192 387Q188 390 188 397L195 425Q197 430 203 430T250 431Q298 431 298 432Q298 434 307 482T319 540Q356 705 465 705Q502 703 526 683T550 630Q550 594 529 578T487 561Q443 561 443 603Q443 622 454 636T478 657L487 662Q471 668 457 668Q445 668 434 658T419 630Q412 601 403 552T387 469T380 433Q380 431 435 431Q480 431 487 430T498 424Q499 420 496 407T491 391Q489 386 482 386T428 385H372L349 263Q301 15 282 -47Q255 -132 212 -173Q175 -205 139 -205Q107 -205 81 -186T55 -132Q55 -95 76 -78T118 -61Q162 -61 162 -103Q162 -122 151 -136T127 -157L118 -162Z"></path></g></g></g></svg></mjx-container></li>
+</ul>
+<h3 id="3-4-Themes"><a href="#3-4-Themes" class="headerlink" title="3.4 Themes"></a>3.4 Themes</h3><p>主题是 Style 的集合，启用主题会自动应用于所有创建的部件，使用主题的方式：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">lv_theme_t</span> * th = lv_theme_default_init(</span><br><span class="line">    display,                 <span class="comment">/*Use the DPI, size, etc from this display*/</span></span><br><span class="line">    LV_COLOR_PALETTE_BLUE, </span><br><span class="line">    LV_COLOR_PALETTE_CYAN,   <span class="comment">/*Primary and secondary palette*/</span></span><br><span class="line">    <span class="literal">false</span>,                   <span class="comment">/*Light or dark mode*/</span></span><br><span class="line">    &amp;lv_font_montserrat_10, </span><br><span class="line">    &amp;lv_font_montserrat_14, </span><br><span class="line">    &amp;lv_font_montserrat_18); <span class="comment">/*Small, normal, large fonts*/</span></span><br><span class="line"></span><br><span class="line">lv_disp_set_theme(display, th); <span class="comment">/*Assign the theme to the display*/</span></span><br></pre></td></tr></table></figure>
+
+<p>在文件<code>lv_conf.h</code> 设置 <code>LV_USE_THEME_DEFAULT 1</code> LVGL会自动使用默认主题。</p>
+<blockquote>
+<p>嵌套扩展主题：<a target="_blank" rel="noopener" href="https://docs.lvgl.io/8.3/overview/style.html#extending-themes">链接</a></p>
+</blockquote>
+<h2 id="4-滚动-Scroll"><a href="#4-滚动-Scroll" class="headerlink" title="4. 滚动-Scroll"></a>4. 滚动-Scroll</h2><p>当子部件超过了父部件的大小，就会产生滚动，例如滚动查看文本框中的文字。</p>
+<blockquote>
+<p>参考：<a target="_blank" rel="noopener" href="https://docs.lvgl.io/8.3/overview/scroll.html#scroll">链接</a></p>
+</blockquote>
+<h2 id="5-Events"><a href="#5-Events" class="headerlink" title="5. Events"></a>5. Events</h2><p>为一个部件添加事件响应：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">lv_obj_t</span> * btn = lv_btn_create(lv_scr_act());</span><br><span class="line"><span class="type">lv_event_dsc_t</span> *event_dsc = lv_obj_add_event_cb(btn, my_event_cb, LV_EVENT_CLICKED, <span class="literal">NULL</span>);   </span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">my_event_cb</span><span class="params">(<span class="type">lv_event_t</span> * event)</span></span><br><span class="line">{</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"Clicked\n"</span>);</span><br><span class="line">}</span><br></pre></td></tr></table></figure>
+
+<p>移除事件响应的两种方式：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">lv_obj_remove_event_cb(obj, event_cb)     <span class="comment">// 根据回调函数</span></span><br><span class="line">lv_obj_remove_event_dsc(obj, event_dsc)   <span class="comment">// 根据 lv_obj_add_event_cb 的返回值</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="5-1-事件类型"><a href="#5-1-事件类型" class="headerlink" title="5.1 事件类型"></a>5.1 事件类型</h3><ul>
+<li>Input device events：通用事件</li>
+<li>Drawing events：通用事件</li>
+<li>Other events：通用事件</li>
+<li>Special events：特殊部件才有的</li>
+<li>Custom events：自定义事件</li>
+</ul>
+<blockquote>
+<p>详细事件种类：<a target="_blank" rel="noopener" href="https://docs.lvgl.io/8.3/overview/event.html#input-device-events">链接</a></p>
+</blockquote>
+<h4 id="1-自定义事件"><a href="#1-自定义事件" class="headerlink" title="(1) 自定义事件"></a>(1) 自定义事件</h4><p>需要在 LVGL 中注册一个 id，之后往这个 id 中手动发送事件就行：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">uint32_t</span> MY_EVENT_1 = lv_event_register_id();   <span class="comment">// 注册一个自定义事件码</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="（2）手动发送事件"><a href="#（2）手动发送事件" class="headerlink" title="（2）手动发送事件"></a>（2）手动发送事件</h4><p>函数原型：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">lv_res_t</span> <span class="title function_">lv_event_send</span><span class="params">(<span class="type">lv_obj_t</span> * obj, <span class="type">lv_event_code_t</span> event_code, <span class="type">void</span> * param)</span></span><br></pre></td></tr></table></figure>
+
+<p>示例代码：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*Simulate the press of the first button (indexes start from zero)*/</span></span><br><span class="line"><span class="type">uint32_t</span> btn_id = <span class="number">0</span>;</span><br><span class="line">lv_event_send(mbox, LV_EVENT_VALUE_CHANGED, &amp;btn_id);</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="3-刷新事件"><a href="#3-刷新事件" class="headerlink" title="(3) 刷新事件"></a>(3) 刷新事件</h4><p><code>LV_EVENT_REFRESH</code> 用来让用户通知一个部件，让它刷新自己，可能的使用场景：</p>
+<ul>
+<li>label 的文本更新了，需要刷新</li>
+<li>系统语言改变了，label 需要刷新</li>
+<li>在某些情况下使能按键，需要让按键刷新</li>
+</ul>
+<h4 id="4-回调函数的参数"><a href="#4-回调函数的参数" class="headerlink" title="(4) 回调函数的参数"></a>(4) 回调函数的参数</h4><p><code>lv_event_t *e</code> 中包括很多有用的信息：</p>
+<ul>
+<li><code>lv_event_get_code(e)</code> 获取事件码</li>
+<li><code>lv_event_get_current_target(e)</code> 获取触发事件的对象</li>
+<li><code>lv_event_get_target(e)</code> 获取原始触发事件的对象；如果不使能 <code>event bubbling</code> 功能，它和上面的函数获取的一样，反之，当子部件触发事件，对于父部件使用该函数会获取到子部件而非自己本身</li>
+<li><code>lv_event_get_user_data(e)</code> 获取注册回调函数 <code>lv_obj_add_event_cb</code> 时传递的参数</li>
+<li><code>lv_event_get_param(e)</code> 获取 <code>lv_event_send</code> 函数传递的参数</li>
+</ul>
+<h4 id="5-Event-bubbling"><a href="#5-Event-bubbling" class="headerlink" title="(5) Event bubbling"></a>(5) Event bubbling</h4><p>使用如下函数可以为 obj 添加 event bubbling 标志：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lv_obj_add_flag(obj, LV_OBJ_FLAG_EVENT_BUBBLE)</span><br></pre></td></tr></table></figure>
+
+<p>含有该标志的 obj 会上传触发的事件到其父部件上，如果父部件同样有该标志，会继续传递给更上一层。</p>
+<h2 id="6-输入设备"><a href="#6-输入设备" class="headerlink" title="6. 输入设备"></a>6. 输入设备</h2><h3 id="6-1-指针"><a href="#6-1-指针" class="headerlink" title="6.1 指针"></a>6.1 指针</h3><h4 id="6-1-1-光标"><a href="#6-1-1-光标" class="headerlink" title="6.1.1 光标"></a>6.1.1 光标</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">lv_indev_t</span> * mouse_indev = lv_indev_drv_register(&amp;indev_drv);</span><br><span class="line"></span><br><span class="line">LV_IMG_DECLARE(mouse_cursor_icon);                         <span class="comment">/*Declare the image source.*/</span></span><br><span class="line"><span class="type">lv_obj_t</span> * cursor_obj = lv_img_create(lv_scr_act());       <span class="comment">/*Create an image object for the cursor */</span></span><br><span class="line">lv_img_set_src(cursor_obj, &amp;mouse_cursor_icon);             <span class="comment">/*Set the image source*/</span></span><br><span class="line">lv_indev_set_cursor(mouse_indev, cursor_obj);               <span class="comment">/*Connect the image  object to the driver*/</span></span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h4 id="6-1-2-手势-Gestures"><a href="#6-1-2-手势-Gestures" class="headerlink" title="6.1.2 手势-Gestures"></a>6.1.2 手势-Gestures</h4><p>例如左滑和右滑，LVGL提供了基础的手势识别（<strong>部件滚动不算手势</strong>）。大部分部件<strong>默认</strong>会将手势事件 <code>LV_EVENT_GESTRUE</code> 上传给其父部件，最终上传到屏幕对象上，例如：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">my_event</span><span class="params">(<span class="type">lv_event_t</span> * e)</span></span><br><span class="line">{</span><br><span class="line">  <span class="type">lv_obj_t</span> * screen = lv_event_get_current_target(e);</span><br><span class="line">  <span class="type">lv_dir_t</span> dir = lv_indev_get_gesture_dir(lv_indev_get_act());</span><br><span class="line">  <span class="keyword">switch</span>(dir) {</span><br><span class="line">    <span class="keyword">case</span> LV_DIR_LEFT:</span><br><span class="line">      ...</span><br><span class="line">      <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">case</span> LV_DIR_RIGHT:</span><br><span class="line">      ...</span><br><span class="line">      <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">case</span> LV_DIR_TOP:</span><br><span class="line">      ...</span><br><span class="line">      <span class="keyword">break</span>;</span><br><span class="line">    <span class="keyword">case</span> LV_DIR_BOTTOM:</span><br><span class="line">      ...</span><br><span class="line">      <span class="keyword">break</span>;</span><br><span class="line">  }</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line">lv_obj_add_event_cb(screen1, my_event, LV_EVENT_GESTURE, <span class="literal">NULL</span>);</span><br></pre></td></tr></table></figure>
+
+<p>想要阻止上传 <code>LV_EVENT_GESTRUE</code> 需要清楚标志 <code>LV_OBJ_FLAG_GESTURE_BUBBLE</code>：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lv_obj_clear_flag(obj, LV_OBJ_FLAG_GESTURE_BUBBLE)</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+<h3 id="6-2-键盘和编码器"><a href="#6-2-键盘和编码器" class="headerlink" title="6.2 键盘和编码器"></a>6.2 键盘和编码器</h3><h4 id="6-2-1-Group"><a href="#6-2-1-Group" class="headerlink" title="6.2.1 Group"></a>6.2.1 Group</h4><p>需要将一个输入设备和一个组关联在一起，一个输入设备只能关联一个组，一个组中可以关联多个输入设备。</p>
+<p>创建组，并为组添加对象：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">lv_group_t</span> * g = lv_group_create()</span><br><span class="line">lv_group_add_obj(g, obj)</span><br></pre></td></tr></table></figure>
+
+<p>将输入设备和组进行关联：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lv_indev_set_group(indev, g)</span><br></pre></td></tr></table></figure>
+
+<p>例如，一个编码器输入设备的创建过程如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">lv_indev_drv_t</span> indev_drv_3;</span><br><span class="line">lv_indev_drv_init(&amp;indev_drv_3); <span class="comment">/*Basic initialization*/</span></span><br><span class="line">indev_drv_3.type = LV_INDEV_TYPE_ENCODER;</span><br><span class="line">indev_drv_3.read_cb = sdl_mousewheel_read;</span><br><span class="line"><span class="type">lv_indev_t</span> *enc_indev = lv_indev_drv_register(&amp;indev_drv_3);</span><br><span class="line">lv_indev_set_group(enc_indev, g);</span><br></pre></td></tr></table></figure>
+
+<p><strong>重点是输入设备的回调函数</strong>，例如 PC 模拟器上的鼠标编码器：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">sdl_mousewheel_read</span><span class="params">(<span class="type">lv_indev_drv_t</span> * indev_drv, <span class="type">lv_indev_data_t</span> * data)</span></span><br><span class="line">{</span><br><span class="line">    (<span class="type">void</span>) indev_drv;      <span class="comment">/*Unused*/</span></span><br><span class="line"></span><br><span class="line">    data-&gt;state = wheel_state;  </span><br><span class="line">    <span class="comment">/* PC模拟器上是由系统获取，在单片机中可以提供一个获取函数在这里 */</span></span><br><span class="line">    <span class="comment">/* data-&gt;enc_diff = get_encoder_data()   */</span></span><br><span class="line">    data-&gt;enc_diff = wheel_diff;</span><br><span class="line">    wheel_diff = <span class="number">0</span>;</span><br><span class="line">}</span><br></pre></td></tr></table></figure>
+
+<p>这个函数是和物理设备交互的关键函数，对于编码器而言，需要设置当前的编码值以及按键的状态两个成员参数；</p>
+<p>该函数会在 LVGL 的定时任务中调用：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(indev-&gt;driver-&gt;read_cb) {</span><br><span class="line">    INDEV_TRACE(<span class="string">"calling indev_read_cb"</span>);</span><br><span class="line">    indev-&gt;driver-&gt;read_cb(indev-&gt;driver, data);</span><br><span class="line">}</span><br></pre></td></tr></table></figure>
+
+<p>调用 <code>read_cb</code> 取得的数据会存储在 data 中，在定时任务的后半部中会根据输入设备的类型进行处理，例如对于编码器有：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>(data-&gt;enc_diff &lt; <span class="number">0</span>) {</span><br><span class="line">    <span class="keyword">for</span>(s = <span class="number">0</span>; s &lt; -data-&gt;enc_diff; s++) {</span><br><span class="line">        lv_group_send_data(g, LV_KEY_LEFT);   <span class="comment">// 在编辑模式下发送，标识减少值或者向左移动</span></span><br><span class="line">        <span class="keyword">if</span>(indev_reset_check(&amp;i-&gt;proc)) <span class="keyword">return</span>;</span><br><span class="line">    }</span><br><span class="line">}</span><br><span class="line"><span class="keyword">else</span> <span class="keyword">if</span>(data-&gt;enc_diff &gt; <span class="number">0</span>) {</span><br><span class="line">    <span class="keyword">for</span>(s = <span class="number">0</span>; s &lt; data-&gt;enc_diff; s++) {</span><br><span class="line">        lv_group_send_data(g, LV_KEY_RIGHT);</span><br><span class="line">        <span class="keyword">if</span>(indev_reset_check(&amp;i-&gt;proc)) <span class="keyword">return</span>;</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></table></figure>
+
+<p>其他输入设备的 data 可以查看 <code>lv_indev_data_t</code> 这个结构体的成员：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> {</span></span><br><span class="line">    <span class="type">lv_point_t</span> point; <span class="comment">/**&lt; For LV_INDEV_TYPE_POINTER the currently pressed point*/</span></span><br><span class="line">    <span class="type">uint32_t</span> key;     <span class="comment">/**&lt; For LV_INDEV_TYPE_KEYPAD the currently pressed key*/</span></span><br><span class="line">    <span class="type">uint32_t</span> btn_id;  <span class="comment">/**&lt; For LV_INDEV_TYPE_BUTTON the currently pressed button*/</span></span><br><span class="line">    <span class="type">int16_t</span> enc_diff; <span class="comment">/**&lt; For LV_INDEV_TYPE_ENCODER number of steps since the previous read*/</span></span><br><span class="line"></span><br><span class="line">    <span class="type">lv_indev_state_t</span> state; <span class="comment">/**&lt; LV_INDEV_STATE_REL or LV_INDEV_STATE_PR*/</span></span><br><span class="line">    <span class="type">bool</span> continue_reading;  <span class="comment">/**&lt; If set to true, the read callback is invoked again*/</span></span><br><span class="line">} <span class="type">lv_indev_data_t</span>;</span><br></pre></td></tr></table></figure>
+
+<p>常见的一些输入设备中，例如触摸屏需要设置 point 成员，键盘需要设置 key 成员，编码器需要设置 enc_diff 成员。</p>
+<h4 id="6-2-2-编辑和导航模式"><a href="#6-2-2-编辑和导航模式" class="headerlink" title="6.2.2 编辑和导航模式"></a>6.2.2 编辑和导航模式</h4><p>因为编码器的按键有限，所以 LVGL 定义了两种模式：编辑 (edit) 和 导航 (navigate)，长按编码器来进行这两种模式的切换：</p>
+<ul>
+<li>编辑模式下转动编码器会给所属组发送 <code>LV_KEY_LEFT/LV_KEY_RIGHT</code> 键值</li>
+<li>导航模式下转动编码器会给所属组发送 <code>LV_KEY_NEXT/LV_KEY_PREV</code> 键值</li>
+</ul>
+<p>短按编码器可以聚焦 (focus) 对象，对象状态为 <code>LV_STATE_FOCUSED</code>；如果对象进入编辑模式，对象状态为 <code>LV_STATE_FOCUSED | LV_STATE_EDITED </code>，对于不同状态可以设置不同的 style</p>
+<h4 id="6-2-3-默认组"><a href="#6-2-3-默认组" class="headerlink" title="6.2.3 默认组"></a>6.2.3 默认组</h4><p><strong>常用部件会自动添加到默认组中，不再需要手动调用</strong><code>lv_group_add_obj</code>函数，我们可以创建一个组，然后将其设置为默认组：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">lv_group_t</span> * g = lv_group_create();   	</span><br><span class="line">lv_group_set_default(g);		    	<span class="comment">// 设置默认组</span></span><br><span class="line">lv_indev_set_group(my_indev, g); 		<span class="comment">//将输入设备分配到默认组</span></span><br></pre></td></tr></table></figure>
+
+<p>哪些部件会被自动添加呢？部件的属性 <code>group_def</code> 为 <code>LV_OBJ_CLASS_GROUP_DEF_TRUE</code> 会被自动添加，例如：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">const</span> <span class="type">lv_obj_class_t</span> lv_btn_class  = {</span><br><span class="line">    .constructor_cb = lv_btn_constructor,</span><br><span class="line">    .width_def = LV_SIZE_CONTENT,</span><br><span class="line">    .height_def = LV_SIZE_CONTENT,</span><br><span class="line">    .group_def = LV_OBJ_CLASS_GROUP_DEF_TRUE,</span><br><span class="line">    .instance_size = <span class="keyword">sizeof</span>(<span class="type">lv_btn_t</span>),</span><br><span class="line">    .base_class = &amp;lv_obj_class</span><br><span class="line">};</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="7-颜色-Colors"><a href="#7-颜色-Colors" class="headerlink" title="7. 颜色-Colors"></a>7. 颜色-Colors</h2><p>在 <code>lv_conf.h</code> 中可以配置两个和颜色有关的宏：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*Color depth: 1 (1 byte per pixel), 8 (RGB332), 16 (RGB565), 32 (ARGB8888)*/</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LV_COLOR_DEPTH 32</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/*Swap the 2 bytes of RGB565 color. Useful if the display has an 8-bit interface (e.g. SPI)*/</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LV_COLOR_16_SWAP 0</span></span><br></pre></td></tr></table></figure>
+
+<p><code>LV_COLOR_16_SWAP</code> 为 0 表示小字节序，通常来说都是小字节序；如果显示器需要大字节序则需要设置为 1</p>
+<h3 id="7-1-创建颜色的方式"><a href="#7-1-创建颜色的方式" class="headerlink" title="7.1 创建颜色的方式"></a>7.1 创建颜色的方式</h3><h4 id="7-1-1-手动创建"><a href="#7-1-1-手动创建" class="headerlink" title="7.1.1 手动创建"></a>7.1.1 手动创建</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//All channels are 0-255</span></span><br><span class="line"><span class="type">lv_color_t</span> c = lv_color_make(red, green, blue);</span><br><span class="line"></span><br><span class="line"><span class="comment">//From hex code 0x000000..0xFFFFFF interpreted as RED + GREEN + BLUE</span></span><br><span class="line"><span class="type">lv_color_t</span> c = lv_color_hex(<span class="number">0x123456</span>);</span><br></pre></td></tr></table></figure>
+
+<h4 id="7-1-2-从调色板中衍生"><a href="#7-1-2-从调色板中衍生" class="headerlink" title="7.1.2 从调色板中衍生"></a>7.1.2 从调色板中衍生</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">lv_color_t</span> c = lv_palette_main(LV_PALETTE_BLUE)</span><br><span class="line">    </span><br><span class="line"><span class="type">lv_color_t</span> c = lv_palette_lighten(LV_PALETTE_BLUE, v)  <span class="comment">// v 是 1-5，值越大颜色越浅</span></span><br><span class="line">    </span><br><span class="line"><span class="type">lv_color_t</span> c = lv_palette_darken(LV_PALETTE_BLUE, v)   <span class="comment">// v 是 1-4，值越大颜色越深</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="7-1-3-修改和混合颜色"><a href="#7-1-3-修改和混合颜色" class="headerlink" title="7.1.3 修改和混合颜色"></a>7.1.3 修改和混合颜色</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Lighten a color. 0: no change, 255: white</span></span><br><span class="line"><span class="type">lv_color_t</span> c = lv_color_lighten(c, lvl);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Darken a color. 0: no change, 255: black</span></span><br><span class="line"><span class="type">lv_color_t</span> c = lv_color_darken(<span class="type">lv_color_t</span> c, <span class="type">lv_opa_t</span> lvl);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Lighten or darken a color. 0: black, 128: no change 255: white</span></span><br><span class="line"><span class="type">lv_color_t</span> c = lv_color_change_lightness(<span class="type">lv_color_t</span> c, <span class="type">lv_opa_t</span> lvl);</span><br><span class="line"></span><br><span class="line"><span class="comment">// Mix two colors with a given ratio 0: full c2, 255: full c1, 128: half c1 and half c2</span></span><br><span class="line"><span class="type">lv_color_t</span> c = lv_color_mix(c1, c2, ratio);</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="7-2-不透明度-Opacity"><a href="#7-2-不透明度-Opacity" class="headerlink" title="7.2 不透明度-Opacity"></a>7.2 不透明度-Opacity</h3><p><code>LV_OPA_TRANSP </code> 值为 0 ，代表透明；</p>
+<p><code>LV_OPA_COVER</code>值为255，代表完全不透明；</p>
+<p><code>LV_OPA_50</code> 代表半透明</p>
+<h2 id="8-字体-fonts"><a href="#8-字体-fonts" class="headerlink" title="8. 字体-fonts"></a>8. 字体-fonts</h2><p>需要在 <code>lv_conf.h</code> 中注意的设置：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 1.颜色通道顺序</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LV_USE_FONT_SUBPX 1</span></span><br><span class="line"><span class="meta">#<span class="keyword">if</span> LV_USE_FONT_SUBPX</span></span><br><span class="line">    <span class="comment">/*Set the pixel order of the display. Physical order of RGB channels. Doesn't matter with "normal" fonts.*/</span></span><br><span class="line">    <span class="meta">#<span class="keyword">define</span> LV_FONT_SUBPX_BGR 0  <span class="comment">/*0: RGB; 1:BGR order*/</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 2. 编码方式</span></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Select a character encoding for strings.</span></span><br><span class="line"><span class="comment"> * Your IDE or editor should have the same character encoding</span></span><br><span class="line"><span class="comment"> * - LV_TXT_ENC_UTF8</span></span><br><span class="line"><span class="comment"> * - LV_TXT_ENC_ASCII</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LV_TXT_ENC LV_TXT_ENC_UTF8</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 3.一行的显示方向</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> LV_USE_BIDI 1</span></span><br><span class="line"><span class="meta">#<span class="keyword">if</span> LV_USE_BIDI</span></span><br><span class="line">    <span class="comment">/*Set the default direction. Supported values:</span></span><br><span class="line"><span class="comment">    *`LV_BASE_DIR_LTR` Left-to-Right</span></span><br><span class="line"><span class="comment">    *`LV_BASE_DIR_RTL` Right-to-Left</span></span><br><span class="line"><span class="comment">    *`LV_BASE_DIR_AUTO` detect texts base direction*/</span></span><br><span class="line">    <span class="meta">#<span class="keyword">define</span> LV_BIDI_BASE_DIR_DEF LV_BASE_DIR_AUTO</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+
+<p>LVGL 支持 UTF-8 格式的 Unicode 字符，所以我们的文件也需要保存为 UTF-8 编码。</p>
+<h3 id="8-1-内建字体"><a href="#8-1-内建字体" class="headerlink" title="8.1 内建字体"></a>8.1 内建字体</h3><p>LVGL 提供了 <a target="_blank" rel="noopener" href="https://fonts.google.com/specimen/Montserrat">Montserrat</a> 风格的不同字体大小的内建字体，具体参见：<a target="_blank" rel="noopener" href="https://docs.lvgl.io/8.3/overview/font.html#normal-fonts">链接</a>，使用 style 来设置：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lv_style_set_text_font(&amp;my_style, &amp;lv_font_montserrat_28);  <span class="comment">/* 设置字号为 28 */</span></span><br></pre></td></tr></table></figure>
+
+<p>此外，LVGL 还提供了大量内建特殊字符图形：</p>
+<p><img src="/../../images/LVGL%E9%80%9F%E6%88%90/image-20240319211022193.png" alt="image-20240319211022193"></p>
+<p>使用示例如下（编译时会自动拼接）：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lv_label_set_text(my_label, LV_SYMBOL_OK <span class="string">"Apply"</span> LV_SYMBOL_PLAY);</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="8-2-其他字体特征"><a href="#8-2-其他字体特征" class="headerlink" title="8.2 其他字体特征"></a>8.2 其他字体特征</h3><ul>
+<li><a target="_blank" rel="noopener" href="https://docs.lvgl.io/8.3/overview/font.html#subpixel-rendering">Subpixel rendering</a></li>
+<li><a target="_blank" rel="noopener" href="https://docs.lvgl.io/8.3/overview/font.html#compressed-fonts">Compressed fonts</a></li>
+</ul>
+<h3 id="8-3-添加中文字库"><a href="#8-3-添加中文字库" class="headerlink" title="8.3 添加中文字库"></a>8.3 添加中文字库</h3><ol>
+<li><p>找到一款开源字体文件：<a target="_blank" rel="noopener" href="https://lvgl.100ask.net/8.1/tools/fonts-zh-source.html?highlight=%E6%80%9D%E6%BA%90#id3">链接</a></p>
+</li>
+<li><p>查找需要转换的字符的 Unicode 编码范围：<a target="_blank" rel="noopener" href="https://lvgl.100ask.net/8.1/tools/fonts-zh-source.html?highlight=%E6%80%9D%E6%BA%90#unicode">链接</a></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// 常用汉字，ASCLL，标点符号</span><br><span class="line">0x4E00-0x9FA5,0x9FA6-0x9FFF,0x30-0x39,0x61-0x7a,0x41-0x5a,0x20-0x2F,0x3A-0x40,0x5B-0x60,0x7B-0x7E</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>在官方的在线字体转换网站上转换得到字符的 bitmap：[链接](<a target="_blank" rel="noopener" href="https://lvgl.io/tools/fontconverter">Online font converter - TTF or WOFF fonts to C array | LVGL</a>)</p>
+</li>
+<li><p>将生成的 .c 文件添加到路径 <code>lvgl/src/font/</code> 目录下</p>
+</li>
+</ol>
+<p><strong>方法1-局部使用字库</strong>（推荐）</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">LV_FONT_DECLARE(lv_font_siyuan_16);</span><br><span class="line">lv_style_set_text_font(&amp;style, &amp;lv_font_siyuan_16 );</span><br><span class="line">lv_obj_add_style(label1, &amp;style, <span class="number">0</span>);</span><br></pre></td></tr></table></figure>
+
+<p><strong>方法2-全局使用字库（不推荐）</strong></p>
+<p>在 lv_conf.h 中声明：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">define LV_FONT_CUSTOM_DECLARE   <span class="title function_">LV_FONT_DECLARE</span><span class="params">(lv_font_siyuan_16)</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="8-4-添加新的符号"><a href="#8-4-添加新的符号" class="headerlink" title="8.4 添加新的符号"></a>8.4 添加新的符号</h3><p>为某个符号制作 .c 文件，并添加到工程中的过程和 8.3 类似，但使用时有所不同：</p>
+<ol>
+<li><p>将符号的 Unicode 值转换为 UTF-8 编码，例如<code>0xf287 -&gt; EF 8A 87</code></p>
+</li>
+<li><p>宏定义：<code>\#define MY_USB_SYMBOL "\xEF\x8A\x87"</code></p>
+</li>
+<li><p>为风格添加字体，然后才能为 label 使用符号（符号相当于仅有一个字符的字库）：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">lv_style_set_text_font(&amp;style, &amp;lv_symbol_usb );</span><br><span class="line">lv_obj_add_style(label1, &amp;style, <span class="number">0</span>);</span><br><span class="line">lv_label_set_text(label, MY_USB_SYMBOL);</span><br></pre></td></tr></table></figure></li>
+</ol>
+<blockquote>
+<p>符号获取网站：<a target="_blank" rel="noopener" href="https://fontawesome.com/">链接</a></p>
+<p>Unicode 转 UTF-8 网站：<a target="_blank" rel="noopener" href="http://www.ltg.ed.ac.uk/~richard/utf-8.cgi?input=f287&mode=hex">链接</a></p>
+</blockquote>
+<h3 id="8-5-添加新的字符引擎"><a href="#8-5-添加新的字符引擎" class="headerlink" title="8.5 添加新的字符引擎"></a>8.5 添加新的字符引擎</h3><p>例如 FreeType，在运行时动态渲染，TODO。</p>
+<h2 id="10-Image"><a href="#10-Image" class="headerlink" title="10 Image"></a>10 Image</h2><h3 id="10-1-显示内建格式的图片"><a href="#10-1-显示内建格式的图片" class="headerlink" title="10.1 显示内建格式的图片"></a>10.1 显示内建格式的图片</h3><p>在线图片转换器：<a target="_blank" rel="noopener" href="https://lvgl.io/tools/imageconverter">https://lvgl.io/tools/imageconverter</a></p>
+<p>显示 .c 文件的原始图片：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">LV_IMG_DECLARE(my_icon_dsc)</span><br><span class="line"></span><br><span class="line"><span class="type">lv_obj_t</span> * icon = lv_img_create(lv_scr_act(), <span class="literal">NULL</span>);</span><br><span class="line"><span class="comment">/*From variable*/</span></span><br><span class="line">lv_img_set_src(icon, &amp;my_icon_dsc);</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="10-2-使用-File-System-和显示原始格式的图片"><a href="#10-2-使用-File-System-和显示原始格式的图片" class="headerlink" title="10.2 使用 File System 和显示原始格式的图片"></a>10.2 使用 File System 和显示原始格式的图片</h3><p>TODO</p>
+<h2 id="11-Animations"><a href="#11-Animations" class="headerlink" title="11. Animations"></a>11. Animations</h2><h3 id="11-1-基本使用"><a href="#11-1-基本使用" class="headerlink" title="11.1 基本使用"></a>11.1 基本使用</h3><p>动画的使用还是比较简单的：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">anim_size_cb</span><span class="params">(<span class="type">void</span> * var, <span class="type">int32_t</span> v)</span></span><br><span class="line">{</span><br><span class="line">    lv_obj_set_size(var, v, v);</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="type">lv_anim_t</span> a;</span><br><span class="line">lv_anim_init(&amp;a);</span><br><span class="line">lv_anim_set_var(&amp;a, label);                <span class="comment">// 配置哪个部件需要动画</span></span><br><span class="line">lv_anim_set_values(&amp;a, <span class="number">0</span>, <span class="number">100</span>);            <span class="comment">// 设置值的变化区间</span></span><br><span class="line">lv_anim_set_time(&amp;a, <span class="number">500</span>);                 <span class="comment">// 设置动画的执行时间</span></span><br><span class="line">lv_anim_set_exec_cb(&amp;a, lv_obj_set_x);     <span class="comment">// 设置需要变化的属性的设置函数</span></span><br><span class="line">lv_anim_set_exec_cb(&amp;a, anum_size_cb);    </span><br><span class="line">lv_anim_set_path_cb(&amp;a, lv_anim_path_overshoot);  <span class="comment">// 设置动画效果路径</span></span><br><span class="line">lv_anim_start(&amp;a);                                <span class="comment">// 开始动画</span></span><br></pre></td></tr></table></figure>
+
+<p>不同动画效果参见：<a target="_blank" rel="noopener" href="https://docs.lvgl.io/8.3/overview/animation.html#animation-path">链接</a>，删除一个动画效果，传入部件以及对应属性的设置函数来完成：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">bool</span> <span class="title function_">lv_anim_del</span><span class="params">(<span class="type">void</span> * var, <span class="type">lv_anim_exec_xcb_t</span> exec_cb)</span></span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h3 id="11-2-Timeline"><a href="#11-2-Timeline" class="headerlink" title="11.2 Timeline"></a>11.2 Timeline</h3><p>TODO</p>
+<h2 id="12-Timer"><a href="#12-Timer" class="headerlink" title="12. Timer"></a>12. Timer</h2><p>LVGL 中 Timer 的实现是非抢占式的，手动创建的 Timer 会被 <code>lv_timer_handler()</code> 调用，因此 <code>lv_timer_handler()</code> 需要每隔几毫秒调用一次。</p>
+<p>创建一个 Timer：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">lv_timer_t</span> * <span class="title function_">lv_timer_create</span><span class="params">(<span class="type">lv_timer_cb_t</span> timer_xcb, <span class="type">uint32_t</span> period, <span class="type">void</span> * user_data)</span></span><br></pre></td></tr></table></figure>
+
+<p>period 的单位是 毫秒，user_data 不能是局部变量。例如：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">my_timer</span><span class="params">(<span class="type">lv_timer_t</span> * timer)</span></span><br><span class="line">{</span><br><span class="line">  <span class="type">uint32_t</span> * user_data = timer-&gt;user_data;</span><br><span class="line">  <span class="built_in">printf</span>(<span class="string">"my_timer called with user data: %d\n"</span>, *user_data);</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">uint32_t</span> user_data = <span class="number">10</span>;</span><br><span class="line"><span class="type">lv_timer_t</span> * timer = lv_timer_create(my_timer, <span class="number">500</span>,  &amp;user_data);</span><br></pre></td></tr></table></figure>
+
+<p>创建完一个定时器之后，每隔 period 毫秒之后都会运行一次。</p>
+<p>其他相关函数：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">lv_timer_ready(timer)          <span class="comment">// 在下一次调用 lv_timer_handler()时即刻运行回调函数</span></span><br><span class="line">    </span><br><span class="line">lv_timer_reset(timer)          <span class="comment">// 清空当前定时器的的计数值</span></span><br><span class="line">    </span><br><span class="line">lv_timer_set_cb(timer, new_cb)              <span class="comment">// 重新设置回调</span></span><br><span class="line"></span><br><span class="line">lv_timer_set_period(timer, new_period)      <span class="comment">// 重新设置定时间隔</span></span><br><span class="line">    </span><br><span class="line">lv_timer_set_repeat_count(timer, count)     <span class="comment">// 设置定时器重复运行次数</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="12-1-闲置时间"><a href="#12-1-闲置时间" class="headerlink" title="12.1 闲置时间"></a>12.1 闲置时间</h3><p>通过调用如下函数可以获取 <code>lv_timer_handler()</code> 在上一次的调用中的空闲时间所占百分比：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">uint8_t lv_timer_get_idle(void)</span><br></pre></td></tr></table></figure>
+
+<p>基于该值可以合理设置 <code>lv_timer_handler()</code> 的调用间隔。</p>
+<p>简单</p>
+<p>基础</p>
+<p>图形化编程</p>
+<p>输入组</p>
+<p>移植</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/LVGL/" rel="tag"># LVGL</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/03/01/Linux%E5%9F%BA%E7%A1%80%E5%92%8CC%E8%AF%AD%E8%A8%80/C%E8%AF%AD%E8%A8%80%E7%9A%84%E5%86%85%E5%AD%98%E5%AF%B9%E9%BD%90%E9%97%AE%E9%A2%98/" rel="prev" title="C语言的内存对齐问题">
+      <i class="fa fa-chevron-left"></i> C语言的内存对齐问题
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-Objects"><span class="nav-text">1. Objects</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E7%88%B6%E9%83%A8%E4%BB%B6%E5%92%8C%E5%AD%90%E9%83%A8%E4%BB%B6"><span class="nav-text">1.1 父部件和子部件</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-1-%E4%BB%8E%E7%88%B6%E9%83%A8%E4%BB%B6%E4%B8%AD%E8%8E%B7%E5%8F%96%E5%AD%90%E9%83%A8%E4%BB%B6"><span class="nav-text">1.1.1 从父部件中获取子部件</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Screen"><span class="nav-text">2.Screen</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-Layers"><span class="nav-text">2.1 Layers</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-Parts"><span class="nav-text">3.Parts</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-States"><span class="nav-text">4.States</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-snapshot"><span class="nav-text">5.snapshot</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Positions-sizes-layouts"><span class="nav-text">2. Positions, sizes, layouts</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E8%AE%BE%E7%BD%AE%E4%BD%8D%E7%BD%AE%E5%A4%A7%E5%B0%8F"><span class="nav-text">2.1 设置位置大小</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E6%94%B9%E5%8F%98%E5%AF%B9%E9%BD%90%E5%8E%9F%E7%82%B9-Align"><span class="nav-text">2.2 改变对齐原点 Align</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%EF%BC%881%EF%BC%89%E5%B5%8C%E5%A5%97%E5%86%85%E6%83%85%E5%86%B5"><span class="nav-text">（1）嵌套内情况</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%EF%BC%882%EF%BC%89%E5%B5%8C%E5%A5%97%E5%A4%96%E6%83%85%E5%86%B5"><span class="nav-text">（2）嵌套外情况</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E5%A4%A7%E5%B0%8F"><span class="nav-text">2.2 大小</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-%E4%BD%BF%E7%94%A8-styles"><span class="nav-text">2.3 使用 styles</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-%E5%B9%B3%E7%A7%BB-Translation"><span class="nav-text">2.4 平移-Translation</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-5-%E5%8F%98%E5%8C%96-Transformation"><span class="nav-text">2.5 变化-Transformation</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-6-%E5%B8%83%E5%B1%80-Layout"><span class="nav-text">2.6 布局-Layout</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-object-%E7%9A%84-Flags"><span class="nav-text">(1) object 的 Flags</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-style"><span class="nav-text">3. style</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-States"><span class="nav-text">3.1 States</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-Parts"><span class="nav-text">3.2 Parts</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-%E4%BD%BF%E7%94%A8-Style"><span class="nav-text">3.3 使用 Style</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-Style-%E6%9C%AC%E8%BA%AB"><span class="nav-text">(1) Style 本身</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-Style-%E5%92%8C-obj"><span class="nav-text">(2) Style 和 obj</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E8%BD%AC%E6%8D%A2%E6%95%88%E6%9E%9C-Transitions"><span class="nav-text">(3) 转换效果-Transitions</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-%E9%80%8F%E6%98%8E%E5%BA%A6-opa-%E3%80%81%E6%B7%B7%E5%90%88%E6%A8%A1%E5%BC%8F-blend-mode-%E3%80%81%E8%A7%92%E5%BA%A6-angle-%E3%80%81%E7%BC%A9%E6%94%BE-zoom"><span class="nav-text">(4) 透明度(opa)、混合模式(blend mode)、角度(angle)、缩放(zoom)</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-4-Themes"><span class="nav-text">3.4 Themes</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E6%BB%9A%E5%8A%A8-Scroll"><span class="nav-text">4. 滚动-Scroll</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-Events"><span class="nav-text">5. Events</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-%E4%BA%8B%E4%BB%B6%E7%B1%BB%E5%9E%8B"><span class="nav-text">5.1 事件类型</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-%E8%87%AA%E5%AE%9A%E4%B9%89%E4%BA%8B%E4%BB%B6"><span class="nav-text">(1) 自定义事件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%EF%BC%882%EF%BC%89%E6%89%8B%E5%8A%A8%E5%8F%91%E9%80%81%E4%BA%8B%E4%BB%B6"><span class="nav-text">（2）手动发送事件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-%E5%88%B7%E6%96%B0%E4%BA%8B%E4%BB%B6"><span class="nav-text">(3) 刷新事件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-%E5%9B%9E%E8%B0%83%E5%87%BD%E6%95%B0%E7%9A%84%E5%8F%82%E6%95%B0"><span class="nav-text">(4) 回调函数的参数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-Event-bubbling"><span class="nav-text">(5) Event bubbling</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-%E8%BE%93%E5%85%A5%E8%AE%BE%E5%A4%87"><span class="nav-text">6. 输入设备</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#6-1-%E6%8C%87%E9%92%88"><span class="nav-text">6.1 指针</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#6-1-1-%E5%85%89%E6%A0%87"><span class="nav-text">6.1.1 光标</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-1-2-%E6%89%8B%E5%8A%BF-Gestures"><span class="nav-text">6.1.2 手势-Gestures</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-2-%E9%94%AE%E7%9B%98%E5%92%8C%E7%BC%96%E7%A0%81%E5%99%A8"><span class="nav-text">6.2 键盘和编码器</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#6-2-1-Group"><span class="nav-text">6.2.1 Group</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-2-2-%E7%BC%96%E8%BE%91%E5%92%8C%E5%AF%BC%E8%88%AA%E6%A8%A1%E5%BC%8F"><span class="nav-text">6.2.2 编辑和导航模式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-2-3-%E9%BB%98%E8%AE%A4%E7%BB%84"><span class="nav-text">6.2.3 默认组</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-%E9%A2%9C%E8%89%B2-Colors"><span class="nav-text">7. 颜色-Colors</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#7-1-%E5%88%9B%E5%BB%BA%E9%A2%9C%E8%89%B2%E7%9A%84%E6%96%B9%E5%BC%8F"><span class="nav-text">7.1 创建颜色的方式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#7-1-1-%E6%89%8B%E5%8A%A8%E5%88%9B%E5%BB%BA"><span class="nav-text">7.1.1 手动创建</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#7-1-2-%E4%BB%8E%E8%B0%83%E8%89%B2%E6%9D%BF%E4%B8%AD%E8%A1%8D%E7%94%9F"><span class="nav-text">7.1.2 从调色板中衍生</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#7-1-3-%E4%BF%AE%E6%94%B9%E5%92%8C%E6%B7%B7%E5%90%88%E9%A2%9C%E8%89%B2"><span class="nav-text">7.1.3 修改和混合颜色</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-2-%E4%B8%8D%E9%80%8F%E6%98%8E%E5%BA%A6-Opacity"><span class="nav-text">7.2 不透明度-Opacity</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-%E5%AD%97%E4%BD%93-fonts"><span class="nav-text">8. 字体-fonts</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#8-1-%E5%86%85%E5%BB%BA%E5%AD%97%E4%BD%93"><span class="nav-text">8.1 内建字体</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-2-%E5%85%B6%E4%BB%96%E5%AD%97%E4%BD%93%E7%89%B9%E5%BE%81"><span class="nav-text">8.2 其他字体特征</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-3-%E6%B7%BB%E5%8A%A0%E4%B8%AD%E6%96%87%E5%AD%97%E5%BA%93"><span class="nav-text">8.3 添加中文字库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-4-%E6%B7%BB%E5%8A%A0%E6%96%B0%E7%9A%84%E7%AC%A6%E5%8F%B7"><span class="nav-text">8.4 添加新的符号</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-5-%E6%B7%BB%E5%8A%A0%E6%96%B0%E7%9A%84%E5%AD%97%E7%AC%A6%E5%BC%95%E6%93%8E"><span class="nav-text">8.5 添加新的字符引擎</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#10-Image"><span class="nav-text">10 Image</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#10-1-%E6%98%BE%E7%A4%BA%E5%86%85%E5%BB%BA%E6%A0%BC%E5%BC%8F%E7%9A%84%E5%9B%BE%E7%89%87"><span class="nav-text">10.1 显示内建格式的图片</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#10-2-%E4%BD%BF%E7%94%A8-File-System-%E5%92%8C%E6%98%BE%E7%A4%BA%E5%8E%9F%E5%A7%8B%E6%A0%BC%E5%BC%8F%E7%9A%84%E5%9B%BE%E7%89%87"><span class="nav-text">10.2 使用 File System 和显示原始格式的图片</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#11-Animations"><span class="nav-text">11. Animations</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#11-1-%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8"><span class="nav-text">11.1 基本使用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#11-2-Timeline"><span class="nav-text">11.2 Timeline</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#12-Timer"><span class="nav-text">12. Timer</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#12-1-%E9%97%B2%E7%BD%AE%E6%97%B6%E9%97%B4"><span class="nav-text">12.1 闲置时间</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Krocz"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">Krocz</p>
+  <div class="site-description" itemprop="description">时间不等人，喜欢就去做</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">29</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/krocz" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;krocz" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1668154689@qq.com" title="E-Mail → mailto:1668154689@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+         
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Krocz</span>
+</div>
+
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动 -->
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+          load: ['[tex]/mhchem'],
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+          packages: {'[+]': ['mhchem']},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

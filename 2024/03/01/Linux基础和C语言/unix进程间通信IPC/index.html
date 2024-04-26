@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="1. 匿名管道12#include &lt;unistd.h&gt;int pipe(int fd[2]);   参数 fd 返回两个文件描述符：fd[0]为读而打开，fd[1]为写而打开。fd[1]的输出是fd[0]的输入。 返回值：若成功，返回0，若出错，返回-1    历史上是半双工的，现在某些系统提供全双工通道，不过为了移植性，最好还是假定管道是半双工的。 管道只能在具有公共祖先的两个进程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Unix 进程间通信(IPC)">
+<meta property="og:url" content="http://example.com/2024/03/01/Linux%E5%9F%BA%E7%A1%80%E5%92%8CC%E8%AF%AD%E8%A8%80/unix%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1IPC/index.html">
+<meta property="og:site_name" content="Krocz&#39;s Blog">
+<meta property="og:description" content="1. 匿名管道12#include &lt;unistd.h&gt;int pipe(int fd[2]);   参数 fd 返回两个文件描述符：fd[0]为读而打开，fd[1]为写而打开。fd[1]的输出是fd[0]的输入。 返回值：若成功，返回0，若出错，返回-1    历史上是半双工的，现在某些系统提供全双工通道，不过为了移植性，最好还是假定管道是半双工的。 管道只能在具有公共祖先的两个进程">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/images/unix%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1IPC/image-20240409184752559.png">
+<meta property="og:image" content="http://example.com/images/unix%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1IPC/image-20240409194852154.png">
+<meta property="og:image" content="http://example.com/images/unix%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1IPC/image-20240409194919891.png">
+<meta property="og:image" content="http://example.com/images/unix%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1IPC/image-20240409201625566.png">
+<meta property="og:image" content="http://example.com/images/unix%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1IPC/image-20240409223858994.png">
+<meta property="og:image" content="http://example.com/images/unix%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1IPC/image-20240409224340728.png">
+<meta property="article:published_time" content="2024-03-01T13:20:30.000Z">
+<meta property="article:modified_time" content="2024-04-26T13:30:45.741Z">
+<meta property="article:author" content="Krocz">
+<meta property="article:tag" content="Linux">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/unix%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1IPC/image-20240409184752559.png">
+
+<link rel="canonical" href="http://example.com/2024/03/01/Linux%E5%9F%BA%E7%A1%80%E5%92%8CC%E8%AF%AD%E8%A8%80/unix%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1IPC/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Unix 进程间通信(IPC) | Krocz's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+  <script src="/live2d-widget/autoload.js"></script>
+ <style>mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+.MathJax path {
+  stroke-width: 3;
+}
+
+mjx-container[display="true"] {
+  overflow: auto hidden;
+}
+
+mjx-container[display="true"] + br {
+  display: none;
+}
+</style><link rel="alternate" href="/atom.xml" title="Krocz's Blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+
+   <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 1; pointer-events: none;" ></canvas> 
+   <script type="text/javascript" src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script> 
+   <script type="text/javascript" src="/js/cursor/fireworks.js"></script>
+
+
+
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Krocz's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">望云登坡</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-首页">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-归档">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-标签">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-分类">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/03/01/Linux%E5%9F%BA%E7%A1%80%E5%92%8CC%E8%AF%AD%E8%A8%80/unix%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1IPC/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="Krocz">
+      <meta itemprop="description" content="时间不等人，喜欢就去做">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Krocz's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Unix 进程间通信(IPC)
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-03-01 21:20:30" itemprop="dateCreated datePublished" datetime="2024-03-01T21:20:30+08:00">2024-03-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-04-26 21:30:45" itemprop="dateModified" datetime="2024-04-26T21:30:45+08:00">2024-04-26</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>7.6k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>14 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="1-匿名管道"><a href="#1-匿名管道" class="headerlink" title="1. 匿名管道"></a>1. 匿名管道</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">pipe</span><span class="params">(<span class="type">int</span> fd[<span class="number">2</span>])</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>参数 fd 返回两个文件描述符：fd[0]为读而打开，fd[1]为写而打开。fd[1]的输出是fd[0]的输入。</li>
+<li>返回值：若成功，返回0，若出错，返回-1</li>
+</ul>
+<p><img src="/../../images/unix%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1IPC/image-20240409184752559.png" alt="image-20240409184752559"></p>
+<ul>
+<li>历史上是半双工的，现在某些系统提供全双工通道，不过为了移植性，最好还是<strong>假定管道是半双工</strong>的。</li>
+<li>管道只能在<strong>具有公共祖先的两个进程之间使用</strong>，进程调用fork之后，这个管道就能在父进程和子进程之间使用。</li>
+</ul>
+<p>当管道的一端被关闭后，下列两条规则起作用：</p>
+<ol>
+<li>当读（read）一个写端已被关闭的管道时，在所有数据都被读取后，read返回0，表示文件结束。</li>
+<li>如果写（write）一个读端已被关闭的管道，则产生信号SIGPIPE。如果忽略该信号或者捕捉该信号并从其处理程序返回，则write返回−1，errno设置为EPIPE</li>
+</ol>
+<p>在写管道（或 FIFO）时，常量 PIPE_BUF 规定了内核的管道缓冲区大小。如果对管道调用write，而且要求写的字节数小于等于 PIPE_BUF，则<strong>此操作不会与其他进程对同一管道（或FIFO）的 write 操作交叉进行</strong>。但是，若有多个进程同时写一个管道（或 FIFO），而且我们要求写的字节数超过PIPE_BUF，<strong>那么我们所写的数据可能会与其他进程所写的数据相互交叉</strong>。</p>
+<p>用pathconf或fpathconf函数可以确定PIPE_BUF的值。</p>
+<h3 id="1-1-例子"><a href="#1-1-例子" class="headerlink" title="1.1 例子"></a>1.1 例子</h3><p>简单的示例，父进程通过管道向子进程写数据，子进程从管道中读取并再标准输出上进行输出</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">"apue.h"</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">{</span><br><span class="line">    <span class="type">int</span> n;</span><br><span class="line">    <span class="type">int</span> fd[<span class="number">2</span>];</span><br><span class="line">    <span class="type">pid_t</span> pid;</span><br><span class="line">    <span class="type">char</span> line[MAXLINE];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (pipe(fd) &lt; <span class="number">0</span>)</span><br><span class="line">        err_sys(<span class="string">"pipe error"</span>);</span><br><span class="line">    <span class="keyword">if</span> ((pid = fork()) &lt; <span class="number">0</span>)</span><br><span class="line">    {</span><br><span class="line">        err_sys(<span class="string">"fork error"</span>);</span><br><span class="line">    } </span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (pid &gt; <span class="number">0</span>)                     <span class="comment">/* parent */</span></span><br><span class="line">    { </span><br><span class="line">        close(fd[<span class="number">0</span>]);</span><br><span class="line">        write(fd[<span class="number">1</span>], <span class="string">"hello world\n"</span>, <span class="number">12</span>);</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">else</span>                                  <span class="comment">/* child */</span></span><br><span class="line">    { </span><br><span class="line">        close(fd[<span class="number">1</span>]);</span><br><span class="line">        n = read(fd[<span class="number">0</span>], line, MAXLINE);</span><br><span class="line">        write(STDOUT_FILENO, line, n);</span><br><span class="line">    }</span><br><span class="line">    <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">}</span><br></pre></td></tr></table></figure>
+
+<p><a href="%5B%E3%80%90Linux%E3%80%91fork(">fork()</a>函数详解 (深入浅出 实例讲解)<em>fork函数-CSDN博客](<a target="_blank" rel="noopener" href="https://blog.csdn.net/Sunnyside">https://blog.csdn.net/Sunnyside</a></em>/article/details/108196543)) 函数返回的 pid 是子进程的 PID；因此对于父进程返回子进程 PID；对于子进程返回 0；</p>
+<h3 id="1-2-例子2"><a href="#1-2-例子2" class="headerlink" title="1.2 例子2"></a>1.2 例子2</h3><p>父进程读取文件内容，写入管道中；子进程将管道的读端设置为 STDIN_FILENO ，从而调用execl函数执行 more 命令分页显示文件；</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">"apue.h"</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/wait.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> DEF_PAGER <span class="string">"/bin/more"</span> <span class="comment">/* default pager program */</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span></span><br><span class="line">{</span><br><span class="line">    <span class="type">int</span> n;</span><br><span class="line">    <span class="type">int</span> fd[<span class="number">2</span>];</span><br><span class="line">    <span class="type">pid_t</span> pid;</span><br><span class="line">    <span class="type">char</span> *pager, *argv0;</span><br><span class="line">    <span class="type">char</span> line[MAXLINE];</span><br><span class="line">    FILE *fp;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (argc != <span class="number">2</span>)</span><br><span class="line">        err_quit(<span class="string">"usage: a.out &lt;pathname&gt;"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> ((fp = fopen(argv[<span class="number">1</span>], <span class="string">"r"</span>)) == <span class="literal">NULL</span>)</span><br><span class="line">        err_sys(<span class="string">"can't open %s"</span>, argv[<span class="number">1</span>]);</span><br><span class="line">    <span class="keyword">if</span> (pipe(fd) &lt; <span class="number">0</span>)</span><br><span class="line">        err_sys(<span class="string">"pipe error"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> ((pid = fork()) &lt; <span class="number">0</span>)</span><br><span class="line">    {</span><br><span class="line">        err_sys(<span class="string">"fork error"</span>);</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (pid &gt; <span class="number">0</span>)                               <span class="comment">/* parent */</span></span><br><span class="line">    {                </span><br><span class="line">        close(fd[<span class="number">0</span>]);                           <span class="comment">/* close read end */</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">/* parent copies argv[1] to pipe */</span></span><br><span class="line">        <span class="keyword">while</span> (fgets(line, MAXLINE, fp) != <span class="literal">NULL</span>)</span><br><span class="line">        {</span><br><span class="line">            n = <span class="built_in">strlen</span>(line);</span><br><span class="line">            <span class="keyword">if</span> (write(fd[<span class="number">1</span>], line, n) != n)</span><br><span class="line">                err_sys(<span class="string">"write error to pipe"</span>);</span><br><span class="line">        }</span><br><span class="line">        <span class="keyword">if</span> (ferror(fp))</span><br><span class="line">            err_sys(<span class="string">"fgets error"</span>);</span><br><span class="line"></span><br><span class="line">        close(fd[<span class="number">1</span>]); <span class="comment">/* close write end of pipe for reader */</span></span><br><span class="line"></span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"enter parent\n"</span>);</span><br><span class="line">        <span class="keyword">if</span> (waitpid(pid, <span class="literal">NULL</span>, <span class="number">0</span>) &lt; <span class="number">0</span>)   <span class="comment">/* 等待子进程结束*/</span></span><br><span class="line">            err_sys(<span class="string">"waitpid error"</span>);</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"exit parent\n"</span>);</span><br><span class="line">        <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">else</span>                                             <span class="comment">/* child */</span></span><br><span class="line">    {                </span><br><span class="line">        close(fd[<span class="number">1</span>]); <span class="comment">/* close write end */</span></span><br><span class="line">        <span class="keyword">if</span> (fd[<span class="number">0</span>] != STDIN_FILENO)</span><br><span class="line">        {</span><br><span class="line">            <span class="comment">/*使其标准输入成为管道的读端*/</span></span><br><span class="line">            <span class="keyword">if</span> (dup2(fd[<span class="number">0</span>], STDIN_FILENO) != STDIN_FILENO)</span><br><span class="line">                err_sys(<span class="string">"dup2 error to stdin"</span>);</span><br><span class="line">            close(fd[<span class="number">0</span>]); <span class="comment">/* don't need this after dup2 */</span></span><br><span class="line">        }</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* get arguments for execl() */</span></span><br><span class="line">        <span class="keyword">if</span> ((pager = getenv(<span class="string">"PAGER"</span>)) == <span class="literal">NULL</span>)  <span class="comment">/* 获取环境变量PAGER的值 */</span></span><br><span class="line">            pager = DEF_PAGER;</span><br><span class="line">        <span class="keyword">if</span> ((argv0 = <span class="built_in">strrchr</span>(pager, <span class="string">'/'</span>)) != <span class="literal">NULL</span>)</span><br><span class="line">            argv0++; <span class="comment">/* step past rightmost slash */</span></span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            argv0 = pager; <span class="comment">/* no slash in pager */</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (execl(pager, argv0, (<span class="type">char</span> *)<span class="number">0</span>) &lt; <span class="number">0</span>) <span class="comment">/* execl("bin/more", "more", 0)*/</span></span><br><span class="line">            err_sys(<span class="string">"execl error for %s"</span>, pager);</span><br><span class="line">    }</span><br><span class="line">    <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">}</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="2-函数-popen-和-pclose"><a href="#2-函数-popen-和-pclose" class="headerlink" title="2.函数 popen 和 pclose"></a>2.函数 popen 和 pclose</h2><p>标准IO库提供函数 popen()，实现：创建一个管道， fork一个子进程，关闭未使用的管道端，执行一个 shell 运行命令，然后等待命令终止。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line">FILE *<span class="title function_">popen</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *cmdstring, <span class="type">const</span> <span class="type">char</span> *type)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">pclose</span><span class="params">(FILE *fp)</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>popen：若成功，返回文件指针；若出错，返回NULL</li>
+<li>pclose：若成功，返回cmdstring 的终止状态；若出错，返回-1</li>
+</ul>
+<p>当 type 设置为 <code>r</code> 时：</p>
+<p><img src="/../../images/unix%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1IPC/image-20240409194852154.png" alt="image-20240409194852154"></p>
+<p>当 type 设置为 <code>w</code> 时：</p>
+<p><img src="/../../images/unix%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1IPC/image-20240409194919891.png" alt="image-20240409194919891"></p>
+<h3 id="2-1-例子"><a href="#2-1-例子" class="headerlink" title="2.1 例子"></a>2.1 例子</h3><p>使用 popen 重新上面的例子：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">"apue.h"</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/wait.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PAGER <span class="string">"${PAGER:-more}"</span> <span class="comment">/* 如果环境变量 PAGER 存在则使用环境变量，否则使用more */</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span></span><br><span class="line">{</span><br><span class="line">    <span class="type">char</span> line[MAXLINE];</span><br><span class="line">    FILE *fpin, *fpout;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (argc != <span class="number">2</span>)</span><br><span class="line">        err_quit(<span class="string">"usage: a.out &lt;pathname&gt;"</span>);</span><br><span class="line">    <span class="keyword">if</span> ((fpin = fopen(argv[<span class="number">1</span>], <span class="string">"r"</span>)) == <span class="literal">NULL</span>)</span><br><span class="line">        err_sys(<span class="string">"can't open %s"</span>, argv[<span class="number">1</span>]);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> ((fpout = popen(PAGER, <span class="string">"w"</span>)) == <span class="literal">NULL</span>)  <span class="comment">/* fpout 指向 more 命令的标准输入*/</span></span><br><span class="line">        err_sys(<span class="string">"popen error"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/* copy argv[1] to pager */</span></span><br><span class="line">    <span class="keyword">while</span> (fgets(line, MAXLINE, fpin) != <span class="literal">NULL</span>)</span><br><span class="line">    {</span><br><span class="line">        <span class="keyword">if</span> (<span class="built_in">fputs</span>(line, fpout) == EOF)</span><br><span class="line">            err_sys(<span class="string">"fputs error to pipe"</span>);</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">if</span> (ferror(fpin))</span><br><span class="line">        err_sys(<span class="string">"fgets error"</span>);</span><br><span class="line">    <span class="keyword">if</span> (pclose(fpout) == <span class="number">-1</span>)</span><br><span class="line">        err_sys(<span class="string">"pclose error"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">}</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="2-2-例子2-过滤器程序"><a href="#2-2-例子2-过滤器程序" class="headerlink" title="2.2 例子2-过滤器程序"></a>2.2 例子2-过滤器程序</h3><p>考虑一个应用程序，它向标准输出写一个提示，然后从标准输入读1行。然后该程序对输入进行的变换可能是路径名扩充，或者是提供一种历史机制（记住以前输入的命令），总之提供了一种“过滤”的操作。</p>
+<p><img src="/../../images/unix%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1IPC/image-20240409201625566.png" alt="image-20240409201625566"></p>
+<p>myuclc.c</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">"apue.h"</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;ctype.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">{</span><br><span class="line">    <span class="type">int</span> c;</span><br><span class="line">    <span class="keyword">while</span> ((c = getchar()) != EOF)</span><br><span class="line">    {</span><br><span class="line">        <span class="keyword">if</span> (<span class="built_in">isupper</span>(c))</span><br><span class="line">            c = <span class="built_in">tolower</span>(c);</span><br><span class="line">        <span class="keyword">if</span> (<span class="built_in">putchar</span>(c) == EOF)</span><br><span class="line">            err_sys(<span class="string">"output error"</span>);</span><br><span class="line">        <span class="keyword">if</span> (c == <span class="string">'\n'</span>)</span><br><span class="line">            fflush(<span class="built_in">stdout</span>);</span><br><span class="line">    }</span><br><span class="line">    <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">}</span><br></pre></td></tr></table></figure>
+
+<p>popen.c</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">"apue.h"</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/wait.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">{</span><br><span class="line">    <span class="type">char</span> line[MAXLINE];</span><br><span class="line">    FILE *fpin;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> ((fpin = popen(<span class="string">"myuclc"</span>, <span class="string">"r"</span>)) == <span class="literal">NULL</span>) <span class="comment">/* fpin为 myuclc的标准输出*/</span></span><br><span class="line">        err_sys(<span class="string">"popen error"</span>);</span><br><span class="line">    <span class="keyword">for</span> (;;)</span><br><span class="line">    {</span><br><span class="line">        <span class="comment">/* 标准输出通常是行缓冲的，而提示并不包含换行符，所以在写了提示之后，需要调用fflush */</span></span><br><span class="line">        <span class="built_in">fputs</span>(<span class="string">"prompt&gt; "</span>, <span class="built_in">stdout</span>);</span><br><span class="line">        fflush(<span class="built_in">stdout</span>);</span><br><span class="line">        <span class="keyword">if</span> (fgets(line, MAXLINE, fpin) == <span class="literal">NULL</span>) <span class="comment">/* read from pipe */</span></span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">if</span> (<span class="built_in">fputs</span>(line, <span class="built_in">stdout</span>) == EOF)</span><br><span class="line">            err_sys(<span class="string">"fputs error to pipe"</span>);</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">if</span> (pclose(fpin) == <span class="number">-1</span>)</span><br><span class="line">        err_sys(<span class="string">"pclose error"</span>);</span><br><span class="line">    <span class="built_in">putchar</span>(<span class="string">'\n'</span>);</span><br><span class="line">    <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">}</span><br></pre></td></tr></table></figure>
+
+<p>myuclc.c 中提供了一个小写转换的程序，popen.c 调用 myuclc 命令将标准输入的字符的转换结果在标准输出上显示。</p>
+<h2 id="3-FIFO-命名管道"><a href="#3-FIFO-命名管道" class="headerlink" title="3.FIFO-命名管道"></a>3.FIFO-命名管道</h2><p>命名管道是一个单独类型的IO文件，可以通过 <code>struct stat</code> 结构的 <code>st_mode </code> 成员判断；使用 S_ISFIFO 宏进行测试。</p>
+<p>创建 FIFO 文件：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/stat.h&gt;</span></span></span><br><span class="line"><span class="type">int</span> <span class="title function_">mkfifo</span><span class="params">(<span class="type">const</span> <span class="type">char</span> *path, <span class="type">mode_t</span> mode)</span>;</span><br><span class="line"><span class="type">int</span> <span class="title function_">mkfifoat</span><span class="params">(<span class="type">int</span> fd, <span class="type">const</span> <span class="type">char</span> *path, <span class="type">mode_t</span> mode)</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>path 为该文件的路径，mode 和 open 函数的 mode 参数一致；</li>
+<li>返回值：若成功，返回0；若出错，返回−1</li>
+<li>mkfifoat函数和mkfifo函数相似，但是mkfifoat函数可以被用来在fd文件描述符表示的目录相关的位置创建一个FIFO</li>
+<li>创建之后，可以通过标准IO函数来操作 FIFO 文件。</li>
+</ul>
+<hr>
+<p>当以阻塞/非阻塞方式open一个FIFO时：</p>
+<ol>
+<li>阻塞方式，只读open要阻塞到某个其他进程为写而打开这个FIFO为止。类似地，只写open要阻塞到某个其他进程为读而打开它为止。</li>
+<li>如果指定了 O_NONBLOCK，则只读 open 立即返回。但是，如果没有进程为读而打开一个FIFO，那么只写open将返回−1，并将errno设置成ENXIO</li>
+</ol>
+<p>类似于管道，<strong>若 write 一个尚无进程为读而打开的 FIFO，则产生信号 SIGPIPE</strong>。若某个FIFO的<strong>最后一个写进程关闭了该FIFO，则将为该FIFO的读进程产生一个文件结束标志</strong>。</p>
+<p>一个给定的 FIFO 有多个写进程是常见的。这就意味着，如果不希望多个进程所写的数据交叉，则必须考虑<strong>原子写</strong>操作。<strong>和管道一样，常量PIPE_BUF说明了可被原子地写到FIFO的最大数据量</strong>。</p>
+<h3 id="3-1-示例"><a href="#3-1-示例" class="headerlink" title="3.1 示例"></a>3.1 示例</h3><p>使用 多个 FIFO 文件可以创建一个多客户进程-单服务器进程的通信功能，如下图所示：</p>
+<p><img src="/../../images/unix%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1IPC/image-20240409223858994.png" alt="image-20240409223858994"></p>
+<p>简单的示例程序如下：</p>
+<p>server.c</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">"apue.h"</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/stat.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/stat.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;fcntl.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdbool.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span><span class="string">&lt;sys/stat.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> SERVER_NAME <span class="string">"./server.fifo"</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> CLIENT_NAME <span class="string">"./client.fifo"</span></span></span><br><span class="line"><span class="type">char</span> buf[<span class="number">1024</span>];</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> **argv)</span></span><br><span class="line">{</span><br><span class="line">    <span class="type">int</span> fd_read;</span><br><span class="line">    <span class="type">int</span> fd_write = <span class="number">-1</span>;</span><br><span class="line">    <span class="type">char</span> send_str[<span class="number">20</span>] = <span class="string">"hello client\n"</span>;</span><br><span class="line">    mkfifo(SERVER_NAME, <span class="number">0664</span>);</span><br><span class="line">    mkfifo(CLIENT_NAME, <span class="number">0664</span>);</span><br><span class="line">    </span><br><span class="line">    fd_read = open(SERVER_NAME, O_RDONLY);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"open success\n"</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span>(<span class="number">1</span>)</span><br><span class="line">    {</span><br><span class="line">        read(fd_read, buf, <span class="number">1024</span>);</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"server recv:%s\n"</span>, buf);</span><br><span class="line">        <span class="keyword">if</span>(<span class="built_in">strcmp</span>(buf, CLIENT_NAME) == <span class="number">0</span>)</span><br><span class="line">        {</span><br><span class="line">            <span class="keyword">if</span>(fd_write == <span class="number">-1</span>)</span><br><span class="line">                fd_write = open(CLIENT_NAME, O_WRONLY);</span><br><span class="line">            write(fd_write, send_str, <span class="built_in">strlen</span>(send_str) + <span class="number">1</span>);</span><br><span class="line">        }</span><br><span class="line">        sleep(<span class="number">5</span>);</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></table></figure>
+
+<p>client.c</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">#include "apue.h"</span><br><span class="line">#include &lt;stdio.h&gt;</span><br><span class="line">#include &lt;sys/stat.h&gt;</span><br><span class="line">#include &lt;sys/types.h&gt;</span><br><span class="line">#include &lt;sys/stat.h&gt;</span><br><span class="line">#include &lt;fcntl.h&gt;</span><br><span class="line">#include &lt;unistd.h&gt;</span><br><span class="line">#include &lt;stdbool.h&gt;</span><br><span class="line">#include&lt;sys/types.h&gt;</span><br><span class="line">#include&lt;sys/stat.h&gt;</span><br><span class="line"></span><br><span class="line">#define SERVER_NAME "./server.fifo"</span><br><span class="line">#define CLIENT_NAME "./client.fifo"</span><br><span class="line">char buf[1024];</span><br><span class="line"></span><br><span class="line">int main(int argc, char **argv)</span><br><span class="line">{</span><br><span class="line">    int fd_write;</span><br><span class="line">    int fd_read = -1;</span><br><span class="line">    char send_str[20] = "hello client\n";</span><br><span class="line">    </span><br><span class="line">    fd_write = open(SERVER_NAME, O_WRONLY);</span><br><span class="line">    printf("open success\n");</span><br><span class="line"></span><br><span class="line">    while(1)</span><br><span class="line">    {</span><br><span class="line">        write(fd_write, CLIENT_NAME, strlen(CLIENT_NAME) + 1);</span><br><span class="line">        sleep(5);</span><br><span class="line">        if(fd_read == -1)</span><br><span class="line">            fd_read = open(CLIENT_NAME, O_RDONLY);</span><br><span class="line">        read(fd_read, buf, 1024);</span><br><span class="line">        printf("client recv: %s", buf);</span><br><span class="line">    }</span><br><span class="line">}</span><br></pre></td></tr></table></figure>
+
+<p>运行之后可以看到服务器和客户端分别收到信息：</p>
+<p><img src="/../../images/unix%E8%BF%9B%E7%A8%8B%E9%97%B4%E9%80%9A%E4%BF%A1IPC/image-20240409224340728.png" alt="image-20240409224340728"></p>
+<p>此外：</p>
+<ol>
+<li>服务器进程不能判断一个客户进程是否崩溃终止，这就使得客户进程专用FIFO会遗留在文件系统中。</li>
+<li>服务器进程还必须得捕捉SIGPIPE信号，因为客户进程在发送一个请求后有可能没有读取响应就终止了，于是留下一个只有写进程（服务器进程）而无读进程的客户进程专用FIFO。</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Linux/" rel="tag"># Linux</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2024/02/20/%E5%B7%A5%E5%85%B7/vscode-cmake-clangd/" rel="prev" title="vscode中使用cmake和clangd">
+      <i class="fa fa-chevron-left"></i> vscode中使用cmake和clangd
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/03/01/Linux%E5%9F%BA%E7%A1%80%E5%92%8CC%E8%AF%AD%E8%A8%80/C%E8%AF%AD%E8%A8%80%E7%9A%84%E5%86%85%E5%AD%98%E5%AF%B9%E9%BD%90%E9%97%AE%E9%A2%98/" rel="next" title="C语言的内存对齐问题">
+      C语言的内存对齐问题 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E5%8C%BF%E5%90%8D%E7%AE%A1%E9%81%93"><span class="nav-text">1. 匿名管道</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E4%BE%8B%E5%AD%90"><span class="nav-text">1.1 例子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-%E4%BE%8B%E5%AD%902"><span class="nav-text">1.2 例子2</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E5%87%BD%E6%95%B0-popen-%E5%92%8C-pclose"><span class="nav-text">2.函数 popen 和 pclose</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E4%BE%8B%E5%AD%90"><span class="nav-text">2.1 例子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E4%BE%8B%E5%AD%902-%E8%BF%87%E6%BB%A4%E5%99%A8%E7%A8%8B%E5%BA%8F"><span class="nav-text">2.2 例子2-过滤器程序</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-FIFO-%E5%91%BD%E5%90%8D%E7%AE%A1%E9%81%93"><span class="nav-text">3.FIFO-命名管道</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-%E7%A4%BA%E4%BE%8B"><span class="nav-text">3.1 示例</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Krocz"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">Krocz</p>
+  <div class="site-description" itemprop="description">时间不等人，喜欢就去做</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">29</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/krocz" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;krocz" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1668154689@qq.com" title="E-Mail → mailto:1668154689@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+         
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Krocz</span>
+</div>
+
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动 -->
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+          load: ['[tex]/mhchem'],
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+          packages: {'[+]': ['mhchem']},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

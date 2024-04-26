@@ -310,7 +310,7 @@ mjx-container[display="true"] + br {
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/12/%E4%BD%BF%E7%94%A8LCD%E5%B1%8F%E5%B9%95/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/17/%E9%9F%A6%E4%B8%9C%E5%B1%B1%E5%B5%8C%E5%85%A5%E5%BC%8FLinux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/%E8%BE%93%E5%85%A5%E7%B3%BB%E7%BB%9F%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B%E5%9F%BA%E7%A1%80/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.png">
@@ -324,7 +324,126 @@ mjx-container[display="true"] + br {
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2023/09/12/%E4%BD%BF%E7%94%A8LCD%E5%B1%8F%E5%B9%95/" class="post-title-link" itemprop="url">使用LCD屏幕</a>
+            <a href="/2023/09/17/%E9%9F%A6%E4%B8%9C%E5%B1%B1%E5%B5%8C%E5%85%A5%E5%BC%8FLinux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/%E8%BE%93%E5%85%A5%E7%B3%BB%E7%BB%9F%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B%E5%9F%BA%E7%A1%80/" class="post-title-link" itemprop="url">输入系统应用编程基础</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-09-17 17:37:46" itemprop="dateCreated datePublished" datetime="2023-09-17T17:37:46+08:00">2023-09-17</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-04-26 17:39:51" itemprop="dateModified" datetime="2024-04-26T17:39:51+08:00">2024-04-26</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%9F%A6%E4%B8%9C%E5%B1%B1Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">韦东山Linux应用开发笔记</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>7.6k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>14 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="1-输入系统框架及调试"><a href="#1-输入系统框架及调试" class="headerlink" title="1. 输入系统框架及调试"></a>1. 输入系统框架及调试</h2><h3 id="1-1-框架概述"><a href="#1-1-框架概述" class="headerlink" title="1.1 框架概述"></a>1.1 框架概述</h3><p><img src="/../../images/%E8%BE%93%E5%85%A5%E7%B3%BB%E7%BB%9F%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20230917174044630.png" alt="image-20230917174044630"></p>
+<ol>
+<li><p>APP 发起读操作，若无数据则休眠； </p>
+</li>
+<li><p>用户操作设备，硬件上产生中断； </p>
+</li>
+<li><p>输入系统驱动层对应的驱动程序处理中断： </p>
+<p>读取到数据，转换为标准的输入事件，向核心层汇报。 所谓输入事件就是一个<code>input_event</code>结构体。 </p>
+</li>
+<li><p>核心层可以决定把输入事件转发给上面哪个 handler 来处理： </p>
+<ul>
+<li><p>从 handler 的名字来看，它就是用来处输入操作的。有多种 handler，比 如：evdev_handler、kbd_handler、joydev_handler 等等。 </p>
+</li>
+<li><p>最常用的是 evdev_handler：它只是把 input_event 结构体保存在内核buffer 等，APP 来读取时就原原本本地返回。它支持多个 APP 同时访问输入设备，每个 APP 都可以获得同一份输入事件。 </p>
+</li>
+<li><p>当 APP 正在等待数据时，evdev_handler 会把它唤醒，这样 APP 就可以返回数据。</p>
+</li>
+</ul>
+</li>
+<li><p>APP 对输入事件的处理：</p>
+</li>
+<li><p>APP获得数据的方法有2种：直接访问设备节点( 比如<code>/dev/input/event0,1,2,...</code>)，或者通过<code>tslib、libinput</code>这类库来间接访问设备节点。这些库简化了对数据的处理。</p>
+</li>
+</ol>
+<h3 id="1-2-编写APP需要掌握的知识"><a href="#1-2-编写APP需要掌握的知识" class="headerlink" title="1.2 编写APP需要掌握的知识"></a>1.2 编写APP需要掌握的知识</h3>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2023/09/17/%E9%9F%A6%E4%B8%9C%E5%B1%B1%E5%B5%8C%E5%85%A5%E5%BC%8FLinux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/%E8%BE%93%E5%85%A5%E7%B3%BB%E7%BB%9F%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B%E5%9F%BA%E7%A1%80/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/12/%E9%9F%A6%E4%B8%9C%E5%B1%B1%E5%B5%8C%E5%85%A5%E5%BC%8FLinux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/%E4%BD%BF%E7%94%A8LCD%E5%B1%8F%E5%B9%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="Krocz">
+      <meta itemprop="description" content="时间不等人，喜欢就去做">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Krocz's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/09/12/%E9%9F%A6%E4%B8%9C%E5%B1%B1%E5%B5%8C%E5%85%A5%E5%BC%8FLinux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/%E4%BD%BF%E7%94%A8LCD%E5%B1%8F%E5%B9%95/" class="post-title-link" itemprop="url">使用LCD屏幕</a>
         </h2>
 
         <div class="post-meta">
@@ -341,7 +460,7 @@ mjx-container[display="true"] + br {
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2024-03-01 11:00:43" itemprop="dateModified" datetime="2024-03-01T11:00:43+08:00">2024-03-01</time>
+                <time title="修改时间：2024-04-26 17:39:43" itemprop="dateModified" datetime="2024-04-26T17:39:43+08:00">2024-04-26</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -349,7 +468,7 @@ mjx-container[display="true"] + br {
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/" itemprop="url" rel="index"><span itemprop="name">Linux应用开发</span></a>
+                  <a href="/categories/%E9%9F%A6%E4%B8%9C%E5%B1%B1Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">韦东山Linux应用开发笔记</span></a>
                 </span>
             </span>
 
@@ -387,12 +506,12 @@ mjx-container[display="true"] + br {
 <li>应用程序：使用 ioctl 获得 LCD 分辨率、BPP；通过 mmap 映射 Framebuffer，在 Framebuffer 中写入数据</li>
 <li>LCD控制器周而复始的从内存中取出LCD屏幕上每一个像素点的显示数据</li>
 </ol>
-<p><img src="/../images/%E4%BD%BF%E7%94%A8LCD%E5%B1%8F%E5%B9%95/image-20230912204455923.png" alt="image-20230912204455923"></p>
+<p><img src="/../../images/%E4%BD%BF%E7%94%A8LCD%E5%B1%8F%E5%B9%95/image-20230912204455923.png" alt="image-20230912204455923"></p>
 <p>计算（x,y）坐标处像素对应Framebuffer地址：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">(x，y)像素起始地址 = fb_base + (xres * bpp / 8) * y + x * bpp / 8</span><br></pre></td></tr></table></figure>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2023/09/12/%E4%BD%BF%E7%94%A8LCD%E5%B1%8F%E5%B9%95/#more" rel="contents">
+              <a class="btn" href="/2023/09/12/%E9%9F%A6%E4%B8%9C%E5%B1%B1%E5%B5%8C%E5%85%A5%E5%BC%8FLinux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/%E4%BD%BF%E7%94%A8LCD%E5%B1%8F%E5%B9%95/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -729,7 +848,7 @@ mjx-container[display="true"] + br {
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/10/makefile%E5%AD%A6%E4%B9%A0/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/10/%E9%9F%A6%E4%B8%9C%E5%B1%B1%E5%B5%8C%E5%85%A5%E5%BC%8FLinux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/makefile%E5%AD%A6%E4%B9%A0/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.png">
@@ -743,7 +862,7 @@ mjx-container[display="true"] + br {
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2023/09/10/makefile%E5%AD%A6%E4%B9%A0/" class="post-title-link" itemprop="url">GCC和Makefile学习</a>
+            <a href="/2023/09/10/%E9%9F%A6%E4%B8%9C%E5%B1%B1%E5%B5%8C%E5%85%A5%E5%BC%8FLinux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/makefile%E5%AD%A6%E4%B9%A0/" class="post-title-link" itemprop="url">GCC和Makefile学习</a>
         </h2>
 
         <div class="post-meta">
@@ -760,7 +879,7 @@ mjx-container[display="true"] + br {
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-12-01 17:47:22" itemprop="dateModified" datetime="2023-12-01T17:47:22+08:00">2023-12-01</time>
+                <time title="修改时间：2024-04-26 17:39:24" itemprop="dateModified" datetime="2024-04-26T17:39:24+08:00">2024-04-26</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -768,7 +887,7 @@ mjx-container[display="true"] + br {
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/" itemprop="url" rel="index"><span itemprop="name">Linux应用开发</span></a>
+                  <a href="/categories/%E9%9F%A6%E4%B8%9C%E5%B1%B1Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">韦东山Linux应用开发笔记</span></a>
                 </span>
             </span>
 
@@ -797,7 +916,7 @@ mjx-container[display="true"] + br {
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="1-GCC编译器的使用"><a href="#1-GCC编译器的使用" class="headerlink" title="1.GCC编译器的使用"></a>1.GCC编译器的使用</h2><p> <img src="/../images/makefile%E5%AD%A6%E4%B9%A0/image-20230910100317585.png" alt="image-20230910100317585"></p>
+          <h2 id="1-GCC编译器的使用"><a href="#1-GCC编译器的使用" class="headerlink" title="1.GCC编译器的使用"></a>1.GCC编译器的使用</h2><p> <img src="/../../images/makefile%E5%AD%A6%E4%B9%A0/image-20230910100317585.png" alt="image-20230910100317585"></p>
 <ul>
 <li>预处理：预处理阶段会根据指令对源代码进行<strong>替换、宏展开</strong>等操作。在这个阶段，编译器会根据#include指令查找头文件，并<strong>将头文件的内容插入到main.c文件中</strong>。预处理后的文件通常以.i或.ii为扩展名。</li>
 <li>编译：编译阶段将预处理后的文件翻译成汇编语言文件（通常使用. s扩展名）。编译器将C代码转换为汇编代码，将高级语言代码转换成底层机器语言的表示形式，同时<strong>进行语法检查和优化</strong>。</li>
@@ -846,7 +965,7 @@ mjx-container[display="true"] + br {
 </tbody></table>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2023/09/10/makefile%E5%AD%A6%E4%B9%A0/#more" rel="contents">
+              <a class="btn" href="/2023/09/10/%E9%9F%A6%E4%B8%9C%E5%B1%B1%E5%B5%8C%E5%85%A5%E5%BC%8FLinux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/makefile%E5%AD%A6%E4%B9%A0/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -870,7 +989,7 @@ mjx-container[display="true"] + br {
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/05/%E9%9F%A6%E4%B8%9C%E5%B1%B1%E5%B5%8C%E5%85%A5%E5%BC%8FLinux%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/%E5%BC%80%E5%8F%91%E6%9D%BF/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/01/Linux%E5%9F%BA%E7%A1%80%E5%92%8CC%E8%AF%AD%E8%A8%80/Linux%E7%B3%BB%E7%BB%9F%E5%9F%BA%E6%9C%AC%E7%9F%A5%E8%AF%86/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.png">
@@ -884,104 +1003,7 @@ mjx-container[display="true"] + br {
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2023/09/05/%E9%9F%A6%E4%B8%9C%E5%B1%B1%E5%B5%8C%E5%85%A5%E5%BC%8FLinux%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/%E5%BC%80%E5%8F%91%E6%9D%BF/" class="post-title-link" itemprop="url">imx6null-mini开发板</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2023-09-05 20:27:59" itemprop="dateCreated datePublished" datetime="2023-09-05T20:27:59+08:00">2023-09-05</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2024-04-26 17:23:04" itemprop="dateModified" datetime="2024-04-26T17:23:04+08:00">2024-04-26</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/" itemprop="url" rel="index"><span itemprop="name">Linux应用开发</span></a>
-                </span>
-            </span>
-
-          <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>416</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>1 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="1-硬件资源简介"><a href="#1-硬件资源简介" class="headerlink" title="1.硬件资源简介"></a>1.硬件资源简介</h2><p><img src="/../../images/%E5%BC%80%E5%8F%91%E6%9D%BF/image-20230905203618081.png" alt="image-20230905203618081"></p>
-<p><img src="/../../images/%E5%BC%80%E5%8F%91%E6%9D%BF/image-20230905204358901.png" alt="image-20230905204358901"></p>
-<h2 id="2-启动方式"><a href="#2-启动方式" class="headerlink" title="2. 启动方式"></a>2. 启动方式</h2><p><img src="/../../images/%E5%BC%80%E5%8F%91%E6%9D%BF/image-20230905204619465.png" alt="image-20230905204619465"></p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2023/09/05/%E9%9F%A6%E4%B8%9C%E5%B1%B1%E5%B5%8C%E5%85%A5%E5%BC%8FLinux%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/%E5%BC%80%E5%8F%91%E6%9D%BF/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/01/Linux%E7%B3%BB%E7%BB%9F%E5%9F%BA%E6%9C%AC%E7%9F%A5%E8%AF%86/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="Krocz">
-      <meta itemprop="description" content="时间不等人，喜欢就去做">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Krocz's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/09/01/Linux%E7%B3%BB%E7%BB%9F%E5%9F%BA%E6%9C%AC%E7%9F%A5%E8%AF%86/" class="post-title-link" itemprop="url">Linux系统基本知识</a>
+            <a href="/2023/09/01/Linux%E5%9F%BA%E7%A1%80%E5%92%8CC%E8%AF%AD%E8%A8%80/Linux%E7%B3%BB%E7%BB%9F%E5%9F%BA%E6%9C%AC%E7%9F%A5%E8%AF%86/" class="post-title-link" itemprop="url">Linux系统基本知识</a>
         </h2>
 
         <div class="post-meta">
@@ -998,7 +1020,7 @@ mjx-container[display="true"] + br {
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2024-04-03 10:27:52" itemprop="dateModified" datetime="2024-04-03T10:27:52+08:00">2024-04-03</time>
+                <time title="修改时间：2024-04-26 17:37:44" itemprop="dateModified" datetime="2024-04-26T17:37:44+08:00">2024-04-26</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -1006,7 +1028,7 @@ mjx-container[display="true"] + br {
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/" itemprop="url" rel="index"><span itemprop="name">Linux应用开发</span></a>
+                  <a href="/categories/Linux/" itemprop="url" rel="index"><span itemprop="name">Linux</span></a>
                 </span>
             </span>
 
@@ -1098,7 +1120,7 @@ mjx-container[display="true"] + br {
 </ul>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2023/09/01/Linux%E7%B3%BB%E7%BB%9F%E5%9F%BA%E6%9C%AC%E7%9F%A5%E8%AF%86/#more" rel="contents">
+              <a class="btn" href="/2023/09/01/Linux%E5%9F%BA%E7%A1%80%E5%92%8CC%E8%AF%AD%E8%A8%80/Linux%E7%B3%BB%E7%BB%9F%E5%9F%BA%E6%9C%AC%E7%9F%A5%E8%AF%86/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -1122,7 +1144,7 @@ mjx-container[display="true"] + br {
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/08/31/DIY%E8%BE%89%E5%85%89%E7%AE%A1%E6%97%B6%E9%92%9F%E8%AE%B0%E5%BD%95/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/08/31/%E7%94%B5%E5%AD%90DIY/DIY%E8%BE%89%E5%85%89%E7%AE%A1%E6%97%B6%E9%92%9F%E8%AE%B0%E5%BD%95/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.png">
@@ -1136,7 +1158,7 @@ mjx-container[display="true"] + br {
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2023/08/31/DIY%E8%BE%89%E5%85%89%E7%AE%A1%E6%97%B6%E9%92%9F%E8%AE%B0%E5%BD%95/" class="post-title-link" itemprop="url">DIY辉光管时钟记录</a>
+            <a href="/2023/08/31/%E7%94%B5%E5%AD%90DIY/DIY%E8%BE%89%E5%85%89%E7%AE%A1%E6%97%B6%E9%92%9F%E8%AE%B0%E5%BD%95/" class="post-title-link" itemprop="url">DIY辉光管时钟记录</a>
         </h2>
 
         <div class="post-meta">
@@ -1153,7 +1175,7 @@ mjx-container[display="true"] + br {
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2024-02-06 17:09:43" itemprop="dateModified" datetime="2024-02-06T17:09:43+08:00">2024-02-06</time>
+                <time title="修改时间：2024-04-26 17:36:32" itemprop="dateModified" datetime="2024-04-26T17:36:32+08:00">2024-04-26</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -1190,7 +1212,7 @@ mjx-container[display="true"] + br {
     <div class="post-body" itemprop="articleBody">
 
       
-          <p><img src="/../images/DIY%E8%BE%89%E5%85%89%E7%AE%A1%E6%97%B6%E9%92%9F%E8%AE%B0%E5%BD%95/QQ%E5%9B%BE%E7%89%8720240127103711.jpg"></p>
+          <p><img src="/../../images/DIY%E8%BE%89%E5%85%89%E7%AE%A1%E6%97%B6%E9%92%9F%E8%AE%B0%E5%BD%95/QQ%E5%9B%BE%E7%89%8720240127103711.jpg"></p>
 <h2 id="1-功能"><a href="#1-功能" class="headerlink" title="1.功能"></a>1.功能</h2><ul>
 <li>4位时间/日期显示</li>
 <li>4位温湿度显示</li>
@@ -1210,7 +1232,7 @@ mjx-container[display="true"] + br {
 </ul>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2023/08/31/DIY%E8%BE%89%E5%85%89%E7%AE%A1%E6%97%B6%E9%92%9F%E8%AE%B0%E5%BD%95/#more" rel="contents">
+              <a class="btn" href="/2023/08/31/%E7%94%B5%E5%AD%90DIY/DIY%E8%BE%89%E5%85%89%E7%AE%A1%E6%97%B6%E9%92%9F%E8%AE%B0%E5%BD%95/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -1404,12 +1426,12 @@ mjx-container[display="true"] + br {
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
-        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-count">11</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
-        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-count">12</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

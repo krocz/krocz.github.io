@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="1.LED驱动程序框架设计-分离在上一篇博文中编写的驱动程序仅能操作固定开发板上的一个LED灯。考虑现实情况，使用同一款主控芯片，不同厂家可能会设计不同的PCB板，针对硬件使用的芯片引脚各不相同，但是同一款主控针对同一硬件的设置都是相似的。因此，我们考虑针对通用LED驱动程序，主控芯片，开发板来分离出三层，以便我们的LED驱动程序能够支持不同主控不同开发板使用：  1.1 开发板层led_reso">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LED驱动程序框架">
+<meta property="og:url" content="http://example.com/2024/01/02/%E9%9F%A6%E4%B8%9C%E5%B1%B1%E5%B5%8C%E5%85%A5%E5%BC%8FLinux%E9%A9%B1%E5%8A%A8%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/LED%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F%E6%A1%86%E6%9E%B6/index.html">
+<meta property="og:site_name" content="Krocz&#39;s Blog">
+<meta property="og:description" content="1.LED驱动程序框架设计-分离在上一篇博文中编写的驱动程序仅能操作固定开发板上的一个LED灯。考虑现实情况，使用同一款主控芯片，不同厂家可能会设计不同的PCB板，针对硬件使用的芯片引脚各不相同，但是同一款主控针对同一硬件的设置都是相似的。因此，我们考虑针对通用LED驱动程序，主控芯片，开发板来分离出三层，以便我们的LED驱动程序能够支持不同主控不同开发板使用：  1.1 开发板层led_reso">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/images/LED%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F%E6%A1%86%E6%9E%B6/image-20231202161816859.png">
+<meta property="og:image" content="http://example.com/images/LED%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F%E6%A1%86%E6%9E%B6/image-20231218153656623.png">
+<meta property="article:published_time" content="2024-01-02T03:02:18.000Z">
+<meta property="article:modified_time" content="2024-04-26T09:40:47.929Z">
+<meta property="article:author" content="Krocz">
+<meta property="article:tag" content="嵌入式">
+<meta property="article:tag" content="Linux">
+<meta property="article:tag" content="C&#x2F;C++">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/LED%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F%E6%A1%86%E6%9E%B6/image-20231202161816859.png">
+
+<link rel="canonical" href="http://example.com/2024/01/02/%E9%9F%A6%E4%B8%9C%E5%B1%B1%E5%B5%8C%E5%85%A5%E5%BC%8FLinux%E9%A9%B1%E5%8A%A8%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/LED%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F%E6%A1%86%E6%9E%B6/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>LED驱动程序框架 | Krocz's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+  <script src="/live2d-widget/autoload.js"></script>
+ <link rel="alternate" href="/atom.xml" title="Krocz's Blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+
+   <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 1; pointer-events: none;" ></canvas> 
+   <script type="text/javascript" src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script> 
+   <script type="text/javascript" src="/js/cursor/fireworks.js"></script>
+
+
+
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Krocz's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">望云登坡</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-首页">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-归档">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-标签">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-分类">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2024/01/02/%E9%9F%A6%E4%B8%9C%E5%B1%B1%E5%B5%8C%E5%85%A5%E5%BC%8FLinux%E9%A9%B1%E5%8A%A8%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/LED%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F%E6%A1%86%E6%9E%B6/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="Krocz">
+      <meta itemprop="description" content="时间不等人，喜欢就去做">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Krocz's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          LED驱动程序框架
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2024-01-02 11:02:18" itemprop="dateCreated datePublished" datetime="2024-01-02T11:02:18+08:00">2024-01-02</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-04-26 17:40:47" itemprop="dateModified" datetime="2024-04-26T17:40:47+08:00">2024-04-26</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%9F%A6%E4%B8%9C%E5%B1%B1Linux%E9%A9%B1%E5%8A%A8%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">韦东山Linux驱动开发笔记</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>17k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>31 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="1-LED驱动程序框架设计-分离"><a href="#1-LED驱动程序框架设计-分离" class="headerlink" title="1.LED驱动程序框架设计-分离"></a>1.LED驱动程序框架设计-分离</h2><p>在上一篇博文中编写的驱动程序仅能操作固定开发板上的一个LED灯。考虑现实情况，使用同一款主控芯片，不同厂家可能会设计不同的PCB板，针对硬件使用的芯片引脚各不相同，但是同一款主控针对同一硬件的设置都是相似的。因此，我们考虑针对通用LED驱动程序，主控芯片，开发板来分离出三层，以便我们的LED驱动程序能够支持不同主控不同开发板使用：</p>
+<p><img src="/../../images/LED%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F%E6%A1%86%E6%9E%B6/image-20231202161816859.png" alt="image-20231202161816859"></p>
+<h3 id="1-1-开发板层"><a href="#1-1-开发板层" class="headerlink" title="1.1 开发板层"></a>1.1 开发板层</h3><p>led_resources.h</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">ifndef</span> _LED_RESOURCES_H_</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _LED_RESOURCES_H_</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> GROUP(x) (x &gt;&gt; 16)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> PIN(x) (x &amp; 0xFFFF)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> GROUP_PIN(g, p) ((g &lt;&lt; 16) | (p))</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">led_resources</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> pins[<span class="number">10</span>];</span><br><span class="line">    <span class="type">int</span> num;</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">struct</span> led_resources *<span class="title function_">get_led_resouce</span><span class="params">(<span class="type">void</span>)</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span> <span class="comment">// !_LED_RESOUS_H_</span></span></span><br></pre></td></tr></table></figure>
+
+<p>board_A_imx6ull.c</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;led_resources.h&quot;</span></span></span><br><span class="line"><span class="comment">// static:该变量对外不可见，仅能通过get_led_resource函数获取</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">led_resources</span> <span class="title">board_A_imx6ll</span> =</span> &#123;</span><br><span class="line">    .pins = &#123; GROUP_PIN(<span class="number">5</span>, <span class="number">3</span>), GROUP_PIN(<span class="number">1</span>, <span class="number">1</span>)&#125;,</span><br><span class="line">    .num = <span class="number">2</span>,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> led_resources *<span class="title function_">get_led_resouce</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">return</span> &amp;board_A_imx6ll;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在该层主要定义开发板上所分别的LED资源，通过定义结构体<code>led_resources</code>并向上一层提供get函数。</p>
+<p>在示例中定义了<code>GPIO5_3</code>和<code>GPIO1_1</code>两个LED引脚。针对不同的开发板需要编写不同.c文件来定义LED引脚。</p>
+<h3 id="1-2-芯片层"><a href="#1-2-芯片层" class="headerlink" title="1.2 芯片层"></a>1.2 芯片层</h3><p>led_operations.h</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">ifndef</span> _LED_OPERATIONS_H_</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> _LED_OPERATIONS_H_</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IOMUXC_SNVS_BASE_ADDRESS 0x02290000</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IOMUXC_SNVS_SW_MUX_CTL_PAD_SNVS_TAMPER3 (IOMUXC_SNVS_BASE_ADDRESS + 0x14)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IOMUXC_SNVS_SW_PAD_CTL_PAD_SNVS_TAMPER3 (IOMUXC_SNVS_BASE_ADDRESS + 0x58)</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IOMUXC_BASE_ADDRESS 0x020E0000</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IOMUXC_SW_MUX_CTL_PAD_GPIO1_IO01 (IOMUXC_BASE_ADDRESS + 0x60)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IOMUXC_SW_PAD_CTL_PAD_GPIO1_IO01 (IOMUXC_BASE_ADDRESS + 0x2EC)</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> GPIO5_BASE_ADDRESS 0x020AC000</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> GPIO5_GDIR (GPIO5_BASE_ADDRESS + 0x04)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> GPIO5_DR (GPIO5_BASE_ADDRESS + 0x00)</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> GPIO1_BASE_ADDRESS 0x0209C000</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> GPIO1_GDIR (GPIO1_BASE_ADDRESS + 0x04)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> GPIO1_DR (GPIO1_BASE_ADDRESS + 0x00)</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">led_operations</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> (*init)(<span class="type">int</span> which);</span><br><span class="line">    <span class="type">int</span> (*ctl) (<span class="type">int</span> which, <span class="type">char</span> status);</span><br><span class="line">    <span class="type">int</span> (*get_led_num)(<span class="type">void</span>);</span><br><span class="line">    <span class="type">int</span> (*close)(<span class="type">void</span>);</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> led_operations *<span class="title function_">get_chip_led_operations</span><span class="params">(<span class="type">void</span>)</span>;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span> <span class="comment">// !_LED_OPERATIONS_H_</span></span></span><br></pre></td></tr></table></figure>
+
+<p>在芯片层的.h文件中，定义所有可能成为LED引脚的相关寄存器地址（当然作为测试仅定义了<code>GPIO5_3</code>和<code>GPIO1_1</code>的相关寄存器），以及定义该芯片实现LED操作所需要的函数，以供上一层调用。</p>
+<p>chip_imx6ull_gpio.c</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;led_operations.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;led_resources.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;asm/io.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/string.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/types.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">led_resources</span> *<span class="title">led_rsc</span> =</span> <span class="literal">NULL</span>;</span><br><span class="line"><span class="comment">/* registers */</span></span><br><span class="line"><span class="type">static</span> <span class="keyword">volatile</span> <span class="type">unsigned</span> <span class="type">int</span> *IOMUXC_MUX_CTL_PAD_Pin_Virtual;</span><br><span class="line"><span class="type">static</span> <span class="keyword">volatile</span> <span class="type">unsigned</span> <span class="type">int</span> *IOMUXC_PAD_CTL_PAD_Pin_Virtual;</span><br><span class="line"><span class="type">static</span> <span class="keyword">volatile</span> <span class="type">unsigned</span> <span class="type">int</span> *GPIOx_GDIR_Virtual;</span><br><span class="line"><span class="type">static</span> <span class="keyword">volatile</span> <span class="type">unsigned</span> <span class="type">int</span> *GPIOx_DR_Virtual;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">chip_led_init</span><span class="params">(<span class="type">int</span> which)</span> <span class="comment">/* 初始化LED, which-哪个LED */</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">uint32_t</span> val;</span><br><span class="line">    printk(<span class="string">&quot;%s %s line %d, led %d\n&quot;</span>, __FILE__, __FUNCTION__, __LINE__, which);</span><br><span class="line">    <span class="keyword">if</span> (!led_rsc)</span><br><span class="line">        led_rsc = get_led_resouce();</span><br><span class="line">    <span class="keyword">if</span> (which &gt; led_rsc-&gt;num)</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    printk(<span class="string">&quot;init gpio: group %d, pin %d\n&quot;</span>, GROUP(led_rsc-&gt;pins[which]), PIN(led_rsc-&gt;pins[which]));</span><br><span class="line">    <span class="keyword">switch</span> (led_rsc-&gt;pins[which])</span><br><span class="line">    &#123;</span><br><span class="line">    <span class="keyword">case</span> <span class="title function_">GROUP_PIN</span><span class="params">(<span class="number">5</span>, <span class="number">3</span>)</span>: &#123;</span><br><span class="line">        printk(<span class="string">&quot;init pin of GPIO5_3 ...\n&quot;</span>);</span><br><span class="line">        IOMUXC_MUX_CTL_PAD_Pin_Virtual = ioremap(IOMUXC_SNVS_SW_MUX_CTL_PAD_SNVS_TAMPER3, <span class="number">4</span>);</span><br><span class="line">        IOMUXC_PAD_CTL_PAD_Pin_Virtual = ioremap(IOMUXC_SNVS_SW_PAD_CTL_PAD_SNVS_TAMPER3, <span class="number">4</span>);</span><br><span class="line">        GPIOx_GDIR_Virtual = ioremap(GPIO5_GDIR, <span class="number">4</span>);</span><br><span class="line">        GPIOx_DR_Virtual = ioremap(GPIO5_DR, <span class="number">4</span>);</span><br><span class="line"></span><br><span class="line">        *GPIOx_GDIR_Virtual |= (<span class="number">1</span> &lt;&lt; <span class="number">3</span>); <span class="comment">// 配置引脚为输出模式</span></span><br><span class="line">        *GPIOx_DR_Virtual |= (<span class="number">1</span> &lt;&lt; <span class="number">3</span>);   <span class="comment">// 先熄灭LED</span></span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">case</span> <span class="title function_">GROUP_PIN</span><span class="params">(<span class="number">1</span>, <span class="number">1</span>)</span>: &#123;</span><br><span class="line">        printk(<span class="string">&quot;init pin of group GPIO1_1 ...\n&quot;</span>);</span><br><span class="line">        IOMUXC_MUX_CTL_PAD_Pin_Virtual = ioremap(IOMUXC_SW_MUX_CTL_PAD_GPIO1_IO01, <span class="number">4</span>);</span><br><span class="line">        IOMUXC_PAD_CTL_PAD_Pin_Virtual = ioremap(IOMUXC_SW_PAD_CTL_PAD_GPIO1_IO01, <span class="number">4</span>);</span><br><span class="line">        GPIOx_GDIR_Virtual = ioremap(GPIO1_GDIR, <span class="number">4</span>);</span><br><span class="line">        GPIOx_DR_Virtual = ioremap(GPIO1_DR, <span class="number">4</span>);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    val = *IOMUXC_MUX_CTL_PAD_Pin_Virtual;</span><br><span class="line">    *IOMUXC_MUX_CTL_PAD_Pin_Virtual = (val &amp; (~<span class="number">0xf</span>)) | <span class="number">0x5</span>; <span class="comment">// 先清除,再赋值，失能测试模式，配置复用为ALT5</span></span><br><span class="line">    *GPIOx_GDIR_Virtual |= (<span class="number">1</span> &lt;&lt; PIN(led_rsc-&gt;pins[which])); <span class="comment">// 配置引脚为输出模式</span></span><br><span class="line">    *GPIOx_DR_Virtual |= (<span class="number">1</span> &lt;&lt; PIN(led_rsc-&gt;pins[which]));   <span class="comment">// 先熄灭LED</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">chip_led_ctl</span><span class="params">(<span class="type">int</span> which, <span class="type">char</span> status)</span> <span class="comment">/* 控制LED, which-哪个LED, status:1-亮,0-灭 */</span></span><br><span class="line">&#123;</span><br><span class="line">    printk(<span class="string">&quot;%s %s line %d, led %d, status: %s\n&quot;</span>, __FILE__, __FUNCTION__, __LINE__, which,</span><br><span class="line">           (status == <span class="number">1</span> ? <span class="string">&quot;on&quot;</span> : <span class="string">&quot;off&quot;</span>));</span><br><span class="line">    printk(<span class="string">&quot;set led %s: group %d, pin %d\n&quot;</span>, status ? <span class="string">&quot;on&quot;</span> : <span class="string">&quot;off&quot;</span>, GROUP(led_rsc-&gt;pins[which]),</span><br><span class="line">           PIN(led_rsc-&gt;pins[which]));</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (status)</span><br><span class="line">        *GPIOx_DR_Virtual &amp;= ~(<span class="number">1</span> &lt;&lt; PIN(led_rsc-&gt;pins[which])); <span class="comment">/* set led on*/</span></span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        *GPIOx_DR_Virtual |= (<span class="number">1</span> &lt;&lt; PIN(led_rsc-&gt;pins[which])); <span class="comment">/* set led off */</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">get_board_led_num</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (!led_rsc)</span><br><span class="line">        led_rsc = get_led_resouce();</span><br><span class="line">    <span class="keyword">return</span> led_rsc-&gt;num;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">chip_led_close</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    iounmap(IOMUXC_MUX_CTL_PAD_Pin_Virtual);</span><br><span class="line">    iounmap(IOMUXC_PAD_CTL_PAD_Pin_Virtual);</span><br><span class="line">    iounmap(GPIOx_GDIR_Virtual);</span><br><span class="line">    iounmap(GPIOx_DR_Virtual);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">led_operations</span> <span class="title">chip_imx6ll_led_opr</span> =</span> &#123;</span><br><span class="line">    .init = chip_led_init,</span><br><span class="line">    .ctl = chip_led_ctl,</span><br><span class="line">    .close = chip_led_close,</span><br><span class="line">    .get_led_num = get_board_led_num,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">struct</span> led_operations *<span class="title function_">get_chip_led_operations</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> &amp;chip_imx6ll_led_opr;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在芯片层的.c文件中实现了<code>led_operations</code>结构体中定义函数，该.c文件所实现的函数是针对imx6ull芯片而开发的。支持其他芯片在新的.c文件中实现相应的操作逻辑。</p>
+<h3 id="1-3-通用LED驱动程序"><a href="#1-3-通用LED驱动程序" class="headerlink" title="1.3 通用LED驱动程序"></a>1.3 通用LED驱动程序</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;led_operations.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;linux/printk.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/device.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/errno.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/fs.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/gfp.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/init.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/kernel.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/kmod.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/major.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/miscdevice.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/module.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/mutex.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/proc_fs.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/seq_file.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/stat.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/tty.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 1. 确定主设备号                                                                 */</span></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> major = <span class="number">0</span>;</span><br><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="keyword">class</span> *<span class="title">led_class</span>;</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">led_operations</span> *<span class="title">p_led_opr</span>;</span></span><br><span class="line"><span class="type">int</span> led_num;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> MIN(a, b) (a &lt; b ? a : b)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">/* 3. 实现对应的open/read/write等函数，填入file_operations结构体                   */</span></span><br><span class="line"><span class="type">static</span> <span class="type">ssize_t</span> <span class="title function_">led_drv_read</span><span class="params">(<span class="keyword">struct</span> file *file, <span class="type">char</span> __user *buf, <span class="type">size_t</span> size, <span class="type">loff_t</span> *offset)</span></span><br><span class="line">&#123;</span><br><span class="line">    printk(<span class="string">&quot;%s %s line %d\n&quot;</span>, __FILE__, __FUNCTION__, __LINE__);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* write(fd, &amp;val, 1); */</span></span><br><span class="line"><span class="type">static</span> <span class="type">ssize_t</span> <span class="title function_">led_drv_write</span><span class="params">(<span class="keyword">struct</span> file *file, <span class="type">const</span> <span class="type">char</span> __user *buf, <span class="type">size_t</span> size, <span class="type">loff_t</span> *offset)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> err;</span><br><span class="line">    <span class="type">char</span> status;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">inode</span> *<span class="title">inode</span> =</span> file_inode(file);</span><br><span class="line">    <span class="type">int</span> minor = iminor(inode);</span><br><span class="line"></span><br><span class="line">    printk(<span class="string">&quot;%s %s line %d\n&quot;</span>, __FILE__, __FUNCTION__, __LINE__);</span><br><span class="line">    err = copy_from_user(&amp;status, buf, <span class="number">1</span>);</span><br><span class="line">	<span class="comment">/* 根据次设备号和status控制LED */</span></span><br><span class="line">	p_led_opr-&gt;ctl(minor, status);</span><br><span class="line">    <span class="keyword">return</span> err;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">led_drv_open</span><span class="params">(<span class="keyword">struct</span> inode *node, <span class="keyword">struct</span> file *file)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> ret;</span><br><span class="line">    <span class="type">int</span> minor = iminor(node);</span><br><span class="line">    printk(<span class="string">&quot;%s %s line %d\n&quot;</span>, __FILE__, __FUNCTION__, __LINE__);</span><br><span class="line">    <span class="comment">/* 根据次设备号初始化LED */</span></span><br><span class="line">    ret = p_led_opr-&gt;init(minor);</span><br><span class="line">    <span class="keyword">return</span> ret;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">led_drv_close</span><span class="params">(<span class="keyword">struct</span> inode *node, <span class="keyword">struct</span> file *file)</span></span><br><span class="line">&#123;</span><br><span class="line">    printk(<span class="string">&quot;%s %s line %d\n&quot;</span>, __FILE__, __FUNCTION__, __LINE__);</span><br><span class="line">	p_led_opr-&gt;close();</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 2. 定义自己的file_operations结构体                                              */</span></span><br><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">file_operations</span> <span class="title">led_drv</span> =</span> &#123;</span><br><span class="line">    .owner = THIS_MODULE,</span><br><span class="line">    .open = led_drv_open,</span><br><span class="line">    .read = led_drv_read,</span><br><span class="line">    .write = led_drv_write,</span><br><span class="line">    .release = led_drv_close,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 4. 把file_operations结构体告诉内核：注册驱动程序                                */</span></span><br><span class="line"><span class="comment">/* 5. 谁来注册驱动程序啊？得有一个入口函数：安装驱动程序时，就会去调用这个入口函数 */</span></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> __init <span class="title function_">led_init</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> err, i;</span><br><span class="line">    printk(<span class="string">&quot;%s %s line %d\n&quot;</span>, __FILE__, __FUNCTION__, __LINE__);</span><br><span class="line">    major = register_chrdev(<span class="number">0</span>, <span class="string">&quot;krocz_led&quot;</span>, &amp;led_drv); <span class="comment">/* /dev/led */</span></span><br><span class="line">    led_class = class_create(THIS_MODULE, <span class="string">&quot;krocz_led_class&quot;</span>);</span><br><span class="line">    err = PTR_ERR(led_class);</span><br><span class="line">    <span class="keyword">if</span> (IS_ERR(led_class))</span><br><span class="line">    &#123;</span><br><span class="line">        printk(<span class="string">&quot;%s %s line %d\n&quot;</span>, __FILE__, __FUNCTION__, __LINE__);</span><br><span class="line">        unregister_chrdev(major, <span class="string">&quot;krocz_led&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    p_led_opr = get_chip_led_operations();</span><br><span class="line">    <span class="keyword">if</span>(p_led_opr == <span class="literal">NULL</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        printk(<span class="string">&quot;get led operations failed!\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    led_num = p_led_opr-&gt;get_led_num();</span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; led_num; i++)</span><br><span class="line">        device_create(led_class, <span class="literal">NULL</span>, MKDEV(major, i), <span class="literal">NULL</span>, <span class="string">&quot;krocz_led%d&quot;</span>, i); <span class="comment">/* /dev/krocz_led0,1,... */</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 6. 有入口函数就应该有出口函数：卸载驱动程序时，就会去调用这个出口函数           */</span></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> __exit <span class="title function_">led_exit</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> i;</span><br><span class="line">    printk(<span class="string">&quot;%s %s line %d\n&quot;</span>, __FILE__, __FUNCTION__, __LINE__);</span><br><span class="line">    <span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; led_num; i++)</span><br><span class="line">        device_destroy(led_class, MKDEV(major, i)); <span class="comment">/* /dev/krocz_led0,1,... */</span></span><br><span class="line">    class_destroy(led_class);</span><br><span class="line">    unregister_chrdev(major, <span class="string">&quot;krocz_led&quot;</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 7. 其他完善：提供设备信息，自动创建设备节点                                     */</span></span><br><span class="line">module_init(led_init);</span><br><span class="line">module_exit(led_exit);</span><br><span class="line">MODULE_LICENSE(<span class="string">&quot;GPL&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>该驱动程序就是通用的驱动框架，只不过具体的引脚以及不同芯片针对引脚的寄存器操作都被分离到芯片层和开发板层了。在使用时，只需要利用下面提供的Makefile将通用LED驱动和相应的芯片.c文件和相应开发板的.c文件进行编译链接即可：</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">KERN_DIR = /home/book/100ask_imx6ull_mini-sdk/Linux-4.9.88</span><br><span class="line"></span><br><span class="line"><span class="section">all:</span></span><br><span class="line">	make -C <span class="variable">$(KERN_DIR)</span> M=`pwd` modules </span><br><span class="line">	<span class="variable">$(CROSS_COMPILE)</span>gcc -o krocz_led_test ledtest.c </span><br><span class="line"></span><br><span class="line"><span class="section">clean:</span></span><br><span class="line">	make -C <span class="variable">$(KERN_DIR)</span> M=`pwd` modules clean</span><br><span class="line">	rm -rf modules.order</span><br><span class="line">	rm -f ledtest</span><br><span class="line"></span><br><span class="line"><span class="comment"># 参考内核源码drivers/char/ipmi/Makefile</span></span><br><span class="line"><span class="comment"># 要想把a.c, b.c编译成ab.ko, 可以这样指定:</span></span><br><span class="line"><span class="comment"># ab-y := a.o b.o</span></span><br><span class="line"><span class="comment"># obj-m += ab.o</span></span><br><span class="line"></span><br><span class="line">krocz_led-y := led_drv.o chip_imx6ll_gpio.o board_A_imx6ll_led.o</span><br><span class="line">obj-m	+= krocz_led.o</span><br></pre></td></tr></table></figure>
+
+<p>通过分层的方式，从而实现了解耦合，使得我们的LED驱动程序具有通用性。</p>
+<h3 id="1-4-测试程序"><a href="#1-4-测试程序" class="headerlink" title="1.4 测试程序"></a>1.4 测试程序</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/stat.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;fcntl.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">//用法：  ./ledtest /dev/krocz_led&lt;0 | 1&gt; &lt;on | off&gt;</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> **argv)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="type">int</span> fd;</span><br><span class="line">	<span class="type">char</span> status;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">/* 1. 判断参数 */</span></span><br><span class="line">	<span class="keyword">if</span> (argc != <span class="number">3</span>) </span><br><span class="line">	&#123;</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;Usage: %s &lt;dev&gt; &lt;on | off&gt;\n&quot;</span>, argv[<span class="number">0</span>]);</span><br><span class="line">		<span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* 2. 打开文件 */</span></span><br><span class="line">	fd = open(argv[<span class="number">1</span>], O_RDWR);</span><br><span class="line">	<span class="keyword">if</span> (fd == <span class="number">-1</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;can not open file %s\n&quot;</span>, argv[<span class="number">1</span>]);</span><br><span class="line">		<span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* 3. 写文件 */</span></span><br><span class="line">	<span class="keyword">if</span> (<span class="number">0</span> == <span class="built_in">strcmp</span>(argv[<span class="number">2</span>], <span class="string">&quot;on&quot;</span>))</span><br><span class="line">	&#123;</span><br><span class="line">		status = <span class="number">1</span>;</span><br><span class="line">		write(fd, &amp;status, <span class="number">1</span>);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="keyword">else</span></span><br><span class="line">	&#123;</span><br><span class="line">		status = <span class="number">0</span>;</span><br><span class="line">		write(fd, &amp;status, <span class="number">1</span>);</span><br><span class="line">	&#125;</span><br><span class="line">	close(fd);</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h2 id="2-总线设备驱动模型"><a href="#2-总线设备驱动模型" class="headerlink" title="2. 总线设备驱动模型"></a>2. 总线设备驱动模型</h2><p>在第1节的基础上，进一步考虑支持开发板上的所有硬件资源。在第1节中，我们主要定义了两个结构体：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">led_resources</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> pins[<span class="number">10</span>];</span><br><span class="line">    <span class="type">int</span> num;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">led_operations</span> &#123;</span></span><br><span class="line">    <span class="type">int</span> (*init)(<span class="type">int</span> which);</span><br><span class="line">    <span class="type">int</span> (*ctl) (<span class="type">int</span> which, <span class="type">char</span> status);</span><br><span class="line">    <span class="type">int</span> (*get_led_num)(<span class="type">void</span>);</span><br><span class="line">    <span class="type">int</span> (*close)(<span class="type">void</span>);</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>并通过相应的.c文件对结构体的内容进行填充。不同的硬件对应的引脚配置和操作函数大体上都是类似的，我们可以考虑定义一个通用的引脚配置结构体<code>struct platform_device</code>和通用的操作配置结构体<code>struct platform_driver</code>，然后在一个.c文件中实现针对主控芯片的所有硬件的操作函数，在另一个.c文件中实现针对某一款开发板的所有硬件的引脚定义，从而将第1节的分离思想应用到所有的硬件：</p>
+<p><img src="/../../images/LED%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F%E6%A1%86%E6%9E%B6/image-20231218153656623.png" alt="image-20231218153656623"></p>
+<h3 id="2-1-理解Bus-Dev-Drv模型"><a href="#2-1-理解Bus-Dev-Drv模型" class="headerlink" title="2.1 理解Bus&#x2F;Dev&#x2F;Drv模型"></a>2.1 理解Bus&#x2F;Dev&#x2F;Drv模型</h3><p>结构体<code>platform_device</code>的定义：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">platform_device</span> &#123;</span></span><br><span class="line">	<span class="type">const</span> <span class="type">char</span>	*name;</span><br><span class="line">	<span class="type">int</span>		id;</span><br><span class="line">	<span class="type">bool</span>		id_auto;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">device</span>	<span class="title">dev</span>;</span></span><br><span class="line">	u32		num_resources;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">resource</span>	*<span class="title">resource</span>;</span></span><br><span class="line"></span><br><span class="line">	<span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">platform_device_id</span>	*<span class="title">id_entry</span>;</span></span><br><span class="line">	<span class="type">char</span> *driver_override; <span class="comment">/* Driver name to force a match */</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">/* MFD cell pointer */</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">mfd_cell</span> *<span class="title">mfd_cell</span>;</span></span><br><span class="line"></span><br><span class="line">	<span class="comment">/* arch specific additions */</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">pdev_archdata</span>	<span class="title">archdata</span>;</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>目前用到的几个结构体成员：</p>
+<ul>
+<li>name：自定义的设备名称，可以根据该名称将<code>platform_device</code>与<code>platform_driver</code>进行匹配</li>
+<li>resource：硬件引脚资源结构体</li>
+<li>num_resources：资源的数量</li>
+<li>driver_override：首先匹配<code>driver_override</code>所表示的<code>platform_driver</code></li>
+</ul>
+<p>结构体<code>struct resource</code>：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">resource</span> &#123;</span></span><br><span class="line">	<span class="type">resource_size_t</span> start;</span><br><span class="line">	<span class="type">resource_size_t</span> end;</span><br><span class="line">	<span class="type">const</span> <span class="type">char</span> *name;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> flags;</span><br><span class="line">	<span class="type">unsigned</span> <span class="type">long</span> desc;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">resource</span> *<span class="title">parent</span>, *<span class="title">sibling</span>, *<span class="title">child</span>;</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>start&#x2F;end：用来表示地址的<code>u32</code>整型数据</p>
+</li>
+<li><p>name：引脚名称标识</p>
+</li>
+<li><p>flag：标识引脚资源类型，后面<code>platform_get_resource</code>的参数 type 指的类别就是下面这些</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * IO resources have these defined flags.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * PCI devices expose these flags to userspace in the &quot;resource&quot; sysfs file,</span></span><br><span class="line"><span class="comment"> * so don&#x27;t move them.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IORESOURCE_BITS		0x000000ff	<span class="comment">/* Bus-specific bits */</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IORESOURCE_TYPE_BITS	0x00001f00	<span class="comment">/* Resource type */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IORESOURCE_IO		0x00000100	<span class="comment">/* PCI/ISA I/O ports */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IORESOURCE_MEM		0x00000200</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IORESOURCE_REG		0x00000300	<span class="comment">/* Register offsets */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IORESOURCE_IRQ		0x00000400</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IORESOURCE_DMA		0x00000800</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IORESOURCE_BUS		0x00001000</span></span><br></pre></td></tr></table></figure></li>
+</ul>
+<p>结构体<code>platform_driver</code>：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">platform_driver</span> &#123;</span></span><br><span class="line">	<span class="type">int</span> (*probe)(<span class="keyword">struct</span> platform_device *);</span><br><span class="line">	<span class="type">int</span> (*remove)(<span class="keyword">struct</span> platform_device *);</span><br><span class="line">	<span class="type">void</span> (*shutdown)(<span class="keyword">struct</span> platform_device *);</span><br><span class="line">	<span class="type">int</span> (*suspend)(<span class="keyword">struct</span> platform_device *, <span class="type">pm_message_t</span> state);</span><br><span class="line">	<span class="type">int</span> (*resume)(<span class="keyword">struct</span> platform_device *);</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">device_driver</span> <span class="title">driver</span>;</span></span><br><span class="line">	<span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">platform_device_id</span> *<span class="title">id_table</span>;</span></span><br><span class="line">	<span class="type">bool</span> prevent_deferred_probe;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>比较重要的几个成员：</p>
+<ul>
+<li>probe：当总线扫描到设备树中的<code>platform_device</code>并与相应的<code>platform_driver</code>进行匹配之后，内核会调用probe函数，probe（探针）函数包含了初始化设备的逻辑。</li>
+<li>remove：当总线或者内核监测到硬件设备拔出事件之后，通常会触发对应驱动程序调用remove函数，该函数包含清理设备资源的逻辑。</li>
+<li>driver-&gt;name：与<code>platform_device</code>的name或者driver_override成员进行匹配的名称</li>
+<li>id_table：表示该 drv 支持若干 个 device，它里面列出了各个 device 的<code>&#123;.name, .driver_data&#125;</code>，其中的<code>name</code>表示该 drv 支持的设备的名字，<code>driver_data</code> 是些提供给该 device 的私有数据，与<code>platform_device</code>的name进行匹配</li>
+</ul>
+<h4 id="2-1-1-Dev和Drv的匹配"><a href="#2-1-1-Dev和Drv的匹配" class="headerlink" title="2.1.1 Dev和Drv的匹配"></a>2.1.1 Dev和Drv的匹配</h4><h5 id="1-匹配优先级（大概了解，后面详细讲）"><a href="#1-匹配优先级（大概了解，后面详细讲）" class="headerlink" title="(1) 匹配优先级（大概了解，后面详细讲）"></a>(1) 匹配优先级（大概了解，后面详细讲）</h5><ol>
+<li>最先比较<code>platform_device.driver_override</code>和 <code>platform_driver.driver.name</code></li>
+<li>然后比较<code>platform_device.name</code> 和 <code>platform_driver.id_table[i].name</code></li>
+<li>最后比较<code>platform_device.name</code> 和 <code>platform_driver.driver.name</code></li>
+</ol>
+<h5 id="2-函数调用关系"><a href="#2-函数调用关系" class="headerlink" title="(2) 函数调用关系"></a>(2) 函数调用关系</h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">platform_device_register </span><br><span class="line">platform_device_add </span><br><span class="line">    device_add </span><br><span class="line">    	bus_add_device <span class="comment">// 放入链表 </span></span><br><span class="line">     	bus_probe_device <span class="comment">// probe 枚举设备，即找到匹配的(dev, drv) </span></span><br><span class="line">    		device_initial_probe </span><br><span class="line">    			__device_attach </span><br><span class="line">    				<span class="title function_">bus_for_each_drv</span><span class="params">(...,__device_attach_driver,...)</span> 											__device_attach_driver </span><br><span class="line">    						<span class="title function_">driver_match_device</span><span class="params">(drv, dev)</span> <span class="comment">// 是否匹配 </span></span><br><span class="line">  							driver_probe_device           <span class="comment">// 调用 drv 的 probe </span></span><br><span class="line"></span><br><span class="line">platform_driver_register </span><br><span class="line">__platform_driver_register </span><br><span class="line">    driver_register </span><br><span class="line">    	bus_add_driver <span class="comment">// 放入链表 </span></span><br><span class="line">    		<span class="title function_">driver_attach</span><span class="params">(drv)</span> </span><br><span class="line">    			<span class="title function_">bus_for_each_dev</span><span class="params">(drv-&gt;bus, <span class="literal">NULL</span>, drv, __driver_attach)</span>; </span><br><span class="line">					__driver_attach </span><br><span class="line">                        <span class="title function_">driver_match_device</span><span class="params">(drv, dev)</span> <span class="comment">// 是否匹配 </span></span><br><span class="line">                        driver_probe_device           <span class="comment">// 调用 drv 的 probe</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="2-1-2-常用函数"><a href="#2-1-2-常用函数" class="headerlink" title="2.1.2 常用函数"></a>2.1.2 常用函数</h4><p>这些函数在内核源码：<code>drivers/base/platform.c</code></p>
+<p><strong>(1) 注册&#x2F;取消注册</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">platform_device_register/ platform_device_unregister </span><br><span class="line">platform_driver_register/ platform_driver_unregister </span><br><span class="line">platform_add_devices <span class="comment">// 注册多个 device</span></span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>(2) 获取资源</strong></p>
+<p>返回该 dev 中某类型(type)资源中的第几个(num)：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> resource *<span class="title function_">platform_get_resource</span><span class="params">(<span class="keyword">struct</span> platform_device *dev, <span class="type">unsigned</span> <span class="type">int</span> type, <span class="type">unsigned</span> <span class="type">int</span> num)</span></span><br></pre></td></tr></table></figure>
+
+<p>返回该 dev 所用的第几个(num)中断：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">platform_get_irq</span><span class="params">(<span class="keyword">struct</span> platform_device *dev, <span class="type">unsigned</span> <span class="type">int</span> num)</span></span><br></pre></td></tr></table></figure>
+
+<p>通过名字(name)返回该 dev 的某类型(type)资源：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> resource *<span class="title function_">platform_get_resource_byname</span><span class="params">(<span class="keyword">struct</span> platform_device *dev, <span class="type">unsigned</span> <span class="type">int</span> type, <span class="type">const</span> <span class="type">char</span> *name)</span></span><br></pre></td></tr></table></figure>
+
+<p>通过名字(name)返回该 dev 的中断号：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="title function_">platform_get_irq_byname</span><span class="params">(<span class="keyword">struct</span> platform_device *dev， <span class="type">const</span> <span class="type">char</span> *name)</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="2-2-编写代码"><a href="#2-2-编写代码" class="headerlink" title="2.2 编写代码"></a>2.2 编写代码</h3><h4 id="2-2-1-开发板层"><a href="#2-2-1-开发板层" class="headerlink" title="2.2.1 开发板层"></a>2.2.1 开发板层</h4><p>board_A_imx6ull.c</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">void</span> <span class="title function_">led_dev_release</span><span class="params">(<span class="keyword">struct</span> device *dev)</span></span><br><span class="line">&#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">resource</span> <span class="title">resources</span>[] =</span> &#123;</span><br><span class="line">        &#123;</span><br><span class="line">                .start = GROUP_PIN(<span class="number">3</span>,<span class="number">1</span>),</span><br><span class="line">                .flags = IORESOURCE_IRQ,</span><br><span class="line">                .name = <span class="string">&quot;100ask_led_pin&quot;</span>,</span><br><span class="line">        &#125;,</span><br><span class="line">        &#123;</span><br><span class="line">                .start = GROUP_PIN(<span class="number">5</span>,<span class="number">8</span>),</span><br><span class="line">                .flags = IORESOURCE_IRQ,</span><br><span class="line">                .name = <span class="string">&quot;100ask_led_pin&quot;</span>,</span><br><span class="line">        &#125;,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">platform_device</span> <span class="title">board_A_led_dev</span> =</span> &#123;</span><br><span class="line">        .name = <span class="string">&quot;100ask_led&quot;</span>,</span><br><span class="line">        .num_resources = ARRAY_SIZE(resources),</span><br><span class="line">        .resource = resources,</span><br><span class="line">        .dev = &#123;</span><br><span class="line">                .release = led_dev_release,</span><br><span class="line">         &#125;,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> __init <span class="title function_">led_dev_init</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> err;</span><br><span class="line">    err = platform_device_register(&amp;board_A_led_dev);   </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> __exit <span class="title function_">led_dev_exit</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    platform_device_unregister(&amp;board_A_led_dev);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">module_init(led_dev_init);</span><br><span class="line">module_exit(led_dev_exit);</span><br><span class="line">MODULE_LICENSE(<span class="string">&quot;GPL&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>当模块安装时会调用<code>led_dev_init</code>，模块卸载时会调用<code>led_dev_exit</code>。</p>
+<p>注：必须要提供<code>release</code>函数，如果不提供则在调用<code>platform_device_unregister</code>时会出现警告：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">WARN(<span class="number">1</span>, KERN_ERR <span class="string">&quot;Device &#x27;%s&#x27; does not have a release() &quot;</span></span><br><span class="line">     <span class="string">&quot;function, it is broken and must be fixed.\n&quot;</span>,</span><br><span class="line">     dev_name(dev));</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="2-2-2-芯片层"><a href="#2-2-2-芯片层" class="headerlink" title="2.2.2 芯片层"></a>2.2.2 芯片层</h4><p>chip_imx6ull_gpio.c</p>
+<p>这一部分对应芯片层的硬件操作，和上一节一致：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">board_demo_led_init</span> <span class="params">(<span class="type">int</span> which)</span> <span class="comment">/* 初始化LED, which-哪个LED */</span>       </span><br><span class="line">&#123;   </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">board_demo_led_ctl</span> <span class="params">(<span class="type">int</span> which, <span class="type">char</span> status)</span> <span class="comment">/* 控制LED, which-哪个LED, status:1-亮,0-灭 */</span></span><br><span class="line">&#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">led_operations</span> <span class="title">board_demo_led_opr</span> =</span> &#123;</span><br><span class="line">    .init = board_demo_led_init,</span><br><span class="line">    .ctl  = board_demo_led_ctl,</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>这一部分对应<code>platform_driver</code>配置和安装和卸载函数：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> g_ledpins[<span class="number">100</span>];</span><br><span class="line"><span class="type">static</span> <span class="type">int</span> g_ledcnt = <span class="number">0</span>;</span><br><span class="line"><span class="comment">/* 当dev和drv匹配时调用，根据dev具体的硬件参数，来完成设备文件初始化等操作 */</span></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">chip_demo_gpio_probe</span><span class="params">(<span class="keyword">struct</span> platform_device *pdev)</span> </span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">resource</span> *<span class="title">res</span>;</span></span><br><span class="line">    <span class="type">int</span> i = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (<span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        res = platform_get_resource(pdev, IORESOURCE_IRQ, i++);</span><br><span class="line">        <span class="keyword">if</span> (!res)   <span class="keyword">break</span>;</span><br><span class="line">        </span><br><span class="line">        g_ledpins[g_ledcnt] = res-&gt;start;</span><br><span class="line">        led_class_create_device(g_ledcnt);  <span class="comment">// 调用通用驱动层的函数，完成设备文件创建</span></span><br><span class="line">        g_ledcnt++;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 当dev和drv解除匹配时调用 */</span></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">chip_demo_gpio_remove</span><span class="params">(<span class="keyword">struct</span> platform_device *pdev)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">resource</span> *<span class="title">res</span>;</span></span><br><span class="line">    <span class="type">int</span> i = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> (<span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        res = platform_get_resource(pdev, IORESOURCE_IRQ, i);</span><br><span class="line">        <span class="keyword">if</span> (!res) <span class="keyword">break</span>;</span><br><span class="line">        </span><br><span class="line">        led_class_destroy_device(i);</span><br><span class="line">        i++;</span><br><span class="line">        g_ledcnt--;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">platform_driver</span> <span class="title">chip_demo_gpio_driver</span> =</span> &#123;</span><br><span class="line">    .probe      = chip_demo_gpio_probe,</span><br><span class="line">    .remove     = chip_demo_gpio_remove,</span><br><span class="line">    .driver     = &#123;</span><br><span class="line">        .name   = <span class="string">&quot;100ask_led&quot;</span>,</span><br><span class="line">    &#125;,</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 在模块安装时调用 */</span></span><br><span class="line"><span class="type">static</span> <span class="type">int</span> __init <span class="title function_">chip_demo_gpio_drv_init</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">int</span> err;</span><br><span class="line">    </span><br><span class="line">    err = platform_driver_register(&amp;chip_demo_gpio_driver); </span><br><span class="line">    register_led_operations(&amp;board_demo_led_opr);</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/* 在模块卸载时调用 */</span></span><br><span class="line"><span class="type">static</span> <span class="type">void</span> __exit <span class="title function_">lchip_demo_gpio_drv_exit</span><span class="params">(<span class="type">void</span>)</span></span><br><span class="line">&#123;</span><br><span class="line">    platform_driver_unregister(&amp;chip_demo_gpio_driver);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">module_init(chip_demo_gpio_drv_init);</span><br><span class="line">module_exit(lchip_demo_gpio_drv_exit);</span><br><span class="line">MODULE_LICENSE(<span class="string">&quot;GPL&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="2-2-3-通用驱动层"><a href="#2-2-3-通用驱动层" class="headerlink" title="2.2.3 通用驱动层"></a>2.2.3 通用驱动层</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> major = <span class="number">0</span>;</span><br><span class="line"><span class="type">static</span> <span class="class"><span class="keyword">struct</span> <span class="keyword">class</span> *<span class="title">led_class</span>;</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">led_operations</span> *<span class="title">p_led_opr</span>;</span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> <span class="title function_">led_class_create_device</span><span class="params">(<span class="type">int</span> minor)</span></span><br><span class="line">&#123;</span><br><span class="line">	device_create(led_class, <span class="literal">NULL</span>, MKDEV(major, minor), <span class="literal">NULL</span>, <span class="string">&quot;100ask_led%d&quot;</span>, minor); <span class="comment">/* /dev/100ask_led0,1,... */</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="type">void</span> <span class="title function_">led_class_destroy_device</span><span class="params">(<span class="type">int</span> minor)</span></span><br><span class="line">&#123;</span><br><span class="line">	device_destroy(led_class, MKDEV(major, minor));</span><br><span class="line">&#125;</span><br><span class="line"><span class="type">void</span> <span class="title function_">register_led_operations</span><span class="params">(<span class="keyword">struct</span> led_operations *opr)</span></span><br><span class="line">&#123;</span><br><span class="line">	p_led_opr = opr;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">EXPORT_SYMBOL(led_class_create_device);</span><br><span class="line">EXPORT_SYMBOL(led_class_destroy_device);</span><br><span class="line">EXPORT_SYMBOL(register_led_operations);</span><br><span class="line"></span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p>通用驱动层的代码和之前几乎一样，只不过设备文件的创建因为和硬件资源的分配有关，所以放到了芯片层完成。</p>
+<p><code>EXPORT_SYMBOL()</code>：EXPORT_SYMBOL标签内定义的函数或者符号对全部内核代码公开，使用EXPORT_SYMBOL可以<strong>将一个函数以符号的方式导出给其他模块使用</strong>。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/" rel="tag"># 嵌入式</a>
+              <a href="/tags/Linux/" rel="tag"># Linux</a>
+              <a href="/tags/C-C/" rel="tag"># C/C++</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/11/10/%E7%AE%97%E6%B3%95%E5%92%8C%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E6%A8%A1%E6%9D%BF/" rel="prev" title="数据结构模板">
+      <i class="fa fa-chevron-left"></i> 数据结构模板
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2024/01/02/%E9%9F%A6%E4%B8%9C%E5%B1%B1%E5%B5%8C%E5%85%A5%E5%BC%8FLinux%E9%A9%B1%E5%8A%A8%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/%E4%BD%BF%E7%94%A8%E8%AE%BE%E5%A4%87%E6%A0%91%E7%9A%84LED%E9%A9%B1%E5%8A%A8%E6%A1%86%E6%9E%B6/" rel="next" title="使用设备树的LED驱动框架">
+      使用设备树的LED驱动框架 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-LED%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F%E6%A1%86%E6%9E%B6%E8%AE%BE%E8%AE%A1-%E5%88%86%E7%A6%BB"><span class="nav-text">1.LED驱动程序框架设计-分离</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E5%BC%80%E5%8F%91%E6%9D%BF%E5%B1%82"><span class="nav-text">1.1 开发板层</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-%E8%8A%AF%E7%89%87%E5%B1%82"><span class="nav-text">1.2 芯片层</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-%E9%80%9A%E7%94%A8LED%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F"><span class="nav-text">1.3 通用LED驱动程序</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-4-%E6%B5%8B%E8%AF%95%E7%A8%8B%E5%BA%8F"><span class="nav-text">1.4 测试程序</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E6%80%BB%E7%BA%BF%E8%AE%BE%E5%A4%87%E9%A9%B1%E5%8A%A8%E6%A8%A1%E5%9E%8B"><span class="nav-text">2. 总线设备驱动模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E7%90%86%E8%A7%A3Bus-Dev-Drv%E6%A8%A1%E5%9E%8B"><span class="nav-text">2.1 理解Bus&#x2F;Dev&#x2F;Drv模型</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-1-Dev%E5%92%8CDrv%E7%9A%84%E5%8C%B9%E9%85%8D"><span class="nav-text">2.1.1 Dev和Drv的匹配</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-%E5%8C%B9%E9%85%8D%E4%BC%98%E5%85%88%E7%BA%A7%EF%BC%88%E5%A4%A7%E6%A6%82%E4%BA%86%E8%A7%A3%EF%BC%8C%E5%90%8E%E9%9D%A2%E8%AF%A6%E7%BB%86%E8%AE%B2%EF%BC%89"><span class="nav-text">(1) 匹配优先级（大概了解，后面详细讲）</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8%E5%85%B3%E7%B3%BB"><span class="nav-text">(2) 函数调用关系</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-2-%E5%B8%B8%E7%94%A8%E5%87%BD%E6%95%B0"><span class="nav-text">2.1.2 常用函数</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E7%BC%96%E5%86%99%E4%BB%A3%E7%A0%81"><span class="nav-text">2.2 编写代码</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-1-%E5%BC%80%E5%8F%91%E6%9D%BF%E5%B1%82"><span class="nav-text">2.2.1 开发板层</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-2-%E8%8A%AF%E7%89%87%E5%B1%82"><span class="nav-text">2.2.2 芯片层</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-3-%E9%80%9A%E7%94%A8%E9%A9%B1%E5%8A%A8%E5%B1%82"><span class="nav-text">2.2.3 通用驱动层</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Krocz"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">Krocz</p>
+  <div class="site-description" itemprop="description">时间不等人，喜欢就去做</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">29</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/krocz" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;krocz" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1668154689@qq.com" title="E-Mail → mailto:1668154689@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+         
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Krocz</span>
+</div>
+
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动 -->
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

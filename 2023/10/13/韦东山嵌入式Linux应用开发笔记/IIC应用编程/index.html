@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":true,"show_result":true,"style":"mac"},"back2top":{"enable":true,"sidebar":false,"scrollpercent":true},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="1. I2C协议  起始信号 停止信号 传输1Bit数据时的信号 应答信号（0：应答，1：非应答）  1.1 I2C写操作">
+<meta property="og:type" content="article">
+<meta property="og:title" content="I2C应用编程">
+<meta property="og:url" content="http://example.com/2023/10/13/%E9%9F%A6%E4%B8%9C%E5%B1%B1%E5%B5%8C%E5%85%A5%E5%BC%8FLinux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/index.html">
+<meta property="og:site_name" content="Krocz&#39;s Blog">
+<meta property="og:description" content="1. I2C协议  起始信号 停止信号 传输1Bit数据时的信号 应答信号（0：应答，1：非应答）  1.1 I2C写操作">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231013195434388.png">
+<meta property="og:image" content="http://example.com/images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231013200107130.png">
+<meta property="og:image" content="http://example.com/images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231013200321711.png">
+<meta property="og:image" content="http://example.com/images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231013200615311.png">
+<meta property="og:image" content="http://example.com/images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231013205135864.png">
+<meta property="og:image" content="http://example.com/images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231013205740269.png">
+<meta property="og:image" content="http://example.com/images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231013210229543.png">
+<meta property="og:image" content="http://example.com/images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231013210406105.png">
+<meta property="og:image" content="http://example.com/images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231013210539307.png">
+<meta property="og:image" content="http://example.com/images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231013210747692.png">
+<meta property="og:image" content="http://example.com/images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231013210922202.png">
+<meta property="og:image" content="http://example.com/images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231013211028442.png">
+<meta property="og:image" content="http://example.com/images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231013211214615.png">
+<meta property="og:image" content="http://example.com/images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231013211836310.png">
+<meta property="og:image" content="http://example.com/images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231013211357246.png">
+<meta property="og:image" content="http://example.com/images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231013211534690.png">
+<meta property="og:image" content="http://example.com/images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231013212003873.png">
+<meta property="og:image" content="http://example.com/images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231013212158627.png">
+<meta property="og:image" content="http://example.com/images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231013201531293.png">
+<meta property="og:image" content="http://example.com/images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231017195937671.png">
+<meta property="og:image" content="http://example.com/images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231023194336992.png">
+<meta property="og:image" content="http://example.com/images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231023200031632.png">
+<meta property="og:image" content="http://example.com/images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231023200102753.png">
+<meta property="og:image" content="http://example.com/images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231023194745114.png">
+<meta property="og:image" content="http://example.com/images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231023200937458.png">
+<meta property="article:published_time" content="2023-10-13T11:17:33.000Z">
+<meta property="article:modified_time" content="2024-04-26T09:39:14.955Z">
+<meta property="article:author" content="Krocz">
+<meta property="article:tag" content="嵌入式">
+<meta property="article:tag" content="Linux">
+<meta property="article:tag" content="C&#x2F;C++">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231013195434388.png">
+
+<link rel="canonical" href="http://example.com/2023/10/13/%E9%9F%A6%E4%B8%9C%E5%B1%B1%E5%B5%8C%E5%85%A5%E5%BC%8FLinux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>I2C应用编程 | Krocz's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+  <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
+  <script src="/live2d-widget/autoload.js"></script>
+ <link rel="alternate" href="/atom.xml" title="Krocz's Blog" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+
+   <canvas class="fireworks" style="position: fixed;left: 0;top: 0;z-index: 1; pointer-events: none;" ></canvas> 
+   <script type="text/javascript" src="//cdn.bootcss.com/animejs/2.2.0/anime.min.js"></script> 
+   <script type="text/javascript" src="/js/cursor/fireworks.js"></script>
+
+
+
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Krocz's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">望云登坡</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-首页">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-归档">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-标签">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-分类">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/10/13/%E9%9F%A6%E4%B8%9C%E5%B1%B1%E5%B5%8C%E5%85%A5%E5%BC%8FLinux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="Krocz">
+      <meta itemprop="description" content="时间不等人，喜欢就去做">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Krocz's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          I2C应用编程
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-10-13 19:17:33" itemprop="dateCreated datePublished" datetime="2023-10-13T19:17:33+08:00">2023-10-13</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-04-26 17:39:14" itemprop="dateModified" datetime="2024-04-26T17:39:14+08:00">2024-04-26</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E9%9F%A6%E4%B8%9C%E5%B1%B1Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">韦东山Linux应用开发笔记</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>11k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>21 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="1-I2C协议"><a href="#1-I2C协议" class="headerlink" title="1. I2C协议"></a>1. I2C协议</h2><p><img src="/../../images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231013195434388.png" alt="image-20231013195434388"></p>
+<ul>
+<li>起始信号</li>
+<li>停止信号</li>
+<li>传输1Bit数据时的信号</li>
+<li>应答信号（<strong>0：应答，1：非应答</strong>）</li>
+</ul>
+<h3 id="1-1-I2C写操作"><a href="#1-1-I2C写操作" class="headerlink" title="1.1 I2C写操作"></a>1.1 I2C写操作</h3><p><img src="/../../images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231013200107130.png" alt="image-20231013200107130"></p>
+<p>（白色背景：主→从；灰色背景：从→主）</p>
+<h3 id="1-2-I2C读操作"><a href="#1-2-I2C读操作" class="headerlink" title="1.2 I2C读操作"></a>1.2 I2C读操作</h3><p><img src="/../../images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231013200321711.png" alt="image-20231013200321711"></p>
+<h3 id="1-3-I2C引脚的硬件设计"><a href="#1-3-I2C引脚的硬件设计" class="headerlink" title="1.3 I2C引脚的硬件设计"></a>1.3 I2C引脚的硬件设计</h3><p><img src="/../../images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231013200615311.png" alt="image-20231013200615311"></p>
+<p>真值表：</p>
+<table>
+<thead>
+<tr>
+<th>A</th>
+<th>B</th>
+<th>SDA</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0</td>
+<td>0</td>
+<td>1</td>
+</tr>
+<tr>
+<td>0</td>
+<td>1</td>
+<td>0</td>
+</tr>
+<tr>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr>
+<td>1</td>
+<td>1</td>
+<td>0</td>
+</tr>
+</tbody></table>
+<ul>
+<li><p>使用开漏电路，可以防止设备引脚存在电压差时短路的出现</p>
+</li>
+<li><p>使用上拉电路，可以在设备都没有拉低信号时，保证引线不浮空</p>
+</li>
+<li><p>SCL采用同样的设计，是因为SCL不仅仅由主设备进行控制，在少数情况下也可能由从设备进行控制，<strong>如从设备需要主设备等待自己时，可能会选择将SCL拉低</strong>。</p>
+</li>
+</ul>
+<h2 id="2-SMBus协议-System-Management-Bus"><a href="#2-SMBus协议-System-Management-Bus" class="headerlink" title="2.SMBus协议(System Management Bus)"></a>2.SMBus协议(System Management Bus)</h2><p>SMBus 最初的目的是为智能电池、充电电池、其他微控制器之间的通信链路而定义的。 SMBus 也被用来连接各种设备，包括电源相关设备，系统传感器，EEPROM 通讯设备等。<strong>SMBus 是基于 I2C 协议的，SMBus 要求更严格，SMBus 是 I2C 协议的子集。</strong></p>
+<h3 id="2-1-与I2C的区别"><a href="#2-1-与I2C的区别" class="headerlink" title="2.1 与I2C的区别"></a>2.1 与I2C的区别</h3><ul>
+<li><p>VDD 的极限值不一样 </p>
+<ul>
+<li>I2C 协议：范围很广，甚至讨论了高达 12V 的情况 </li>
+<li>SMBus：1.8V~5V</li>
+</ul>
+</li>
+<li><p>最小时钟频率、最大的 Clock Stretching </p>
+<ul>
+<li><strong>Clock Stretching</strong>：某个设备需要更多时间进行内部的处理时，它可以把 SCL 拉低占住 I2C 总线</li>
+<li>I2C ：时钟频率最小值无限制，Clock Stretching 时长也没有限制 </li>
+<li>SMBus ：时钟频率最小值是 10KHz，Clock Stretching 的最大时间值也有限制</li>
+</ul>
+</li>
+<li><p>地址回应(Address Acknowledge)：一个 I2C 设备接收到它的设备地址后， 是否必须发出回应信号？ </p>
+<ul>
+<li>I2C：没有强制要求必须发出回应信号 </li>
+<li>SMBus：强制要求必须发出回应信号，这样对方才知道该设备的状态： busy，failed，或是被移除了</li>
+</ul>
+</li>
+<li><p>SMBus 协议明确了数据的传输格式 </p>
+<ul>
+<li>I2C ：它只定义了怎么传输数据，但是并没有定义数据的格式，这完全由设备来定义 </li>
+<li>SMBus：定义了几种数据格式</li>
+</ul>
+</li>
+<li><p>REPEATED START Condition(重复发出 S 信号)</p>
+<ul>
+<li>在连续的写&#x2F;读之间，可以不发出 P 信号，而是直接发出 S 信号：这个 S 信号就是 REPEATED START</li>
+</ul>
+<p><img src="/../../images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231013205135864.png" alt="image-20231013205135864"></p>
+</li>
+<li><p>SMBus Low Power Version：SMBus 也有低功耗的版本</p>
+</li>
+</ul>
+<h3 id="2-2-SMBus-协议分析"><a href="#2-2-SMBus-协议分析" class="headerlink" title="2.2 SMBus 协议分析"></a>2.2 SMBus 协议分析</h3><p><code>Functionality flag</code> 是 Linux 的某个 I2C 控制器驱动所支持的功能。比如 <code>Functionality flag: I2C_FUNC_SMBUS_QUICK</code>，表示需要 I2C 控制器支持 SMBus Quick Command。</p>
+<h4 id="1-SMBus-Quick-Command"><a href="#1-SMBus-Quick-Command" class="headerlink" title="(1) SMBus Quick Command"></a>(1) SMBus Quick Command</h4><p><img src="/../../images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231013205740269.png" alt="image-20231013205740269"></p>
+<p>只是用来发送一位数据：R&#x2F;W#本意是用来表示读或写，但是在 SMBus 里可以用来表示其他含义；比如某些开关设备，可以根据这一位来决定是打开还是关闭。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Functionality flag: I2C_FUNC_SMBUS_QUICK</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-SMBus-Receive-Byte"><a href="#2-SMBus-Receive-Byte" class="headerlink" title="(2) SMBus Receive Byte"></a>(2) SMBus Receive Byte</h4><p><img src="/../../images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231013210229543.png" alt="image-20231013210229543"></p>
+<p>和I2C读取字节相同，对应I2C-tools 中的函数：<code>i2c_smbus_read_byte()</code>。读取一个字节，Host adapter 接收到一个字节后不需要发出回应信号。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Functionality flag: I2C_FUNC_SMBUS_READ_BYTE</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-SMBus-Send-Byte"><a href="#3-SMBus-Send-Byte" class="headerlink" title="(3) SMBus Send Byte"></a>(3) SMBus Send Byte</h4><p><img src="/../../images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231013210406105.png" alt="image-20231013210406105"></p>
+<p>和I2C写字节相同，对应I2C-tools 中的函数：<code>i2c_smbus_write_byte()</code>。发送一个字节。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Functionality flag: I2C_FUNC_SMBUS_WRITE_BYTE</span><br></pre></td></tr></table></figure>
+
+<h4 id="4-SMBus-Read-Byte"><a href="#4-SMBus-Read-Byte" class="headerlink" title="(4) SMBus Read Byte"></a>(4) SMBus Read Byte</h4><p><img src="/../../images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231013210539307.png" alt="image-20231013210539307"></p>
+<p>I2C-tools 中的函数：<code>i2c_smbus_read_byte_data()</code>。先发出 Command Code(它一般表示芯片内部的寄存器地址)，再读取一个字节的数据。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Functionality flag: I2C_FUNC_SMBUS_READ_BYTE_DATA</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="5-SMBus-Read-Word"><a href="#5-SMBus-Read-Word" class="headerlink" title="(5) SMBus Read Word"></a>(5) SMBus Read Word</h4><p><img src="/../../images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231013210747692.png" alt="image-20231013210747692"></p>
+<p>I2C-tools 中的函数：<code>i2c_smbus_read_word_data()</code>。先发出 Command Code(它一般表示芯片内部的寄存器地址)，再读取 2 个字节的数据</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Functionality flag: I2C_FUNC_SMBUS_READ_WORD_DATA</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="6-SMBus-Write-Byte"><a href="#6-SMBus-Write-Byte" class="headerlink" title="(6) SMBus Write Byte"></a>(6) SMBus Write Byte</h4><p><img src="/../../images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231013210922202.png" alt="image-20231013210922202"></p>
+<p>I2C-tools 中的函数：<code>i2c_smbus_write_byte_data()</code>。先发出 Command Code(它一般表示芯片内部的寄存器地址)，再发出 1 个字节的数据</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Functionality flag: I2C_FUNC_SMBUS_WRITE_BYTE_DATA</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="7-SMBus-Write-Word"><a href="#7-SMBus-Write-Word" class="headerlink" title="(7) SMBus Write Word"></a>(7) SMBus Write Word</h4><p><img src="/../../images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231013211028442.png" alt="image-20231013211028442"></p>
+<p>I2C-tools 中的函数：<code>i2c_smbus_write_word_data()</code>。先发出 Command Code(它一般表示芯片内部的寄存器地址)，再发出 2 个字节的数据。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Functionality flag: I2C_FUNC_SMBUS_WRITE_WORD_DATA</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="8-SMBus-Block-Read"><a href="#8-SMBus-Block-Read" class="headerlink" title="(8) SMBus Block Read"></a>(8) SMBus Block Read</h4><p><img src="/../../images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231013211214615.png" alt="image-20231013211214615"></p>
+<p>I2C-tools 中的函数：<code>i2c_smbus_read_block_data()</code>。先发出 Command Code(它一般表示芯片内部的寄存器地址)，再发起度操作：</p>
+<ul>
+<li>先读到一个字节(Block Count)，表示后续要读的字节数 </li>
+<li>然后读取全部数据</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Functionality flag: I2C_FUNC_SMBUS_READ_BLOCK_DATA</span><br></pre></td></tr></table></figure>
+
+<h5 id="PS：I2C-Block-Read"><a href="#PS：I2C-Block-Read" class="headerlink" title="PS：I2C Block Read"></a>PS：I2C Block Read</h5><p>在一般的 I2C 协议中，也可以连续读出多个字节。它跟 SMBus Block Read 的差别在于从设备发出的第 1 个数据不是长度 N，如下图所示：</p>
+<p><img src="/../../images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231013211836310.png" alt="image-20231013211836310"></p>
+<p>I2C-tools 中的函数：<code>i2c_smbus_read_i2c_block_data()</code>。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Functionality flag: I2C_FUNC_SMBUS_READ_I2C_BLOCK</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h4 id="9-SMBus-Block-Write"><a href="#9-SMBus-Block-Write" class="headerlink" title="(9) SMBus Block Write"></a>(9) SMBus Block Write</h4><p><img src="/../../images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231013211357246.png" alt="image-20231013211357246"></p>
+<p>I2C-tools 中的函数：<code>i2c_smbus_write_block_data()</code>。先发出 Command Code(它一般表示芯片内部的寄存器地址)，再发出 1 个字节的 Byte Conut(表示后续要发出的数据字节数)，最后发出全部数据。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Functionality flag: I2C_FUNC_SMBUS_WRITE_BLOCK_DATA</span><br></pre></td></tr></table></figure>
+
+<h5 id="PS：I2C-Block-Write"><a href="#PS：I2C-Block-Write" class="headerlink" title="PS：I2C Block Write"></a>PS：I2C Block Write</h5><p>在一般的 I2C 协议中，也可以连续发出多个字节。它跟 SMBus Block Write 的差别在于发出的第 1 个数据不是长度 N，如下图所示：</p>
+<p><img src="/../../images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231013211534690.png" alt="image-20231013211534690"></p>
+<p>I2C-tools 中的函数：<code>i2c_smbus_write_i2c_block_data()</code>。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Functionality flag: I2C_FUNC_SMBUS_WRITE_I2C_BLOCK</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h4 id="10-SMBus-Block-Write-Block-Read-Process-Call"><a href="#10-SMBus-Block-Write-Block-Read-Process-Call" class="headerlink" title="(10) SMBus Block Write - Block Read Process Call"></a>(10) SMBus Block Write - Block Read Process Call</h4><p><img src="/../../images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231013212003873.png" alt="image-20231013212003873"></p>
+<p>先写一块数据，再读一块数据。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Functionality flag: I2C_FUNC_SMBUS_BLOCK_PROC_CALL</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="11-Packet-Error-Checking-PEC"><a href="#11-Packet-Error-Checking-PEC" class="headerlink" title="(11) Packet Error Checking (PEC)"></a>(11) Packet Error Checking (PEC)</h4><p>PEC 是一种错误校验码，如果使用 PEC，那么在 P 信号之前，数据发送方要发送一个字节的 PEC 码(<strong>它是 CRC-8 码</strong>)。以 SMBus Send Byte 为例，下图中， 一个未使用 PEC，另一个使用 PEC：</p>
+<p><img src="/../../images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231013212158627.png" alt="image-20231013212158627"></p>
+<h4 id="PS："><a href="#PS：" class="headerlink" title="PS："></a>PS：</h4><p>因为很多设备都实现了 SMBus，而不是更宽泛的 I2C 协议，所以优先使用 SMBus。即使 I2C 控制器没有实现 SMBus，软件方面也是可以使用 I2C 协议来 模拟 SMBus。所以：<strong>Linux 建议优先使用 SMBus</strong>。</p>
+<h2 id="3-Linux系统中I2C的软件框架"><a href="#3-Linux系统中I2C的软件框架" class="headerlink" title="3.Linux系统中I2C的软件框架"></a>3.Linux系统中I2C的软件框架</h2><p><img src="/../../images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231013201531293.png" alt="image-20231013201531293"></p>
+<ul>
+<li><p>怎么理解I2C Device Driver和I2C Controller Driver</p>
+<ul>
+<li>I2C Device Driver用于针对每一种I2C设备编写相应的数据收发格式</li>
+<li>I2C Controller Driver用于通用的产生I2C协议的各类信号</li>
+</ul>
+</li>
+<li><p>APP 可以通过两类驱动程序访问设备</p>
+<ul>
+<li>I2C 设备自己的驱动程序 </li>
+<li>内核自带的 i2c-dev.c 驱动程序，它是 i2c 控制器驱动程序暴露给用户空间的驱动程序(i2c-dev.c)</li>
+</ul>
+</li>
+<li><p>I2C Device Driver</p>
+<ul>
+<li>I2C 设备自己的驱动程序 </li>
+<li>内核自带的 i2c-dev.c 驱动程序，它是 i2c 控制器驱动程序暴露给用户空间的驱动程序(i2c-dev.c)</li>
+</ul>
+</li>
+<li><p>I2C Controller Driver </p>
+<ul>
+<li>芯片 I2C 控制器的驱动程序(称为 adapter) </li>
+<li>使用 GPIO 模拟的 I2C 控制器驱动程序(i2c-gpio.c)</li>
+</ul>
+</li>
+</ul>
+<h2 id="4-I2C应用编程"><a href="#4-I2C应用编程" class="headerlink" title="4. I2C应用编程"></a>4. I2C应用编程</h2><h3 id="4-1-重要结构体"><a href="#4-1-重要结构体" class="headerlink" title="4.1 重要结构体"></a>4.1 重要结构体</h3><p><img src="/../../images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231017195937671.png" alt="image-20231017195937671"></p>
+<p>参考I2C硬件结构体，每一个I2C Controller使用<code>i2c_adapter</code>来表示：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">i2c_adapter</span> &#123;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">module</span> *<span class="title">owner</span>;</span></span><br><span class="line">	<span class="type">unsigned</span> <span class="type">int</span> <span class="class"><span class="keyword">class</span>;</span>		  <span class="comment">/* classes to allow probing for */</span></span><br><span class="line">	<span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">i2c_algorithm</span> *<span class="title">algo</span>;</span> <span class="comment">/* the algorithm to access the bus */</span></span><br><span class="line">	<span class="type">void</span> *algo_data;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* data fields that are valid for all devices	*/</span></span><br><span class="line">	<span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">i2c_lock_operations</span> *<span class="title">lock_ops</span>;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">rt_mutex</span> <span class="title">bus_lock</span>;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">rt_mutex</span> <span class="title">mux_lock</span>;</span></span><br><span class="line"></span><br><span class="line">	<span class="type">int</span> timeout;			<span class="comment">/* in jiffies */</span></span><br><span class="line">	<span class="type">int</span> retries;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">device</span> <span class="title">dev</span>;</span>		<span class="comment">/* the adapter device */</span></span><br><span class="line"></span><br><span class="line">	<span class="type">int</span> nr;</span><br><span class="line">	<span class="type">char</span> name[<span class="number">48</span>];</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">completion</span> <span class="title">dev_released</span>;</span></span><br><span class="line"></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">mutex</span> <span class="title">userspace_clients_lock</span>;</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">userspace_clients</span>;</span></span><br><span class="line"></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">i2c_bus_recovery_info</span> *<span class="title">bus_recovery_info</span>;</span></span><br><span class="line">	<span class="type">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">i2c_adapter_quirks</span> *<span class="title">quirks</span>;</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>其中重要的成员：</p>
+<ul>
+<li><code>algo</code>：指定控制器传输数据使用的函数，用来收发I2C数据</li>
+<li><code>nr</code>：第几个I2C Controller</li>
+</ul>
+<p><code>i2c_algorithm</code>结构体原型：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">i2c_algorithm</span> &#123;</span></span><br><span class="line">	<span class="comment">/* If an adapter algorithm can&#x27;t do I2C-level access, set master_xfer</span></span><br><span class="line"><span class="comment">	   to NULL. If an adapter algorithm can do SMBus access, set</span></span><br><span class="line"><span class="comment">	   smbus_xfer. If set to NULL, the SMBus protocol is simulated</span></span><br><span class="line"><span class="comment">	   using common I2C messages */</span></span><br><span class="line">	<span class="comment">/* master_xfer should return the number of messages successfully</span></span><br><span class="line"><span class="comment">	   processed, or a negative value on error */</span></span><br><span class="line">	<span class="type">int</span> (*master_xfer)(<span class="keyword">struct</span> i2c_adapter *adap, <span class="keyword">struct</span> i2c_msg *msgs,</span><br><span class="line">			   <span class="type">int</span> num);</span><br><span class="line">	<span class="type">int</span> (*smbus_xfer) (<span class="keyword">struct</span> i2c_adapter *adap, u16 addr,</span><br><span class="line">			   <span class="type">unsigned</span> <span class="type">short</span> flags, <span class="type">char</span> read_write,</span><br><span class="line">			   u8 command, <span class="type">int</span> size, <span class="keyword">union</span> i2c_smbus_data *data);</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* To determine what the adapter supports */</span></span><br><span class="line">	u32 (*functionality) (<span class="keyword">struct</span> i2c_adapter *);</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">if</span> IS_ENABLED(CONFIG_I2C_SLAVE)</span></span><br><span class="line">	<span class="type">int</span> (*reg_slave)(<span class="keyword">struct</span> i2c_client *client);</span><br><span class="line">	<span class="type">int</span> (*unreg_slave)(<span class="keyword">struct</span> i2c_client *client);</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>从结构体<code>i2c_algorithm</code>中发现和I2C从设备相关的结构体<code>i2c_client</code>:</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*flags for the client struct: */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> I2C_CLIENT_PEC		0x04	<span class="comment">/* Use Packet Error Checking */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> I2C_CLIENT_TEN		0x10	<span class="comment">/* we have a ten bit chip address */</span></span></span><br><span class="line">					<span class="comment">/* Must equal I2C_M_TEN below */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> I2C_CLIENT_SLAVE	0x20	<span class="comment">/* we are the slave */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> I2C_CLIENT_WAKE		0x80	<span class="comment">/* for board_info; true iff can wake */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> I2C_CLIENT_SCCB		0x9000	<span class="comment">/* Use Omnivision SCCB protocol */</span></span></span><br><span class="line">					<span class="comment">/* Must match I2C_M_STOP|IGNORE_NAK */</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">i2c_client</span> &#123;</span></span><br><span class="line">	<span class="type">unsigned</span> <span class="type">short</span> flags;		<span class="comment">/* div., see below		*/</span></span><br><span class="line">	<span class="type">unsigned</span> <span class="type">short</span> addr;		<span class="comment">/* chip address - <span class="doctag">NOTE:</span> 7bit	*/</span></span><br><span class="line">					<span class="comment">/* addresses are stored in the	*/</span></span><br><span class="line">					<span class="comment">/* _LOWER_ 7 bits		*/</span></span><br><span class="line">	<span class="type">char</span> name[I2C_NAME_SIZE];</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">i2c_adapter</span> *<span class="title">adapter</span>;</span>	<span class="comment">/* the adapter we sit on	*/</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">device</span> <span class="title">dev</span>;</span>		<span class="comment">/* the device structure		*/</span></span><br><span class="line">	<span class="type">int</span> irq;			<span class="comment">/* irq issued by device		*/</span></span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">list_head</span> <span class="title">detected</span>;</span></span><br><span class="line"><span class="meta">#<span class="keyword">if</span> IS_ENABLED(CONFIG_I2C_SLAVE)</span></span><br><span class="line">	<span class="type">i2c_slave_cb_t</span> slave_cb;	<span class="comment">/* callback for slave mode	*/</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>在该结构体中最重要的成员：</p>
+<ul>
+<li><code>addr</code>：表示该I2C设备的设备地址</li>
+<li><code>adapter</code>：表示该I2C设备挂载在哪个I2C Controller下</li>
+</ul>
+<p>结构体<code>i2c_msg</code>封装了需要传输的数据：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">i2c_msg</span> &#123;</span></span><br><span class="line">	__u16 addr;	<span class="comment">/* slave address			*/</span></span><br><span class="line">	__u16 flags;        <span class="comment">/* 表示读或写 */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> I2C_M_RD		0x0001	<span class="comment">/* read data, from slave to master */</span></span></span><br><span class="line">					<span class="comment">/* I2C_M_RD is guaranteed to be 0x0001! */</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> I2C_M_TEN		0x0010	<span class="comment">/* this is a ten bit chip address */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> I2C_M_RECV_LEN		0x0400	<span class="comment">/* length will be first received byte */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> I2C_M_NO_RD_ACK		0x0800	<span class="comment">/* if I2C_FUNC_PROTOCOL_MANGLING */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> I2C_M_IGNORE_NAK	0x1000	<span class="comment">/* if I2C_FUNC_PROTOCOL_MANGLING */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> I2C_M_REV_DIR_ADDR	0x2000	<span class="comment">/* if I2C_FUNC_PROTOCOL_MANGLING */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> I2C_M_NOSTART		0x4000	<span class="comment">/* if I2C_FUNC_NOSTART */</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> I2C_M_STOP		0x8000	<span class="comment">/* if I2C_FUNC_PROTOCOL_MANGLING */</span></span></span><br><span class="line">	__u16 len;		<span class="comment">/* msg length				*/</span></span><br><span class="line">	__u8 *buf;		<span class="comment">/* pointer to msg data			*/</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>flags</code>：该字段为0表示写，为<code>I2C_M_RD</code>表示读</li>
+</ul>
+<h3 id="4-2-使用I2C-Tools访问I2C设备"><a href="#4-2-使用I2C-Tools访问I2C设备" class="headerlink" title="4.2 使用I2C-Tools访问I2C设备"></a>4.2 使用I2C-Tools访问I2C设备</h3><p><img src="/../../images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231023194336992.png" alt="image-20231023194336992"></p>
+<h4 id="4-2-1-体验I2C-Tools可执行程序"><a href="#4-2-1-体验I2C-Tools可执行程序" class="headerlink" title="4.2.1 体验I2C-Tools可执行程序"></a>4.2.1 体验I2C-Tools可执行程序</h4><h5 id="1-i2cdectect-列出设备上I2C设备的信息"><a href="#1-i2cdectect-列出设备上I2C设备的信息" class="headerlink" title="(1) i2cdectect-列出设备上I2C设备的信息"></a>(1) i2cdectect-列出设备上I2C设备的信息</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">// 列出当前的 I2C Adapter(或称为 I2C Bus、I2C Controller) </span><br><span class="line">i2cdetect -l </span><br><span class="line"></span><br><span class="line">// 打印某个 I2C Adapter 的 Functionalities, I2CBUS 为 0、1、2 等整数 </span><br><span class="line">i2cdetect -F I2CBUS </span><br><span class="line"></span><br><span class="line">// 看看有哪些 I2C 设备, I2CBUS 为 0、1、2 等整数 </span><br><span class="line">// --表示没有该地址对应的设备,UU表示有该设备并且它已经有驱动程序,数值表示有该设备但是没有对应的设备驱动</span><br><span class="line">i2cdetect -y -a I2CBUS </span><br></pre></td></tr></table></figure>
+
+
+
+<h5 id="2-i2cget-读数据"><a href="#2-i2cget-读数据" class="headerlink" title="(2) i2cget-读数据"></a>(2) i2cget-读数据</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">// 读一个字节: I2CBUS 为 0、1、2 等整数, 表示 I2C Bus; CHIP-ADDRESS 表示设备地址 </span><br><span class="line">i2cget -f -y I2CBUS CHIP-ADDRESS </span><br><span class="line"></span><br><span class="line">// 读某个地址上的一个字节: </span><br><span class="line">// I2CBUS 为 0、1、2 等整数, 表示 I2C Bus </span><br><span class="line">// CHIP-ADDRESS 表示设备地址 </span><br><span class="line">// DATA-ADDRESS: 芯片上寄存器地址 </span><br><span class="line">// MODE：有 2 个取值:</span><br><span class="line">// b:使用`SMBus Read Byte`先发出 DATA-ADDRESS, 再读一个字节, 中间无 P 信号 </span><br><span class="line">// c:先 write byte, 在 read byte，中间有 P 信号 </span><br><span class="line">i2cget -f -y I2CBUS CHIP-ADDRESS DATA-ADDRESS MODE</span><br></pre></td></tr></table></figure>
+
+
+
+<h5 id="3-i2cset-写数据"><a href="#3-i2cset-写数据" class="headerlink" title="(3) i2cset-写数据"></a>(3) i2cset-写数据</h5><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">// 写一个字节: I2CBUS 为 0、1、2 等整数, 表示 I2C Bus; CHIP-ADDRESS 表示设备地址 </span><br><span class="line">// DATA-ADDRESS 就是要写的数据 </span><br><span class="line">i2cset -f -y I2CBUS CHIP-ADDRESS DATA-ADDRESS</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// 给 address 写 1 个字节或者 1 个字(address, value): </span><br><span class="line">// I2CBUS 为 0、1、2 等整数, 表示 I2C Bus; CHIP-ADDRESS 表示设备地址 </span><br><span class="line">// DATA-ADDRESS: 8 位芯片寄存器地址; </span><br><span class="line">// VALUE: 8 位数值 或者 16 位数据</span><br><span class="line">// MODE: b表示写字节，w表示写字</span><br><span class="line">i2cset -f -y I2CBUS CHIP-ADDRESS DATA-ADDRESS VALUE b or w</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// SMBus Block Write：给 address 写 N 个字节的数据 </span><br><span class="line">// 发送的数据有：address, N, value1, value2, ..., valueN </span><br><span class="line">// 跟`I2C Block Write`相比, 需要发送长度 N </span><br><span class="line">// I2CBUS 为 0、1、2 等整数, 表示 I2C Bus; CHIP-ADDRESS 表示设备地址 </span><br><span class="line">// DATA-ADDRESS: 8 位芯片寄存器地址; </span><br><span class="line">// VALUE1~N: N 个 8 位数值 </span><br><span class="line">// MODE: s </span><br><span class="line">i2cset -f -y I2CBUS CHIP-ADDRESS DATA-ADDRESS VALUE1 ... VALUEN s</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// I2C Block Write：给 address 写 N 个字节的数据 </span><br><span class="line">// 发送的数据有：address, value1, value2, ..., valueN </span><br><span class="line">// 跟`SMBus Block Write`相比, 不需要发送长度 N</span><br><span class="line">// I2CBUS 为 0、1、2 等整数, 表示 I2C Bus; CHIP-ADDRESS 表示设备地址 </span><br><span class="line">// DATA-ADDRESS: 8 位芯片寄存器地址; </span><br><span class="line">// VALUE1~N: N 个 8 位数值 </span><br><span class="line">// MODE: i </span><br><span class="line">i2cset -f -y I2CBUS CHIP-ADDRESS DATA-ADDRESS VALUE1 ... VALUEN i</span><br></pre></td></tr></table></figure>
+
+
+
+<h5 id="4-i2ctransfer-基于I2C协议传输数据"><a href="#4-i2ctransfer-基于I2C协议传输数据" class="headerlink" title="(4) i2ctransfer-基于I2C协议传输数据"></a>(4) i2ctransfer-基于I2C协议传输数据</h5><p>i2ctransfer命令的使用说明如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Usage: i2ctransfer [-f] [-y] [-v] [-V] [-a] I2CBUS DESC [DATA] [DESC [DATA]]...</span><br><span class="line">  I2CBUS is an integer or an I2C bus name</span><br><span class="line">  DESC describes the transfer in the form: &#123;r|w&#125;LENGTH[@address]</span><br><span class="line">    1) read/write-flag 2) LENGTH (range 0-65535, or &#x27;?&#x27;)</span><br><span class="line">    3) I2C address (use last one if omitted)</span><br><span class="line">  DATA are LENGTH bytes for a write message. They can be shortened by a suffix:</span><br><span class="line">    = (keep value constant until LENGTH)</span><br><span class="line">    + (increase value by 1 until LENGTH)</span><br><span class="line">    - (decrease value by 1 until LENGTH)</span><br><span class="line">    p (use pseudo random generator until LENGTH with value as seed)</span><br></pre></td></tr></table></figure>
+
+<p>使用例子：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">// Example (bus 0, read 8 byte at offset 0x64 from EEPROM at 0x50): </span><br><span class="line"># i2ctransfer -f -y 0 w1@0x50 0x64 r8 </span><br><span class="line"></span><br><span class="line"></span><br><span class="line">// Example (bus 0, write 3 byte at offset 0x64 from EEPROM at 0x50): </span><br><span class="line"># i2ctransfer -f -y 0 w9@0x50 0x64 val1 val2 val3 </span><br><span class="line"></span><br><span class="line"> </span><br><span class="line">// Example：first: (bus 0, write 3 byte at offset 0x64 from EEPROM at 0x50) </span><br><span class="line">// and then: (bus 0, read 3 byte at offset 0x64 from EEPROM at 0x50) </span><br><span class="line"># i2ctransfer -f -y 0 w9@0x50 0x64 val1 val2 val3 r3@0x50 </span><br><span class="line"># i2ctransfer -f -y 0 w9@0x50 0x64 val1 val2 val3 r3 //如果设备地址不变,后面的设备地址可 省略</span><br></pre></td></tr></table></figure>
+
+
+
+<h4 id="4-2-2-I2C-Tools访问I2C设备的2种方式"><a href="#4-2-2-I2C-Tools访问I2C设备的2种方式" class="headerlink" title="4.2.2 I2C-Tools访问I2C设备的2种方式"></a>4.2.2 I2C-Tools访问I2C设备的2种方式</h4><p>I2C-Tools可以通过SMBus来访问I2C设备，也可以使用一般的I2C协议来访问I2C设备。</p>
+<h5 id="1-使用I2C方式"><a href="#1-使用I2C方式" class="headerlink" title="(1) 使用I2C方式"></a>(1) 使用I2C方式</h5><p>示例代码：i2ctransfer.c</p>
+<p><img src="/../../images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231023200031632.png" alt="image-20231023200031632"></p>
+<h5 id="2-使用SMBus方式"><a href="#2-使用SMBus方式" class="headerlink" title="(2) 使用SMBus方式"></a>(2) 使用SMBus方式</h5><p>示例代码：i2cget.c、i2cset.c</p>
+<p><img src="/../../images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231023200102753.png" alt="image-20231023200102753"></p>
+<h4 id="4-2-3-使用I2C-Tools读取温湿度传感器AHT10的数据"><a href="#4-2-3-使用I2C-Tools读取温湿度传感器AHT10的数据" class="headerlink" title="4.2.3 使用I2C-Tools读取温湿度传感器AHT10的数据"></a>4.2.3 使用I2C-Tools读取温湿度传感器AHT10的数据</h4><p><img src="/../../images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231023194745114.png" alt="image-20231023194745114"></p>
+<p>分析数据手册中提供的时序图，AHT10使用的通信协议中“读取温湿度数据”部分并不符合SMBus协议中规定的格式；因此，”触发测量数据“部分使用SMBus方式，“读取温湿度数据”部分使用I2C方式。</p>
+<p><img src="/../../images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231023200937458.png" alt="image-20231023200937458"></p>
+<p>传感器在采集时需要时间,主机发出测量指令（0xAC） 后,延时75毫秒以上再读取转换后的数据并判断返回的状 态位是否正常。若状态比特位[Bit7]为0代表数据可正常读取,为1时传感器为忙状态,主机需要等待数据处理完成。</p>
+<h5 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h5><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;i2cbusses.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;errno.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;i2c/smbus.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/i2c-dev.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;linux/i2c.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;string.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;sys/ioctl.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;time.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdint.h&gt;</span></span></span><br><span class="line"><span class="type">const</span> <span class="type">uint32_t</span> N = <span class="number">1</span> &lt;&lt; <span class="number">20</span>;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> **argv)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">char</span> read_buffer[<span class="number">6</span>], dev_addr = <span class="number">0x38</span>;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">i2c_rdwr_ioctl_data</span> <span class="title">rdwr</span>;</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">i2c_msg</span> <span class="title">msg</span>;</span></span><br><span class="line">    <span class="type">char</span> filename[<span class="number">20</span>];</span><br><span class="line">    <span class="type">int</span> fd, ret;</span><br><span class="line">    <span class="type">float</span> temper, humid;</span><br><span class="line">    <span class="type">unsigned</span> <span class="type">int</span> t, h;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">if</span> (argc != <span class="number">2</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;Usage:\n&quot;</span>);</span><br><span class="line">		<span class="built_in">printf</span>(<span class="string">&quot;read AHT10: %s &lt;i2c_bus_number&gt; string\n&quot;</span>, argv[<span class="number">0</span>]);</span><br><span class="line">		<span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">	&#125;    </span><br><span class="line">    <span class="comment">// 打开I2C Controller</span></span><br><span class="line">    fd = open_i2c_dev(argv[<span class="number">1</span>][<span class="number">0</span>] - <span class="string">&#x27;0&#x27;</span>, filename, <span class="keyword">sizeof</span>(filename), <span class="number">0</span>);</span><br><span class="line">    <span class="keyword">if</span> (fd &lt; <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;can&#x27;t open %s\n&quot;</span>, filename);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 设置从机地址</span></span><br><span class="line">    <span class="keyword">if</span> (set_slave_addr(fd, dev_addr, <span class="number">0</span>))</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;can&#x27;t set slave address\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//写入传感器触发测量的命令</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; <span class="number">3</span>; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//写入字：先写低8位,再写高8位</span></span><br><span class="line">        ret = i2c_smbus_write_word_data(fd, <span class="number">0xAC</span>, <span class="number">0x33</span>); </span><br><span class="line">        <span class="keyword">if</span> (ret)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;i2c_smbus_write_word_data error\n&quot;</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 循环监测传感器设备是否忙</span></span><br><span class="line">    <span class="keyword">do</span></span><br><span class="line">    &#123;</span><br><span class="line">        ret = i2c_smbus_read_byte(fd);</span><br><span class="line">        <span class="keyword">if</span> (ret &lt; <span class="number">0</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;i2c_smbus_read_byte error\n&quot;</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">        &#125; </span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;ret = %d\n&quot;</span>, ret);</span><br><span class="line">    &#125; <span class="keyword">while</span> (ret &amp; <span class="number">0x80</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//通过ioctl函数读取I2C设备文件</span></span><br><span class="line">    msg.addr = dev_addr;</span><br><span class="line">    msg.flags = I2C_M_RD;</span><br><span class="line">    msg.len = <span class="number">6</span>;</span><br><span class="line">    <span class="built_in">memset</span>(read_buffer, <span class="number">0</span>, <span class="keyword">sizeof</span>(read_buffer));</span><br><span class="line">    msg.buf = read_buffer;</span><br><span class="line">    rdwr.msgs = &amp;msg;</span><br><span class="line">    rdwr.nmsgs = <span class="number">1</span>;</span><br><span class="line">    ret = ioctl(fd, I2C_RDWR, &amp;rdwr);</span><br><span class="line">    <span class="keyword">if</span>(ret == <span class="number">-1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        perror(<span class="string">&quot;ioctl_read_error&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//将数据转换为实际温湿度</span></span><br><span class="line">	h = ((<span class="type">uint32_t</span>)read_buffer[<span class="number">1</span>] &lt;&lt; <span class="number">12</span>) | ((<span class="type">uint32_t</span>)read_buffer[<span class="number">2</span>] &lt;&lt; <span class="number">4</span>) | (read_buffer[<span class="number">3</span>] &gt;&gt; <span class="number">4</span>);</span><br><span class="line">	t = ((<span class="type">uint32_t</span>)(read_buffer[<span class="number">3</span>] &amp; <span class="number">0x0f</span>) &lt;&lt; <span class="number">16</span>) | ((<span class="type">uint32_t</span>)read_buffer[<span class="number">4</span>] &lt;&lt; <span class="number">8</span>) | read_buffer[<span class="number">5</span>];</span><br><span class="line">	temper = <span class="number">-50.0</span> + <span class="number">200.0</span> * (<span class="type">float</span>)t / N;</span><br><span class="line">	humid = <span class="number">100.0</span> * h / N;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;temper=%f, humid=%f \n&quot;</span>, temper, humid);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/" rel="tag"># 嵌入式</a>
+              <a href="/tags/Linux/" rel="tag"># Linux</a>
+              <a href="/tags/C-C/" rel="tag"># C/C++</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/10/06/%E9%9F%A6%E4%B8%9C%E5%B1%B1%E5%B5%8C%E5%85%A5%E5%BC%8FLinux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/UART%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/" rel="prev" title="UART应用编程">
+      <i class="fa fa-chevron-left"></i> UART应用编程
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2023/10/22/%E6%B8%B8%E6%88%8F%E8%AE%B0%E5%BD%95/%E6%98%9F%E9%99%85%E6%8B%93%E8%8D%92%E5%90%8E%E8%AE%B0/" rel="next" title="星际拓荒后记">
+      星际拓荒后记 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-I2C%E5%8D%8F%E8%AE%AE"><span class="nav-text">1. I2C协议</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-I2C%E5%86%99%E6%93%8D%E4%BD%9C"><span class="nav-text">1.1 I2C写操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-I2C%E8%AF%BB%E6%93%8D%E4%BD%9C"><span class="nav-text">1.2 I2C读操作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-I2C%E5%BC%95%E8%84%9A%E7%9A%84%E7%A1%AC%E4%BB%B6%E8%AE%BE%E8%AE%A1"><span class="nav-text">1.3 I2C引脚的硬件设计</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-SMBus%E5%8D%8F%E8%AE%AE-System-Management-Bus"><span class="nav-text">2.SMBus协议(System Management Bus)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E4%B8%8EI2C%E7%9A%84%E5%8C%BA%E5%88%AB"><span class="nav-text">2.1 与I2C的区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-SMBus-%E5%8D%8F%E8%AE%AE%E5%88%86%E6%9E%90"><span class="nav-text">2.2 SMBus 协议分析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-SMBus-Quick-Command"><span class="nav-text">(1) SMBus Quick Command</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-SMBus-Receive-Byte"><span class="nav-text">(2) SMBus Receive Byte</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-SMBus-Send-Byte"><span class="nav-text">(3) SMBus Send Byte</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-SMBus-Read-Byte"><span class="nav-text">(4) SMBus Read Byte</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-SMBus-Read-Word"><span class="nav-text">(5) SMBus Read Word</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-SMBus-Write-Byte"><span class="nav-text">(6) SMBus Write Byte</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#7-SMBus-Write-Word"><span class="nav-text">(7) SMBus Write Word</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#8-SMBus-Block-Read"><span class="nav-text">(8) SMBus Block Read</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#PS%EF%BC%9AI2C-Block-Read"><span class="nav-text">PS：I2C Block Read</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#9-SMBus-Block-Write"><span class="nav-text">(9) SMBus Block Write</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#PS%EF%BC%9AI2C-Block-Write"><span class="nav-text">PS：I2C Block Write</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#10-SMBus-Block-Write-Block-Read-Process-Call"><span class="nav-text">(10) SMBus Block Write - Block Read Process Call</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#11-Packet-Error-Checking-PEC"><span class="nav-text">(11) Packet Error Checking (PEC)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#PS%EF%BC%9A"><span class="nav-text">PS：</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-Linux%E7%B3%BB%E7%BB%9F%E4%B8%ADI2C%E7%9A%84%E8%BD%AF%E4%BB%B6%E6%A1%86%E6%9E%B6"><span class="nav-text">3.Linux系统中I2C的软件框架</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-I2C%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B"><span class="nav-text">4. I2C应用编程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-%E9%87%8D%E8%A6%81%E7%BB%93%E6%9E%84%E4%BD%93"><span class="nav-text">4.1 重要结构体</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-%E4%BD%BF%E7%94%A8I2C-Tools%E8%AE%BF%E9%97%AEI2C%E8%AE%BE%E5%A4%87"><span class="nav-text">4.2 使用I2C-Tools访问I2C设备</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-2-1-%E4%BD%93%E9%AA%8CI2C-Tools%E5%8F%AF%E6%89%A7%E8%A1%8C%E7%A8%8B%E5%BA%8F"><span class="nav-text">4.2.1 体验I2C-Tools可执行程序</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-i2cdectect-%E5%88%97%E5%87%BA%E8%AE%BE%E5%A4%87%E4%B8%8AI2C%E8%AE%BE%E5%A4%87%E7%9A%84%E4%BF%A1%E6%81%AF"><span class="nav-text">(1) i2cdectect-列出设备上I2C设备的信息</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-i2cget-%E8%AF%BB%E6%95%B0%E6%8D%AE"><span class="nav-text">(2) i2cget-读数据</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-i2cset-%E5%86%99%E6%95%B0%E6%8D%AE"><span class="nav-text">(3) i2cset-写数据</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-i2ctransfer-%E5%9F%BA%E4%BA%8EI2C%E5%8D%8F%E8%AE%AE%E4%BC%A0%E8%BE%93%E6%95%B0%E6%8D%AE"><span class="nav-text">(4) i2ctransfer-基于I2C协议传输数据</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-2-2-I2C-Tools%E8%AE%BF%E9%97%AEI2C%E8%AE%BE%E5%A4%87%E7%9A%842%E7%A7%8D%E6%96%B9%E5%BC%8F"><span class="nav-text">4.2.2 I2C-Tools访问I2C设备的2种方式</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-%E4%BD%BF%E7%94%A8I2C%E6%96%B9%E5%BC%8F"><span class="nav-text">(1) 使用I2C方式</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-%E4%BD%BF%E7%94%A8SMBus%E6%96%B9%E5%BC%8F"><span class="nav-text">(2) 使用SMBus方式</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-2-3-%E4%BD%BF%E7%94%A8I2C-Tools%E8%AF%BB%E5%8F%96%E6%B8%A9%E6%B9%BF%E5%BA%A6%E4%BC%A0%E6%84%9F%E5%99%A8AHT10%E7%9A%84%E6%95%B0%E6%8D%AE"><span class="nav-text">4.2.3 使用I2C-Tools读取温湿度传感器AHT10的数据</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81"><span class="nav-text">代码</span></a></li></ol></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Krocz"
+      src="/images/avatar.png">
+  <p class="site-author-name" itemprop="name">Krocz</p>
+  <div class="site-description" itemprop="description">时间不等人，喜欢就去做</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives">
+          <span class="site-state-item-count">29</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">11</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/krocz" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;krocz" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1668154689@qq.com" title="E-Mail → mailto:1668154689@qq.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+         
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Krocz</span>
+</div>
+
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动 -->
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -78,7 +78,119 @@
   <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome/css/font-awesome.min.css">
   <script src="/live2d-widget/autoload.js"></script>
- <link rel="alternate" href="/atom.xml" title="Krocz's Blog" type="application/atom+xml">
+ <style>mjx-container[jax="SVG"] {
+  direction: ltr;
+}
+
+mjx-container[jax="SVG"] > svg {
+  overflow: visible;
+}
+
+mjx-container[jax="SVG"][display="true"] {
+  display: block;
+  text-align: center;
+  margin: 1em 0;
+}
+
+mjx-container[jax="SVG"][justify="left"] {
+  text-align: left;
+}
+
+mjx-container[jax="SVG"][justify="right"] {
+  text-align: right;
+}
+
+g[data-mml-node="merror"] > g {
+  fill: red;
+  stroke: red;
+}
+
+g[data-mml-node="merror"] > rect[data-background] {
+  fill: yellow;
+  stroke: none;
+}
+
+g[data-mml-node="mtable"] > line[data-line] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > rect[data-frame] {
+  stroke-width: 70px;
+  fill: none;
+}
+
+g[data-mml-node="mtable"] > .mjx-dashed {
+  stroke-dasharray: 140;
+}
+
+g[data-mml-node="mtable"] > .mjx-dotted {
+  stroke-linecap: round;
+  stroke-dasharray: 0,140;
+}
+
+g[data-mml-node="mtable"] > svg {
+  overflow: visible;
+}
+
+[jax="SVG"] mjx-tool {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0;
+}
+
+[jax="SVG"] mjx-tool > mjx-tip {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+mjx-tool > mjx-tip {
+  display: inline-block;
+  padding: .2em;
+  border: 1px solid #888;
+  font-size: 70%;
+  background-color: #F8F8F8;
+  color: black;
+  box-shadow: 2px 2px 5px #AAAAAA;
+}
+
+g[data-mml-node="maction"][data-toggle] {
+  cursor: pointer;
+}
+
+mjx-status {
+  display: block;
+  position: fixed;
+  left: 1em;
+  bottom: 1em;
+  min-width: 25%;
+  padding: .2em .4em;
+  border: 1px solid #888;
+  font-size: 90%;
+  background-color: #F8F8F8;
+  color: black;
+}
+
+foreignObject[data-mjx-xml] {
+  font-family: initial;
+  line-height: normal;
+  overflow: visible;
+}
+
+.MathJax path {
+  stroke-width: 3;
+}
+
+mjx-container[display="true"] {
+  overflow: auto hidden;
+}
+
+mjx-container[display="true"] + br {
+  display: none;
+}
+</style><link rel="alternate" href="/atom.xml" title="Krocz's Blog" type="application/atom+xml">
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage">
@@ -198,7 +310,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/10/31/%E7%AE%97%E6%B3%95%E6%A8%A1%E6%9D%BF/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/11/10/%E7%AE%97%E6%B3%95%E5%92%8C%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E6%A8%A1%E6%9D%BF/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.png">
@@ -212,7 +324,104 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2023/10/31/%E7%AE%97%E6%B3%95%E6%A8%A1%E6%9D%BF/" class="post-title-link" itemprop="url">算法模板</a>
+            <a href="/2023/11/10/%E7%AE%97%E6%B3%95%E5%92%8C%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E6%A8%A1%E6%9D%BF/" class="post-title-link" itemprop="url">数据结构模板</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-11-10 11:54:12" itemprop="dateCreated datePublished" datetime="2023-11-10T11:54:12+08:00">2023-11-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-04-26 17:38:14" itemprop="dateModified" datetime="2024-04-26T17:38:14+08:00">2024-04-26</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E7%AE%97%E6%B3%95%E5%92%8C%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">算法和数据结构</span></a>
+                </span>
+            </span>
+
+          <br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="far fa-file-word"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>24k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="far fa-clock"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>44 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h2 id="1-链表"><a href="#1-链表" class="headerlink" title="1.链表"></a>1.链表</h2><h3 id="1-1-静态链表（数组模拟）"><a href="#1-1-静态链表（数组模拟）" class="headerlink" title="1.1 静态链表（数组模拟）"></a>1.1 静态链表（数组模拟）</h3><h4 id="1-1-1-单链表"><a href="#1-1-1-单链表" class="headerlink" title="1.1.1 单链表"></a>1.1.1 单链表</h4><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"><span class="type">const</span> <span class="type">int</span> N = <span class="number">100010</span>;</span><br><span class="line"><span class="type">int</span> e[N], ne[N], idx, head = <span class="number">-1</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">add_head</span><span class="params">(<span class="type">int</span> v)</span></span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">    e[idx] = v, ne[idx] = head, head = idx++;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">add</span><span class="params">(<span class="type">int</span> k, <span class="type">int</span> v)</span></span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">    e[idx] = v, ne[idx] = ne[k], ne[k] = idx++;</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">remove</span><span class="params">(<span class="type">int</span> k)</span></span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">    <span class="keyword">if</span>(~k) ne[k] = ne[ne[k]];</span><br><span class="line">    <span class="keyword">else</span> head = ne[head];</span><br><span class="line">}</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>{</span><br><span class="line">    <span class="type">int</span> m;</span><br><span class="line">    cin &gt;&gt; m;</span><br><span class="line">    <span class="keyword">while</span>(m --)</span><br><span class="line">    {</span><br><span class="line">        <span class="type">int</span> k, v;</span><br><span class="line">        <span class="type">char</span> c;</span><br><span class="line">        cin &gt;&gt; c;</span><br><span class="line">        <span class="keyword">switch</span>(c)</span><br><span class="line">        {</span><br><span class="line">            <span class="keyword">case</span> <span class="string">'H'</span>:</span><br><span class="line">                cin &gt;&gt; v;</span><br><span class="line">                <span class="built_in">add_head</span>(v);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="comment">// 题中对于k的计数从1开始，但是存储下标从0开始，因此需要k - 1</span></span><br><span class="line">            <span class="keyword">case</span> <span class="string">'I'</span>:</span><br><span class="line">                cin &gt;&gt; k &gt;&gt; v;</span><br><span class="line">                <span class="built_in">add</span>(k - <span class="number">1</span>, v);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">'D'</span>:</span><br><span class="line">                cin &gt;&gt; k;</span><br><span class="line">                <span class="built_in">remove</span>(k - <span class="number">1</span>);</span><br><span class="line">        }</span><br><span class="line">    }</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i = head; ~i; i = ne[i])</span><br><span class="line">        cout &lt;&lt; e[i] &lt;&lt; <span class="string">" "</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">}</span><br></pre></td></tr></table></figure>
+
+<p>注1：为了逻辑清晰代码简洁，无论是静态链表还是动态链表都最好加上头节点，但是仅在数组模拟单链表时没有头节点，因为算法题中使用单链表时一般仅使用在头插入新节点，不涉及其他操作，所以没有必要加入头节点</p>
+          <!--noindex-->
+            <div class="post-button">
+              <a class="btn" href="/2023/11/10/%E7%AE%97%E6%B3%95%E5%92%8C%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E6%A8%A1%E6%9D%BF/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/10/31/%E7%AE%97%E6%B3%95%E5%92%8C%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/%E7%AE%97%E6%B3%95%E6%A8%A1%E6%9D%BF/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.png">
+      <meta itemprop="name" content="Krocz">
+      <meta itemprop="description" content="时间不等人，喜欢就去做">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Krocz's Blog">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/10/31/%E7%AE%97%E6%B3%95%E5%92%8C%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/%E7%AE%97%E6%B3%95%E6%A8%A1%E6%9D%BF/" class="post-title-link" itemprop="url">算法模板</a>
         </h2>
 
         <div class="post-meta">
@@ -229,7 +438,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2024-04-26 17:14:12" itemprop="dateModified" datetime="2024-04-26T17:14:12+08:00">2024-04-26</time>
+                <time title="修改时间：2024-04-26 17:38:22" itemprop="dateModified" datetime="2024-04-26T17:38:22+08:00">2024-04-26</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -237,7 +446,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E7%AE%97%E6%B3%95%E6%A8%A1%E6%9D%BF/" itemprop="url" rel="index"><span itemprop="name">算法模板</span></a>
+                  <a href="/categories/%E7%AE%97%E6%B3%95%E5%92%8C%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">算法和数据结构</span></a>
                 </span>
             </span>
 
@@ -272,7 +481,7 @@
 <h3 id="1-1-选择第K大的数字-quick-select"><a href="#1-1-选择第K大的数字-quick-select" class="headerlink" title="1.1 选择第K大的数字(quick_select)"></a>1.1 选择第K大的数字(quick_select)</h3><p>时间复杂度：$O(n)$</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2023/10/31/%E7%AE%97%E6%B3%95%E6%A8%A1%E6%9D%BF/#more" rel="contents">
+              <a class="btn" href="/2023/10/31/%E7%AE%97%E6%B3%95%E5%92%8C%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/%E7%AE%97%E6%B3%95%E6%A8%A1%E6%9D%BF/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -296,7 +505,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/10/30/LED%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/10/30/%E9%9F%A6%E4%B8%9C%E5%B1%B1%E5%B5%8C%E5%85%A5%E5%BC%8FLinux%E9%A9%B1%E5%8A%A8%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/LED%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.png">
@@ -310,7 +519,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2023/10/30/LED%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F/" class="post-title-link" itemprop="url">LED驱动程序</a>
+            <a href="/2023/10/30/%E9%9F%A6%E4%B8%9C%E5%B1%B1%E5%B5%8C%E5%85%A5%E5%BC%8FLinux%E9%A9%B1%E5%8A%A8%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/LED%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F/" class="post-title-link" itemprop="url">简单的LED驱动程序</a>
         </h2>
 
         <div class="post-meta">
@@ -327,7 +536,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2024-01-02 11:10:37" itemprop="dateModified" datetime="2024-01-02T11:10:37+08:00">2024-01-02</time>
+                <time title="修改时间：2024-04-26 17:40:56" itemprop="dateModified" datetime="2024-04-26T17:40:56+08:00">2024-04-26</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -335,7 +544,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/" itemprop="url" rel="index"><span itemprop="name">Linux应用开发</span></a>
+                  <a href="/categories/%E9%9F%A6%E4%B8%9C%E5%B1%B1Linux%E9%A9%B1%E5%8A%A8%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">韦东山Linux驱动开发笔记</span></a>
                 </span>
             </span>
 
@@ -373,7 +582,7 @@
 <p>一般的，芯片GPIO引脚使能的操作如下：</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2023/10/30/LED%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F/#more" rel="contents">
+              <a class="btn" href="/2023/10/30/%E9%9F%A6%E4%B8%9C%E5%B1%B1%E5%B5%8C%E5%85%A5%E5%BC%8FLinux%E9%A9%B1%E5%8A%A8%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/LED%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -397,7 +606,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/10/23/%E7%BC%96%E5%86%99%E7%AC%AC%E4%B8%80%E4%B8%AA%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/10/23/%E9%9F%A6%E4%B8%9C%E5%B1%B1%E5%B5%8C%E5%85%A5%E5%BC%8FLinux%E9%A9%B1%E5%8A%A8%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/%E7%BC%96%E5%86%99%E7%AC%AC%E4%B8%80%E4%B8%AA%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.png">
@@ -411,7 +620,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2023/10/23/%E7%BC%96%E5%86%99%E7%AC%AC%E4%B8%80%E4%B8%AA%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F/" class="post-title-link" itemprop="url">编写第一个驱动程序</a>
+            <a href="/2023/10/23/%E9%9F%A6%E4%B8%9C%E5%B1%B1%E5%B5%8C%E5%85%A5%E5%BC%8FLinux%E9%A9%B1%E5%8A%A8%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/%E7%BC%96%E5%86%99%E7%AC%AC%E4%B8%80%E4%B8%AA%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F/" class="post-title-link" itemprop="url">编写第一个驱动程序</a>
         </h2>
 
         <div class="post-meta">
@@ -428,7 +637,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-12-17 10:16:28" itemprop="dateModified" datetime="2023-12-17T10:16:28+08:00">2023-12-17</time>
+                <time title="修改时间：2024-04-26 17:41:12" itemprop="dateModified" datetime="2024-04-26T17:41:12+08:00">2024-04-26</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -436,7 +645,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/" itemprop="url" rel="index"><span itemprop="name">Linux应用开发</span></a>
+                  <a href="/categories/%E9%9F%A6%E4%B8%9C%E5%B1%B1Linux%E9%A9%B1%E5%8A%A8%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">韦东山Linux驱动开发笔记</span></a>
                 </span>
             </span>
 
@@ -471,7 +680,7 @@
 <p>在APP中调用open函数打开文件时，传入的flags、mode等参数会记录在内核相应的<code>struct file</code>成员<code>f_flags\f_mode</code>中；读写文件的偏移地址也会保存在<code>struct file</code>结构体的<code>f_pos</code>成员中。</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2023/10/23/%E7%BC%96%E5%86%99%E7%AC%AC%E4%B8%80%E4%B8%AA%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F/#more" rel="contents">
+              <a class="btn" href="/2023/10/23/%E9%9F%A6%E4%B8%9C%E5%B1%B1%E5%B5%8C%E5%85%A5%E5%BC%8FLinux%E9%A9%B1%E5%8A%A8%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/%E7%BC%96%E5%86%99%E7%AC%AC%E4%B8%80%E4%B8%AA%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -593,7 +802,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/10/13/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/10/13/%E9%9F%A6%E4%B8%9C%E5%B1%B1%E5%B5%8C%E5%85%A5%E5%BC%8FLinux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.png">
@@ -607,7 +816,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2023/10/13/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/" class="post-title-link" itemprop="url">I2C应用编程</a>
+            <a href="/2023/10/13/%E9%9F%A6%E4%B8%9C%E5%B1%B1%E5%B5%8C%E5%85%A5%E5%BC%8FLinux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/" class="post-title-link" itemprop="url">I2C应用编程</a>
         </h2>
 
         <div class="post-meta">
@@ -624,7 +833,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-10-23 20:17:16" itemprop="dateModified" datetime="2023-10-23T20:17:16+08:00">2023-10-23</time>
+                <time title="修改时间：2024-04-26 17:39:14" itemprop="dateModified" datetime="2024-04-26T17:39:14+08:00">2024-04-26</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -632,7 +841,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/" itemprop="url" rel="index"><span itemprop="name">Linux应用开发</span></a>
+                  <a href="/categories/%E9%9F%A6%E4%B8%9C%E5%B1%B1Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">韦东山Linux应用开发笔记</span></a>
                 </span>
             </span>
 
@@ -661,17 +870,17 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="1-I2C协议"><a href="#1-I2C协议" class="headerlink" title="1. I2C协议"></a>1. I2C协议</h2><p><img src="/../images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231013195434388.png" alt="image-20231013195434388"></p>
+          <h2 id="1-I2C协议"><a href="#1-I2C协议" class="headerlink" title="1. I2C协议"></a>1. I2C协议</h2><p><img src="/../../images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231013195434388.png" alt="image-20231013195434388"></p>
 <ul>
 <li>起始信号</li>
 <li>停止信号</li>
 <li>传输1Bit数据时的信号</li>
 <li>应答信号（<strong>0：应答，1：非应答</strong>）</li>
 </ul>
-<h3 id="1-1-I2C写操作"><a href="#1-1-I2C写操作" class="headerlink" title="1.1 I2C写操作"></a>1.1 I2C写操作</h3><p><img src="/../images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231013200107130.png" alt="image-20231013200107130"></p>
+<h3 id="1-1-I2C写操作"><a href="#1-1-I2C写操作" class="headerlink" title="1.1 I2C写操作"></a>1.1 I2C写操作</h3><p><img src="/../../images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231013200107130.png" alt="image-20231013200107130"></p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2023/10/13/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/#more" rel="contents">
+              <a class="btn" href="/2023/10/13/%E9%9F%A6%E4%B8%9C%E5%B1%B1%E5%B5%8C%E5%85%A5%E5%BC%8FLinux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -695,7 +904,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/10/06/UART%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/10/06/%E9%9F%A6%E4%B8%9C%E5%B1%B1%E5%B5%8C%E5%85%A5%E5%BC%8FLinux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/UART%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.png">
@@ -709,7 +918,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2023/10/06/UART%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/" class="post-title-link" itemprop="url">UART应用编程</a>
+            <a href="/2023/10/06/%E9%9F%A6%E4%B8%9C%E5%B1%B1%E5%B5%8C%E5%85%A5%E5%BC%8FLinux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/UART%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/" class="post-title-link" itemprop="url">UART应用编程</a>
         </h2>
 
         <div class="post-meta">
@@ -726,7 +935,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2024-04-05 11:43:03" itemprop="dateModified" datetime="2024-04-05T11:43:03+08:00">2024-04-05</time>
+                <time title="修改时间：2024-04-26 17:39:34" itemprop="dateModified" datetime="2024-04-26T17:39:34+08:00">2024-04-26</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -734,7 +943,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/" itemprop="url" rel="index"><span itemprop="name">Linux应用开发</span></a>
+                  <a href="/categories/%E9%9F%A6%E4%B8%9C%E5%B1%B1Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">韦东山Linux应用开发笔记</span></a>
                 </span>
             </span>
 
@@ -769,10 +978,10 @@
 <p><a target="_blank" rel="noopener" href="https://taoshu.in/tty.html">解密 TTY 设备</a></p>
 </blockquote>
 <h3 id="1-1-终端机"><a href="#1-1-终端机" class="headerlink" title="1.1 终端机"></a>1.1 终端机</h3><p>从历史上看，终端刚开始就是终端机，配有打印机，键盘，带有一个串口，通过串口传送数据到主机端，然后主机处理完交给终端打印出来。电传打字机(teletype)可以被看作是这类设备的统称，因此终端也被简称为 TTY(teletype 的缩写)：</p>
-<p><img src="/../images/UART%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231006145708741.png" alt="image-20231006145708741"></p>
+<p><img src="/../../images/UART%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231006145708741.png" alt="image-20231006145708741"></p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2023/10/06/UART%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/#more" rel="contents">
+              <a class="btn" href="/2023/10/06/%E9%9F%A6%E4%B8%9C%E5%B1%B1%E5%B5%8C%E5%85%A5%E5%BC%8FLinux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/UART%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -796,7 +1005,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/10/03/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%BC%96%E7%A8%8B/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/10/03/%E9%9F%A6%E4%B8%9C%E5%B1%B1%E5%B5%8C%E5%85%A5%E5%BC%8FLinux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%BC%96%E7%A8%8B/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.png">
@@ -810,7 +1019,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2023/10/03/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%BC%96%E7%A8%8B/" class="post-title-link" itemprop="url">多线程编程</a>
+            <a href="/2023/10/03/%E9%9F%A6%E4%B8%9C%E5%B1%B1%E5%B5%8C%E5%85%A5%E5%BC%8FLinux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%BC%96%E7%A8%8B/" class="post-title-link" itemprop="url">多线程编程</a>
         </h2>
 
         <div class="post-meta">
@@ -827,7 +1036,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2024-02-26 18:14:59" itemprop="dateModified" datetime="2024-02-26T18:14:59+08:00">2024-02-26</time>
+                <time title="修改时间：2024-04-26 17:39:38" itemprop="dateModified" datetime="2024-04-26T17:39:38+08:00">2024-04-26</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -835,7 +1044,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/" itemprop="url" rel="index"><span itemprop="name">Linux应用开发</span></a>
+                  <a href="/categories/%E9%9F%A6%E4%B8%9C%E5%B1%B1Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">韦东山Linux应用开发笔记</span></a>
                 </span>
             </span>
 
@@ -873,7 +1082,7 @@
 <h2 id="2-线程的创建"><a href="#2-线程的创建" class="headerlink" title="2. 线程的创建"></a>2. 线程的创建</h2>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2023/10/03/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%BC%96%E7%A8%8B/#more" rel="contents">
+              <a class="btn" href="/2023/10/03/%E9%9F%A6%E4%B8%9C%E5%B1%B1%E5%B5%8C%E5%85%A5%E5%BC%8FLinux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/%E5%A4%9A%E7%BA%BF%E7%A8%8B%E7%BC%96%E7%A8%8B/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -897,7 +1106,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/26/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/26/%E9%9F%A6%E4%B8%9C%E5%B1%B1%E5%B5%8C%E5%85%A5%E5%BC%8FLinux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.png">
@@ -911,7 +1120,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2023/09/26/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/" class="post-title-link" itemprop="url">网络编程入门</a>
+            <a href="/2023/09/26/%E9%9F%A6%E4%B8%9C%E5%B1%B1%E5%B5%8C%E5%85%A5%E5%BC%8FLinux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/" class="post-title-link" itemprop="url">网络编程入门</a>
         </h2>
 
         <div class="post-meta">
@@ -928,7 +1137,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-10-03 19:08:41" itemprop="dateModified" datetime="2023-10-03T19:08:41+08:00">2023-10-03</time>
+                <time title="修改时间：2024-04-26 17:39:56" itemprop="dateModified" datetime="2024-04-26T17:39:56+08:00">2024-04-26</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -936,7 +1145,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/" itemprop="url" rel="index"><span itemprop="name">Linux应用开发</span></a>
+                  <a href="/categories/%E9%9F%A6%E4%B8%9C%E5%B1%B1Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">韦东山Linux应用开发笔记</span></a>
                 </span>
             </span>
 
@@ -965,11 +1174,11 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="1-TCP-UDP网络通信流程图"><a href="#1-TCP-UDP网络通信流程图" class="headerlink" title="1. TCP&#x2F;UDP网络通信流程图"></a>1. TCP&#x2F;UDP网络通信流程图</h2><h3 id="1-1-TCP"><a href="#1-1-TCP" class="headerlink" title="1.1 TCP"></a>1.1 TCP</h3><p><img src="/../images/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/image-20230926192207003.png" alt="image-20230926192207003"></p>
+          <h2 id="1-TCP-UDP网络通信流程图"><a href="#1-TCP-UDP网络通信流程图" class="headerlink" title="1. TCP&#x2F;UDP网络通信流程图"></a>1. TCP&#x2F;UDP网络通信流程图</h2><h3 id="1-1-TCP"><a href="#1-1-TCP" class="headerlink" title="1.1 TCP"></a>1.1 TCP</h3><p><img src="/../../images/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/image-20230926192207003.png" alt="image-20230926192207003"></p>
 <h4 id="1-1-1-代码"><a href="#1-1-1-代码" class="headerlink" title="1.1.1 代码"></a>1.1.1 代码</h4><h5 id="server-c"><a href="#server-c" class="headerlink" title="server.c"></a>server.c</h5>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2023/09/26/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/#more" rel="contents">
+              <a class="btn" href="/2023/09/26/%E9%9F%A6%E4%B8%9C%E5%B1%B1%E5%B5%8C%E5%85%A5%E5%BC%8FLinux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -993,7 +1202,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/22/%E4%BD%BF%E7%94%A8%E7%94%B5%E9%98%BB%E5%B1%8F%E5%92%8C%E7%94%B5%E5%AE%B9%E5%B1%8F/">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/22/%E9%9F%A6%E4%B8%9C%E5%B1%B1%E5%B5%8C%E5%85%A5%E5%BC%8FLinux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/tslib%E8%AF%BB%E5%8F%96%E8%A7%A6%E6%91%B8%E5%B1%8F/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.png">
@@ -1007,7 +1216,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2023/09/22/%E4%BD%BF%E7%94%A8%E7%94%B5%E9%98%BB%E5%B1%8F%E5%92%8C%E7%94%B5%E5%AE%B9%E5%B1%8F/" class="post-title-link" itemprop="url">使用电阻屏和电容屏</a>
+            <a href="/2023/09/22/%E9%9F%A6%E4%B8%9C%E5%B1%B1%E5%B5%8C%E5%85%A5%E5%BC%8FLinux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/tslib%E8%AF%BB%E5%8F%96%E8%A7%A6%E6%91%B8%E5%B1%8F/" class="post-title-link" itemprop="url">使用tslib读取触摸屏</a>
         </h2>
 
         <div class="post-meta">
@@ -1024,7 +1233,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-09-24 17:57:44" itemprop="dateModified" datetime="2023-09-24T17:57:44+08:00">2023-09-24</time>
+                <time title="修改时间：2024-04-26 17:39:29" itemprop="dateModified" datetime="2024-04-26T17:39:29+08:00">2024-04-26</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -1032,7 +1241,7 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/" itemprop="url" rel="index"><span itemprop="name">Linux应用开发</span></a>
+                  <a href="/categories/%E9%9F%A6%E4%B8%9C%E5%B1%B1Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/" itemprop="url" rel="index"><span itemprop="name">韦东山Linux应用开发笔记</span></a>
                 </span>
             </span>
 
@@ -1061,7 +1270,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="1-电阻屏和电容屏定位原理"><a href="#1-电阻屏和电容屏定位原理" class="headerlink" title="1. 电阻屏和电容屏定位原理"></a>1. 电阻屏和电容屏定位原理</h2><h3 id="1-1-电阻屏"><a href="#1-1-电阻屏" class="headerlink" title="1.1 电阻屏"></a>1.1 电阻屏</h3><p><img src="/../images/%E4%BD%BF%E7%94%A8%E7%94%B5%E9%98%BB%E5%B1%8F%E5%92%8C%E7%94%B5%E5%AE%B9%E5%B1%8F/image-20230922200403814.png" alt="image-20230922200403814"></p>
+          <h2 id="1-电阻屏和电容屏定位原理"><a href="#1-电阻屏和电容屏定位原理" class="headerlink" title="1. 电阻屏和电容屏定位原理"></a>1. 电阻屏和电容屏定位原理</h2><h3 id="1-1-电阻屏"><a href="#1-1-电阻屏" class="headerlink" title="1.1 电阻屏"></a>1.1 电阻屏</h3><p><img src="/../../images/%E4%BD%BF%E7%94%A8%E7%94%B5%E9%98%BB%E5%B1%8F%E5%92%8C%E7%94%B5%E5%AE%B9%E5%B1%8F/image-20230922200403814.png" alt="image-20230922200403814"></p>
 <ul>
 <li>根据分压原理，计算电阻值。假设材料长度和电阻成线性关系，则可以计算出相对距离</li>
 <li>电阻屏分为上下两层薄膜，一层通电时，另一层在按压时作为探针获取分压值，从而进行计算</li>
@@ -1070,126 +1279,7 @@
 <h4 id="1-1-1-电阻屏数据"><a href="#1-1-1-电阻屏数据" class="headerlink" title="1.1.1 电阻屏数据"></a>1.1.1 电阻屏数据</h4>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/2023/09/22/%E4%BD%BF%E7%94%A8%E7%94%B5%E9%98%BB%E5%B1%8F%E5%92%8C%E7%94%B5%E5%AE%B9%E5%B1%8F/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="http://example.com/2023/09/17/%E8%BE%93%E5%85%A5%E7%B3%BB%E7%BB%9F%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.png">
-      <meta itemprop="name" content="Krocz">
-      <meta itemprop="description" content="时间不等人，喜欢就去做">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Krocz's Blog">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/09/17/%E8%BE%93%E5%85%A5%E7%B3%BB%E7%BB%9F%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/" class="post-title-link" itemprop="url">输入系统应用编程</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2023-09-17 17:37:46" itemprop="dateCreated datePublished" datetime="2023-09-17T17:37:46+08:00">2023-09-17</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-09-20 21:55:54" itemprop="dateModified" datetime="2023-09-20T21:55:54+08:00">2023-09-20</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/" itemprop="url" rel="index"><span itemprop="name">Linux应用开发</span></a>
-                </span>
-            </span>
-
-          <br>
-            <span class="post-meta-item" title="本文字数">
-              <span class="post-meta-item-icon">
-                <i class="far fa-file-word"></i>
-              </span>
-                <span class="post-meta-item-text">本文字数：</span>
-              <span>7.6k</span>
-            </span>
-            <span class="post-meta-item" title="阅读时长">
-              <span class="post-meta-item-icon">
-                <i class="far fa-clock"></i>
-              </span>
-                <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>14 分钟</span>
-            </span>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h2 id="1-输入系统框架及调试"><a href="#1-输入系统框架及调试" class="headerlink" title="1. 输入系统框架及调试"></a>1. 输入系统框架及调试</h2><h3 id="1-1-框架概述"><a href="#1-1-框架概述" class="headerlink" title="1.1 框架概述"></a>1.1 框架概述</h3><p><img src="/../images/%E8%BE%93%E5%85%A5%E7%B3%BB%E7%BB%9F%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20230917174044630.png" alt="image-20230917174044630"></p>
-<ol>
-<li><p>APP 发起读操作，若无数据则休眠； </p>
-</li>
-<li><p>用户操作设备，硬件上产生中断； </p>
-</li>
-<li><p>输入系统驱动层对应的驱动程序处理中断： </p>
-<p>读取到数据，转换为标准的输入事件，向核心层汇报。 所谓输入事件就是一个<code>input_event</code>结构体。 </p>
-</li>
-<li><p>核心层可以决定把输入事件转发给上面哪个 handler 来处理： </p>
-<ul>
-<li><p>从 handler 的名字来看，它就是用来处输入操作的。有多种 handler，比 如：evdev_handler、kbd_handler、joydev_handler 等等。 </p>
-</li>
-<li><p>最常用的是 evdev_handler：它只是把 input_event 结构体保存在内核buffer 等，APP 来读取时就原原本本地返回。它支持多个 APP 同时访问输入设备，每个 APP 都可以获得同一份输入事件。 </p>
-</li>
-<li><p>当 APP 正在等待数据时，evdev_handler 会把它唤醒，这样 APP 就可以返回数据。</p>
-</li>
-</ul>
-</li>
-<li><p>APP 对输入事件的处理：</p>
-</li>
-<li><p>APP获得数据的方法有2种：直接访问设备节点( 比如<code>/dev/input/event0,1,2,...</code>)，或者通过<code>tslib、libinput</code>这类库来间接访问设备节点。这些库简化了对数据的处理。</p>
-</li>
-</ol>
-<h3 id="1-2-编写APP需要掌握的知识"><a href="#1-2-编写APP需要掌握的知识" class="headerlink" title="1.2 编写APP需要掌握的知识"></a>1.2 编写APP需要掌握的知识</h3>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/2023/09/17/%E8%BE%93%E5%85%A5%E7%B3%BB%E7%BB%9F%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/#more" rel="contents">
+              <a class="btn" href="/2023/09/22/%E9%9F%A6%E4%B8%9C%E5%B1%B1%E5%B5%8C%E5%85%A5%E5%BC%8FLinux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91%E7%AC%94%E8%AE%B0/tslib%E8%AF%BB%E5%8F%96%E8%A7%A6%E6%91%B8%E5%B1%8F/#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -1285,12 +1375,12 @@
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
-        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-count">11</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
-        <span class="site-state-item-count">9</span>
+        <span class="site-state-item-count">12</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -1390,6 +1480,61 @@
   
 
   
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+          load: ['[tex]/mhchem'],
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+          packages: {'[+]': ['mhchem']},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
 
   
 
