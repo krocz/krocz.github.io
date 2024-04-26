@@ -6,7 +6,7 @@
   <link href="http://example.com/atom.xml" rel="self"/>
   
   <link href="http://example.com/"/>
-  <updated>2024-01-12T11:23:10.156Z</updated>
+  <updated>2024-03-24T09:06:52.789Z</updated>
   <id>http://example.com/</id>
   
   <author>
@@ -17,6 +17,59 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>IS_ERR、PTR_ERR和ERR_PTR的用法</title>
+    <link href="http://example.com/2024/03/23/Linux%E3%80%81C%E8%AF%AD%E8%A8%80/IS-ERR%E3%80%81PTR-ERR%E5%92%8CERR-PTR%E7%9A%84%E7%94%A8%E6%B3%95/"/>
+    <id>http://example.com/2024/03/23/Linux%E3%80%81C%E8%AF%AD%E8%A8%80/IS-ERR%E3%80%81PTR-ERR%E5%92%8CERR-PTR%E7%9A%84%E7%94%A8%E6%B3%95/</id>
+    <published>2024-03-23T07:44:15.000Z</published>
+    <updated>2024-03-24T09:06:52.789Z</updated>
+    
+    
+    <summary type="html">&lt;p&gt;z&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;在内核创建设备文件 class 结构体时，常见代码：&lt;/p&gt;
+&lt;figure class=&quot;highlight c&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;4&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;5&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;cpuid_class = class_create(THIS_MODULE, &lt;span class=&quot;string&quot;&gt;&quot;cpuid&quot;&lt;/span&gt;);&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;if&lt;/span&gt; (IS_ERR(cpuid_class)) {&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    err = PTR_ERR(cpuid_class);&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; err;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;}&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+
+&lt;p&gt;其中 &lt;code&gt;IS_ERR&lt;/code&gt; 和 &lt;code&gt;PTR_ERR&lt;/code&gt; 是 Linux 内核中常用的宏，它们的定义如下：&lt;/p&gt;</summary>
+    
+    
+    
+    <category term="Linux内核源码" scheme="http://example.com/categories/Linux%E5%86%85%E6%A0%B8%E6%BA%90%E7%A0%81/"/>
+    
+    
+    <category term="C/C++" scheme="http://example.com/tags/C-C/"/>
+    
+    <category term="Linux 内核" scheme="http://example.com/tags/Linux-%E5%86%85%E6%A0%B8/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>C语言的内存对齐问题</title>
+    <link href="http://example.com/2024/03/01/Linux%E3%80%81C%E8%AF%AD%E8%A8%80/C%E8%AF%AD%E8%A8%80%E7%9A%84%E5%86%85%E5%AD%98%E5%AF%B9%E9%BD%90%E9%97%AE%E9%A2%98/"/>
+    <id>http://example.com/2024/03/01/Linux%E3%80%81C%E8%AF%AD%E8%A8%80/C%E8%AF%AD%E8%A8%80%E7%9A%84%E5%86%85%E5%AD%98%E5%AF%B9%E9%BD%90%E9%97%AE%E9%A2%98/</id>
+    <published>2024-03-01T13:20:30.000Z</published>
+    <updated>2024-03-02T03:32:24.306Z</updated>
+    
+    
+    <summary type="html">&lt;h2 id=&quot;1-什么是内存对齐？&quot;&gt;&lt;a href=&quot;#1-什么是内存对齐？&quot; class=&quot;headerlink&quot; title=&quot;1.什么是内存对齐？&quot;&gt;&lt;/a&gt;1.什么是内存对齐？&lt;/h2&gt;&lt;p&gt;以一个例子来说：&lt;/p&gt;
+&lt;figure class=&quot;highlight c&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;4&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;5&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;6&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;7&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;8&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;9&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;10&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;11&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;class&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;test&lt;/span&gt;{&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    &lt;span class=&quot;type&quot;&gt;char&lt;/span&gt; a;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    &lt;span class=&quot;type&quot;&gt;int&lt;/span&gt; i;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    &lt;span class=&quot;type&quot;&gt;char&lt;/span&gt; b;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;};&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;type&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;title function_&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;(&lt;span class=&quot;type&quot;&gt;int&lt;/span&gt; argc, &lt;span class=&quot;type&quot;&gt;char&lt;/span&gt; **argv)&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;{&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    &lt;span class=&quot;built_in&quot;&gt;printf&lt;/span&gt;(&lt;span class=&quot;string&quot;&gt;&quot;size : %ld&#92;n&quot;&lt;/span&gt;, &lt;span class=&quot;keyword&quot;&gt;sizeof&lt;/span&gt;(&lt;span class=&quot;keyword&quot;&gt;struct&lt;/span&gt; test));&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;number&quot;&gt;0&lt;/span&gt;;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;}&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+
+&lt;p&gt;在 Inter i5 + Ubuntu 18.04 + gcc 7.5 上输出：&lt;/p&gt;
+&lt;figure class=&quot;highlight plaintext&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;size : 12&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;</summary>
+    
+    
+    
+    <category term="C/C++" scheme="http://example.com/categories/C-C/"/>
+    
+    
+    <category term="C/C++" scheme="http://example.com/tags/C-C/"/>
+    
+    <category term="嵌入式" scheme="http://example.com/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/"/>
+    
+    <category term="Linux" scheme="http://example.com/tags/Linux/"/>
+    
+  </entry>
+  
+  <entry>
     <title>mmap</title>
     <link href="http://example.com/2024/01/12/mmap/"/>
     <id>http://example.com/2024/01/12/mmap/</id>
@@ -24,21 +77,21 @@
     <updated>2024-01-12T11:23:10.156Z</updated>
     
     
-      
-      
-    <summary type="html">&lt;h2 id=&quot;1-为什么要使用-mmap&quot;&gt;&lt;a href=&quot;#1-为什么要使用-mmap&quot; class=&quot;headerlink&quot; title=&quot;1. 为什么要使用 mmap&quot;&gt;&lt;/a&gt;1. 为什么要使用 mmap&lt;/h2&gt;&lt;p&gt;应用程序和驱动程序之间传递数据时，可以通过 re</summary>
-      
+    <summary type="html">&lt;h2 id=&quot;1-为什么要使用-mmap&quot;&gt;&lt;a href=&quot;#1-为什么要使用-mmap&quot; class=&quot;headerlink&quot; title=&quot;1. 为什么要使用 mmap&quot;&gt;&lt;/a&gt;1. 为什么要使用 mmap&lt;/h2&gt;&lt;p&gt;应用程序和驱动程序之间传递数据时，可以通过 read、write 函数进行，如下图：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/../images/mmap/image-20240112114136049.png&quot; alt=&quot;image-20240112114136049&quot;&gt;&lt;/p&gt;
+&lt;p&gt;应用程序不能直接读写驱动程序中的 buffer，需要在用户态 buffer 和内核态 buffer 之间进行一次数据拷贝。这种方式在数据量比较小时没什么问题； 但是数据量比较大时效率太低。例如更新 LCD，假设 LCD 采用 &lt;code&gt;1024 × 600 × 32 bpp&lt;/code&gt; 的格式，则一帧数据就有 2.3 M左右，拷贝的步骤效率太低。&lt;/p&gt;
+&lt;p&gt;应该允许程序直接读写驱动程序中的 buffer，这可以通过 mmap 实现(memory map)，把内核的 buffer 映射到用户态，让 APP 在用户态直接读写。&lt;/p&gt;</summary>
     
     
     
     <category term="Linux应用开发" scheme="http://example.com/categories/Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/"/>
     
     
+    <category term="C/C++" scheme="http://example.com/tags/C-C/"/>
+    
     <category term="嵌入式" scheme="http://example.com/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/"/>
     
     <category term="Linux" scheme="http://example.com/tags/Linux/"/>
-    
-    <category term="C/C++" scheme="http://example.com/tags/C-C/"/>
     
   </entry>
   
@@ -50,21 +103,26 @@
     <updated>2024-01-11T12:22:33.597Z</updated>
     
     
-      
-      
-    <summary type="html">&lt;h2 id=&quot;1-休眠与唤醒&quot;&gt;&lt;a href=&quot;#1-休眠与唤醒&quot; class=&quot;headerlink&quot; title=&quot;1. 休眠与唤醒&quot;&gt;&lt;/a&gt;1. 休眠与唤醒&lt;/h2&gt;&lt;h3 id=&quot;1-1-使用示例&quot;&gt;&lt;a href=&quot;#1-1-使用示例&quot; class=&quot;header</summary>
-      
+    <summary type="html">&lt;h2 id=&quot;1-休眠与唤醒&quot;&gt;&lt;a href=&quot;#1-休眠与唤醒&quot; class=&quot;headerlink&quot; title=&quot;1. 休眠与唤醒&quot;&gt;&lt;/a&gt;1. 休眠与唤醒&lt;/h2&gt;&lt;h3 id=&quot;1-1-使用示例&quot;&gt;&lt;a href=&quot;#1-1-使用示例&quot; class=&quot;headerlink&quot; title=&quot;1.1 使用示例&quot;&gt;&lt;/a&gt;1.1 使用示例&lt;/h3&gt;&lt;p&gt;使用休眠-唤醒机制来编写按键驱动程序：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;APP 调用 read 等函数试图读取数据，比如读取按键；&lt;/li&gt;
+&lt;li&gt;APP 进入内核态，也就是调用驱动中的对应函数，发现有数据则复制到用户空间并马上返回；&lt;/li&gt;
+&lt;li&gt;如果 APP 在内核态，也就是在驱动程序中发现没有数据，则 APP 休眠，进程&amp;#x2F;线程状态改为非 Running；&lt;/li&gt;
+&lt;li&gt;当有数据时，比如当按下按键时，驱动程序的中断服务程序被调用，它会记录数据、将 APP 的进程&amp;#x2F;线程状态修改为 Running；&lt;/li&gt;
+&lt;li&gt;调度器调度 APP 继续运行它的内核态代码，也就是驱动程序中的函数，复制数据到用户空间并马上返回。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;如下图所示：&lt;/p&gt;</summary>
     
     
     
     <category term="Linux应用开发" scheme="http://example.com/categories/Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/"/>
     
     
+    <category term="C/C++" scheme="http://example.com/tags/C-C/"/>
+    
     <category term="嵌入式" scheme="http://example.com/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/"/>
     
     <category term="Linux" scheme="http://example.com/tags/Linux/"/>
-    
-    <category term="C/C++" scheme="http://example.com/tags/C-C/"/>
     
   </entry>
   
@@ -76,21 +134,19 @@
     <updated>2024-01-07T06:53:30.825Z</updated>
     
     
-      
-      
-    <summary type="html">&lt;h2 id=&quot;1-APP读取按键值&quot;&gt;&lt;a href=&quot;#1-APP读取按键值&quot; class=&quot;headerlink&quot; title=&quot;1.APP读取按键值&quot;&gt;&lt;/a&gt;1.APP读取按键值&lt;/h2&gt;&lt;h3 id=&quot;1-1-APP读取按键的-4-种方法&quot;&gt;&lt;a href=&quot;#1-1</summary>
-      
+    <summary type="html">&lt;h2 id=&quot;1-APP读取按键值&quot;&gt;&lt;a href=&quot;#1-APP读取按键值&quot; class=&quot;headerlink&quot; title=&quot;1.APP读取按键值&quot;&gt;&lt;/a&gt;1.APP读取按键值&lt;/h2&gt;&lt;h3 id=&quot;1-1-APP读取按键的-4-种方法&quot;&gt;&lt;a href=&quot;#1-1-APP读取按键的-4-种方法&quot; class=&quot;headerlink&quot; title=&quot;1.1 APP读取按键的 4 种方法&quot;&gt;&lt;/a&gt;1.1 APP读取按键的 4 种方法&lt;/h3&gt;&lt;h4 id=&quot;1-1-1-查询方式&quot;&gt;&lt;a href=&quot;#1-1-1-查询方式&quot; class=&quot;headerlink&quot; title=&quot;1.1.1 查询方式&quot;&gt;&lt;/a&gt;1.1.1 查询方式&lt;/h4&gt;&lt;p&gt;&lt;img src=&quot;/../images/APP%E8%AF%BB%E5%8F%96%E6%8C%89%E9%94%AE%E7%9A%84%E5%87%A0%E7%A7%8D%E6%96%B9%E5%BC%8F/image-20240102195020502.png&quot; alt=&quot;image-20240102195020502&quot;&gt;&lt;/p&gt;
+&lt;p&gt;驱动程序中构造、注册一个 file_operations 结构体，里面提供有对应的 open,read 函数。&lt;/p&gt;</summary>
     
     
     
     <category term="Linux应用开发" scheme="http://example.com/categories/Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/"/>
     
     
+    <category term="C/C++" scheme="http://example.com/tags/C-C/"/>
+    
     <category term="嵌入式" scheme="http://example.com/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/"/>
     
     <category term="Linux" scheme="http://example.com/tags/Linux/"/>
-    
-    <category term="C/C++" scheme="http://example.com/tags/C-C/"/>
     
   </entry>
   
@@ -99,24 +155,31 @@
     <link href="http://example.com/2024/01/05/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/"/>
     <id>http://example.com/2024/01/05/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/</id>
     <published>2024-01-05T02:36:47.000Z</published>
-    <updated>2024-01-11T02:17:01.175Z</updated>
+    <updated>2024-03-22T09:34:50.929Z</updated>
     
     
-      
-      
-    <summary type="html">&lt;h2 id=&quot;1-异常和中断&quot;&gt;&lt;a href=&quot;#1-异常和中断&quot; class=&quot;headerlink&quot; title=&quot;1.异常和中断&quot;&gt;&lt;/a&gt;1.异常和中断&lt;/h2&gt;&lt;h3 id=&quot;1-1-异常和中断的概念&quot;&gt;&lt;a href=&quot;#1-1-异常和中断的概念&quot; class=&quot;</summary>
-      
+    <summary type="html">&lt;h2 id=&quot;1-异常和中断&quot;&gt;&lt;a href=&quot;#1-异常和中断&quot; class=&quot;headerlink&quot; title=&quot;1.异常和中断&quot;&gt;&lt;/a&gt;1.异常和中断&lt;/h2&gt;&lt;h3 id=&quot;1-1-异常和中断的概念&quot;&gt;&lt;a href=&quot;#1-1-异常和中断的概念&quot; class=&quot;headerlink&quot; title=&quot;1.1 异常和中断的概念&quot;&gt;&lt;/a&gt;1.1 异常和中断的概念&lt;/h3&gt;&lt;p&gt;异常不可屏蔽，中断可以屏蔽，中断一种特殊的异常。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/../images/%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD/image-20240105105633741.png&quot; alt=&quot;image-20240105105633741&quot;&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;初始化，设置中断源（设置中断源、设置中断控制器、使能CPU总开关）&lt;/li&gt;
+&lt;li&gt;执行程序&lt;/li&gt;
+&lt;li&gt;产生中断：中断源 -&amp;gt; 中断控制器 -&amp;gt; CPU&lt;/li&gt;
+&lt;li&gt;CPU每执行完一条指令，都会检查有无中断&amp;#x2F;异常产生&lt;/li&gt;
+&lt;li&gt;CPU发现有中断&amp;#x2F;异常产生，开始处理&lt;/li&gt;
+&lt;li&gt;对于不同的异常，跳去不同的地址执行指令（中断向量表），这些指令只是一条跳转指令，跳去执行某个函数&lt;/li&gt;
+&lt;li&gt;处理函数：保存现场，&lt;strong&gt;分辨中断源并调用相应的处理函数&lt;/strong&gt;，恢复现场&lt;/li&gt;
+&lt;/ol&gt;</summary>
     
     
     
     <category term="Linux应用开发" scheme="http://example.com/categories/Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/"/>
     
     
+    <category term="C/C++" scheme="http://example.com/tags/C-C/"/>
+    
     <category term="嵌入式" scheme="http://example.com/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/"/>
     
     <category term="Linux" scheme="http://example.com/tags/Linux/"/>
-    
-    <category term="C/C++" scheme="http://example.com/tags/C-C/"/>
     
   </entry>
   
@@ -125,24 +188,25 @@
     <link href="http://example.com/2024/01/02/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/"/>
     <id>http://example.com/2024/01/02/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/</id>
     <published>2024-01-02T11:43:44.000Z</published>
-    <updated>2024-01-07T06:53:35.028Z</updated>
+    <updated>2024-03-22T02:31:31.325Z</updated>
     
     
-      
-      
-    <summary type="html">&lt;h2 id=&quot;1-GPIO-和-Pinctrl-子系统的使用&quot;&gt;&lt;a href=&quot;#1-GPIO-和-Pinctrl-子系统的使用&quot; class=&quot;headerlink&quot; title=&quot;1.  GPIO 和 Pinctrl 子系统的使用&quot;&gt;&lt;/a&gt;1.  GPIO 和 Pinc</summary>
-      
+    <summary type="html">&lt;h2 id=&quot;1-GPIO-和-Pinctrl-子系统的使用&quot;&gt;&lt;a href=&quot;#1-GPIO-和-Pinctrl-子系统的使用&quot; class=&quot;headerlink&quot; title=&quot;1.  GPIO 和 Pinctrl 子系统的使用&quot;&gt;&lt;/a&gt;1.  GPIO 和 Pinctrl 子系统的使用&lt;/h2&gt;&lt;p&gt;在 LED 驱动程序中，我们使用寄存器操作的方式来配置硬件，这种方式是非常低效的，对于具有大量寄存器的芯片肯定需要将寄存器操作，可以由芯片厂的BSP工程师来封装成库，然后来让驱动开发人员进行调用，这就是今天引入的 GPIO 和 Pinctrl 子系统。&lt;/p&gt;
+&lt;h3 id=&quot;1-1-Pinctrl-子系统&quot;&gt;&lt;a href=&quot;#1-1-Pinctrl-子系统&quot; class=&quot;headerlink&quot; title=&quot;1.1 Pinctrl 子系统&quot;&gt;&lt;/a&gt;1.1 Pinctrl 子系统&lt;/h3&gt;&lt;blockquote&gt;
+&lt;p&gt;参考文档：内核目录&#92;Documentation&#92;devicetree&#92;bindings&#92;pinctrl&#92;pinctrl-bindings.txt&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;Pinctrl 子系统涉及 2 个对象：pin controller、client device。&lt;/p&gt;</summary>
     
     
     
     <category term="Linux应用开发" scheme="http://example.com/categories/Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/"/>
     
     
+    <category term="C/C++" scheme="http://example.com/tags/C-C/"/>
+    
     <category term="嵌入式" scheme="http://example.com/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/"/>
     
     <category term="Linux" scheme="http://example.com/tags/Linux/"/>
-    
-    <category term="C/C++" scheme="http://example.com/tags/C-C/"/>
     
   </entry>
   
@@ -151,24 +215,23 @@
     <link href="http://example.com/2024/01/02/%E4%BD%BF%E7%94%A8%E8%AE%BE%E5%A4%87%E6%A0%91%E7%9A%84LED%E9%A9%B1%E5%8A%A8%E6%A1%86%E6%9E%B6/"/>
     <id>http://example.com/2024/01/02/%E4%BD%BF%E7%94%A8%E8%AE%BE%E5%A4%87%E6%A0%91%E7%9A%84LED%E9%A9%B1%E5%8A%A8%E6%A1%86%E6%9E%B6/</id>
     <published>2024-01-02T03:02:49.000Z</published>
-    <updated>2024-01-06T04:29:11.167Z</updated>
+    <updated>2024-03-21T13:43:48.896Z</updated>
     
     
-      
-      
-    <summary type="html">&lt;h2 id=&quot;1-设备树&quot;&gt;&lt;a href=&quot;#1-设备树&quot; class=&quot;headerlink&quot; title=&quot;1. 设备树&quot;&gt;&lt;/a&gt;1. 设备树&lt;/h2&gt;&lt;h3 id=&quot;1-1-设备树的引入&quot;&gt;&lt;a href=&quot;#1-1-设备树的引入&quot; class=&quot;headerlink</summary>
-      
+    <summary type="html">&lt;h2 id=&quot;1-设备树&quot;&gt;&lt;a href=&quot;#1-设备树&quot; class=&quot;headerlink&quot; title=&quot;1. 设备树&quot;&gt;&lt;/a&gt;1. 设备树&lt;/h2&gt;&lt;h3 id=&quot;1-1-设备树的引入&quot;&gt;&lt;a href=&quot;#1-1-设备树的引入&quot; class=&quot;headerlink&quot; title=&quot;1.1 设备树的引入&quot;&gt;&lt;/a&gt;1.1 设备树的引入&lt;/h3&gt;&lt;p&gt;如果按照上面的方式来让我们的Linux内核支持所有的主控和开发板；也许常用的主控芯片并不是很多，但是基于主控芯片所设计出的开发板就是那就是千千万万了。如果要将所有的开发板的引脚配置编译到内核中，那内核中将充斥大量的高度重复的文件。为此，引入了设备树的概念，&lt;strong&gt;设备树用来给内核里的驱动程序指定硬件的信息&lt;/strong&gt;：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/../images/%E4%BD%BF%E7%94%A8%E8%AE%BE%E5%A4%87%E6%A0%91%E7%9A%84LED%E9%A9%B1%E5%8A%A8%E6%A1%86%E6%9E%B6/image-20231218155959125.png&quot; alt=&quot;image-20231218155959125&quot;&gt;&lt;/p&gt;
+&lt;h3 id=&quot;1-2-设备树的语法&quot;&gt;&lt;a href=&quot;#1-2-设备树的语法&quot; class=&quot;headerlink&quot; title=&quot;1.2 设备树的语法&quot;&gt;&lt;/a&gt;1.2 设备树的语法&lt;/h3&gt;</summary>
     
     
     
     <category term="Linux应用开发" scheme="http://example.com/categories/Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/"/>
     
     
+    <category term="C/C++" scheme="http://example.com/tags/C-C/"/>
+    
     <category term="嵌入式" scheme="http://example.com/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/"/>
     
     <category term="Linux" scheme="http://example.com/tags/Linux/"/>
-    
-    <category term="C/C++" scheme="http://example.com/tags/C-C/"/>
     
   </entry>
   
@@ -180,21 +243,20 @@
     <updated>2024-01-06T04:29:14.832Z</updated>
     
     
-      
-      
-    <summary type="html">&lt;h2 id=&quot;1-LED驱动程序框架设计-分离&quot;&gt;&lt;a href=&quot;#1-LED驱动程序框架设计-分离&quot; class=&quot;headerlink&quot; title=&quot;1.LED驱动程序框架设计-分离&quot;&gt;&lt;/a&gt;1.LED驱动程序框架设计-分离&lt;/h2&gt;&lt;p&gt;在上一篇博文中编写的驱动程序</summary>
-      
+    <summary type="html">&lt;h2 id=&quot;1-LED驱动程序框架设计-分离&quot;&gt;&lt;a href=&quot;#1-LED驱动程序框架设计-分离&quot; class=&quot;headerlink&quot; title=&quot;1.LED驱动程序框架设计-分离&quot;&gt;&lt;/a&gt;1.LED驱动程序框架设计-分离&lt;/h2&gt;&lt;p&gt;在上一篇博文中编写的驱动程序仅能操作固定开发板上的一个LED灯。考虑现实情况，使用同一款主控芯片，不同厂家可能会设计不同的PCB板，针对硬件使用的芯片引脚各不相同，但是同一款主控针对同一硬件的设置都是相似的。因此，我们考虑针对通用LED驱动程序，主控芯片，开发板来分离出三层，以便我们的LED驱动程序能够支持不同主控不同开发板使用：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/../images/LED%E9%A9%B1%E5%8A%A8%E7%A8%8B%E5%BA%8F%E6%A1%86%E6%9E%B6/image-20231202161816859.png&quot; alt=&quot;image-20231202161816859&quot;&gt;&lt;/p&gt;
+&lt;h3 id=&quot;1-1-开发板层&quot;&gt;&lt;a href=&quot;#1-1-开发板层&quot; class=&quot;headerlink&quot; title=&quot;1.1 开发板层&quot;&gt;&lt;/a&gt;1.1 开发板层&lt;/h3&gt;&lt;p&gt;led_resources.h&lt;/p&gt;</summary>
     
     
     
     <category term="Linux应用开发" scheme="http://example.com/categories/Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/"/>
     
     
+    <category term="C/C++" scheme="http://example.com/tags/C-C/"/>
+    
     <category term="嵌入式" scheme="http://example.com/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/"/>
     
     <category term="Linux" scheme="http://example.com/tags/Linux/"/>
-    
-    <category term="C/C++" scheme="http://example.com/tags/C-C/"/>
     
   </entry>
   
@@ -203,13 +265,12 @@
     <link href="http://example.com/2023/11/10/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E6%A8%A1%E6%9D%BF/"/>
     <id>http://example.com/2023/11/10/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E6%A8%A1%E6%9D%BF/</id>
     <published>2023-11-10T03:54:12.000Z</published>
-    <updated>2024-02-06T10:18:53.521Z</updated>
+    <updated>2024-04-12T05:27:08.595Z</updated>
     
     
-      
-      
-    <summary type="html">&lt;h2 id=&quot;1-链表&quot;&gt;&lt;a href=&quot;#1-链表&quot; class=&quot;headerlink&quot; title=&quot;1.链表&quot;&gt;&lt;/a&gt;1.链表&lt;/h2&gt;&lt;h3 id=&quot;1-1-静态链表（数组模拟）&quot;&gt;&lt;a href=&quot;#1-1-静态链表（数组模拟）&quot; class=&quot;headerli</summary>
-      
+    <summary type="html">&lt;h2 id=&quot;1-链表&quot;&gt;&lt;a href=&quot;#1-链表&quot; class=&quot;headerlink&quot; title=&quot;1.链表&quot;&gt;&lt;/a&gt;1.链表&lt;/h2&gt;&lt;h3 id=&quot;1-1-静态链表（数组模拟）&quot;&gt;&lt;a href=&quot;#1-1-静态链表（数组模拟）&quot; class=&quot;headerlink&quot; title=&quot;1.1 静态链表（数组模拟）&quot;&gt;&lt;/a&gt;1.1 静态链表（数组模拟）&lt;/h3&gt;&lt;h4 id=&quot;1-1-1-单链表&quot;&gt;&lt;a href=&quot;#1-1-1-单链表&quot; class=&quot;headerlink&quot; title=&quot;1.1.1 单链表&quot;&gt;&lt;/a&gt;1.1.1 单链表&lt;/h4&gt;&lt;figure class=&quot;highlight c++&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;4&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;5&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;6&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;7&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;8&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;9&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;10&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;11&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;12&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;13&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;14&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;15&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;16&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;17&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;18&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;19&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;20&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;21&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;22&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;23&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;24&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;25&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;26&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;27&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;28&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;29&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;30&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;31&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;32&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;33&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;34&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;35&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;36&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;37&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;38&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;39&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;40&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;41&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;42&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;43&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;44&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;45&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;46&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;47&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;48&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;49&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;50&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;meta&quot;&gt;#&lt;span class=&quot;keyword&quot;&gt;include&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;&amp;lt;iostream&amp;gt;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;using&lt;/span&gt; &lt;span class=&quot;keyword&quot;&gt;namespace&lt;/span&gt; std;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;type&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;type&quot;&gt;int&lt;/span&gt; N = &lt;span class=&quot;number&quot;&gt;100010&lt;/span&gt;;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;type&quot;&gt;int&lt;/span&gt; e[N], ne[N], idx, head = &lt;span class=&quot;number&quot;&gt;-1&lt;/span&gt;;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;function&quot;&gt;&lt;span class=&quot;type&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;add_head&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;(&lt;span class=&quot;type&quot;&gt;int&lt;/span&gt; v)&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;function&quot;&gt;&lt;/span&gt;{&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    e[idx] = v, ne[idx] = head, head = idx++;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;}&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;function&quot;&gt;&lt;span class=&quot;type&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;add&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;(&lt;span class=&quot;type&quot;&gt;int&lt;/span&gt; k, &lt;span class=&quot;type&quot;&gt;int&lt;/span&gt; v)&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;function&quot;&gt;&lt;/span&gt;{&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    e[idx] = v, ne[idx] = ne[k], ne[k] = idx++;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;}&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;function&quot;&gt;&lt;span class=&quot;type&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;remove&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;(&lt;span class=&quot;type&quot;&gt;int&lt;/span&gt; k)&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;function&quot;&gt;&lt;/span&gt;{&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;if&lt;/span&gt;(~k) ne[k] = ne[ne[k]];&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;else&lt;/span&gt; head = ne[head];&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;}&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;function&quot;&gt;&lt;span class=&quot;type&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;()&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;function&quot;&gt;&lt;/span&gt;{&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    &lt;span class=&quot;type&quot;&gt;int&lt;/span&gt; m;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    cin &amp;gt;&amp;gt; m;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;while&lt;/span&gt;(m --)&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    {&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;        &lt;span class=&quot;type&quot;&gt;int&lt;/span&gt; k, v;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;        &lt;span class=&quot;type&quot;&gt;char&lt;/span&gt; c;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;        cin &amp;gt;&amp;gt; c;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;        &lt;span class=&quot;keyword&quot;&gt;switch&lt;/span&gt;(c)&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;        {&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;            &lt;span class=&quot;keyword&quot;&gt;case&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;&#39;H&#39;&lt;/span&gt;:&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;                cin &amp;gt;&amp;gt; v;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;                &lt;span class=&quot;built_in&quot;&gt;add_head&lt;/span&gt;(v);&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;                &lt;span class=&quot;keyword&quot;&gt;break&lt;/span&gt;;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;            &lt;span class=&quot;comment&quot;&gt;// 题中对于k的计数从1开始，但是存储下标从0开始，因此需要k - 1&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;            &lt;span class=&quot;keyword&quot;&gt;case&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;&#39;I&#39;&lt;/span&gt;:&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;                cin &amp;gt;&amp;gt; k &amp;gt;&amp;gt; v;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;                &lt;span class=&quot;built_in&quot;&gt;add&lt;/span&gt;(k - &lt;span class=&quot;number&quot;&gt;1&lt;/span&gt;, v);&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;                &lt;span class=&quot;keyword&quot;&gt;break&lt;/span&gt;;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;            &lt;span class=&quot;keyword&quot;&gt;case&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;&#39;D&#39;&lt;/span&gt;:&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;                cin &amp;gt;&amp;gt; k;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;                &lt;span class=&quot;built_in&quot;&gt;remove&lt;/span&gt;(k - &lt;span class=&quot;number&quot;&gt;1&lt;/span&gt;);&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;        }&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    }&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;for&lt;/span&gt;(&lt;span class=&quot;type&quot;&gt;int&lt;/span&gt; i = head; ~i; i = ne[i])&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;        cout &amp;lt;&amp;lt; e[i] &amp;lt;&amp;lt; &lt;span class=&quot;string&quot;&gt;&quot; &quot;&lt;/span&gt;;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;number&quot;&gt;0&lt;/span&gt;;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;}&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+
+&lt;p&gt;注1：为了逻辑清晰代码简洁，无论是静态链表还是动态链表都最好加上头节点，但是仅在数组模拟单链表时没有头节点，因为算法题中使用单链表时一般仅使用在头插入新节点，不涉及其他操作，所以没有必要加入头节点&lt;/p&gt;</summary>
     
     
     
@@ -227,14 +288,13 @@
     <link href="http://example.com/2023/10/31/%E7%AE%97%E6%B3%95%E6%A8%A1%E6%9D%BF/"/>
     <id>http://example.com/2023/10/31/%E7%AE%97%E6%B3%95%E6%A8%A1%E6%9D%BF/</id>
     <published>2023-10-31T03:54:06.000Z</published>
-    <updated>2024-01-19T06:25:40.431Z</updated>
+    <updated>2024-04-26T09:14:12.535Z</updated>
     
     
-      
-      
     <summary type="html">&lt;h2 id=&quot;1-快速排序&quot;&gt;&lt;a href=&quot;#1-快速排序&quot; class=&quot;headerlink&quot; title=&quot;1.快速排序&quot;&gt;&lt;/a&gt;1.快速排序&lt;/h2&gt;&lt;p&gt;时间复杂度：$O(nlogn)$&lt;/p&gt;
-&lt;figure class=&quot;highlight c++&quot;&gt;&lt;ta</summary>
-      
+&lt;figure class=&quot;highlight c++&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;4&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;5&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;6&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;7&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;8&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;9&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;10&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;11&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;12&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;function&quot;&gt;&lt;span class=&quot;type&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;quick_sort&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;(&lt;span class=&quot;type&quot;&gt;int&lt;/span&gt; l, &lt;span class=&quot;type&quot;&gt;int&lt;/span&gt; r)&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;function&quot;&gt;&lt;/span&gt;&amp;#123;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;if&lt;/span&gt;(l &amp;gt;= r) &lt;span class=&quot;keyword&quot;&gt;return&lt;/span&gt;;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    &lt;span class=&quot;type&quot;&gt;int&lt;/span&gt; x = a[l + r &amp;gt;&amp;gt; &lt;span class=&quot;number&quot;&gt;1&lt;/span&gt;], i = l - &lt;span class=&quot;number&quot;&gt;1&lt;/span&gt;, j = r + &lt;span class=&quot;number&quot;&gt;1&lt;/span&gt;;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    &lt;span class=&quot;keyword&quot;&gt;while&lt;/span&gt;(i &amp;lt; j)&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    &amp;#123;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;        &lt;span class=&quot;keyword&quot;&gt;do&lt;/span&gt; i++; &lt;span class=&quot;keyword&quot;&gt;while&lt;/span&gt;(a[i] &amp;lt; x);&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;        &lt;span class=&quot;keyword&quot;&gt;do&lt;/span&gt; j--; &lt;span class=&quot;keyword&quot;&gt;while&lt;/span&gt;(a[j] &amp;gt; x);&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;        &lt;span class=&quot;keyword&quot;&gt;if&lt;/span&gt;(i &amp;lt; j) &lt;span class=&quot;built_in&quot;&gt;swap&lt;/span&gt;(a[i], a[j]);&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    &amp;#125;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;    &lt;span class=&quot;built_in&quot;&gt;quick_sort&lt;/span&gt;(l, j), &lt;span class=&quot;built_in&quot;&gt;quick_sort&lt;/span&gt;(j + &lt;span class=&quot;number&quot;&gt;1&lt;/span&gt;, r);&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&amp;#125;&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+
+&lt;h3 id=&quot;1-1-选择第K大的数字-quick-select&quot;&gt;&lt;a href=&quot;#1-1-选择第K大的数字-quick-select&quot; class=&quot;headerlink&quot; title=&quot;1.1 选择第K大的数字(quick_select)&quot;&gt;&lt;/a&gt;1.1 选择第K大的数字(quick_select)&lt;/h3&gt;&lt;p&gt;时间复杂度：$O(n)$&lt;/p&gt;</summary>
     
     
     
@@ -255,21 +315,24 @@
     <updated>2024-01-02T03:10:37.634Z</updated>
     
     
-      
-      
-    <summary type="html">&lt;h2 id=&quot;1-学会看芯片手册&quot;&gt;&lt;a href=&quot;#1-学会看芯片手册&quot; class=&quot;headerlink&quot; title=&quot;1.学会看芯片手册&quot;&gt;&lt;/a&gt;1.学会看芯片手册&lt;/h2&gt;&lt;h3 id=&quot;1-1-GPIO的通用操作方法&quot;&gt;&lt;a href=&quot;#1-1-GPIO的通</summary>
-      
+    <summary type="html">&lt;h2 id=&quot;1-学会看芯片手册&quot;&gt;&lt;a href=&quot;#1-学会看芯片手册&quot; class=&quot;headerlink&quot; title=&quot;1.学会看芯片手册&quot;&gt;&lt;/a&gt;1.学会看芯片手册&lt;/h2&gt;&lt;h3 id=&quot;1-1-GPIO的通用操作方法&quot;&gt;&lt;a href=&quot;#1-1-GPIO的通用操作方法&quot; class=&quot;headerlink&quot; title=&quot;1.1 GPIO的通用操作方法&quot;&gt;&lt;/a&gt;1.1 GPIO的通用操作方法&lt;/h3&gt;&lt;p&gt;参考stm32的GPIO引脚的使用过程：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;使能GPIOx时钟&lt;/li&gt;
+&lt;li&gt;设置GPIOx引脚的工作模式（输入、输出、复用、&lt;strong&gt;重定向&lt;/strong&gt;）&lt;/li&gt;
+&lt;li&gt;读取&amp;#x2F;设置GOPIOx引脚的电平&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;一般的，芯片GPIO引脚使能的操作如下：&lt;/p&gt;</summary>
     
     
     
     <category term="Linux应用开发" scheme="http://example.com/categories/Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/"/>
     
     
+    <category term="C/C++" scheme="http://example.com/tags/C-C/"/>
+    
     <category term="嵌入式" scheme="http://example.com/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/"/>
     
     <category term="Linux" scheme="http://example.com/tags/Linux/"/>
-    
-    <category term="C/C++" scheme="http://example.com/tags/C-C/"/>
     
   </entry>
   
@@ -281,21 +344,21 @@
     <updated>2023-12-17T02:16:28.836Z</updated>
     
     
-      
-      
-    <summary type="html">&lt;h2 id=&quot;1-编写驱动程序的框架&quot;&gt;&lt;a href=&quot;#1-编写驱动程序的框架&quot; class=&quot;headerlink&quot; title=&quot;1. 编写驱动程序的框架&quot;&gt;&lt;/a&gt;1. 编写驱动程序的框架&lt;/h2&gt;&lt;h3 id=&quot;1-1-APP-打开的文件在内核中如何表示&quot;&gt;&lt;a h</summary>
-      
+    <summary type="html">&lt;h2 id=&quot;1-编写驱动程序的框架&quot;&gt;&lt;a href=&quot;#1-编写驱动程序的框架&quot; class=&quot;headerlink&quot; title=&quot;1. 编写驱动程序的框架&quot;&gt;&lt;/a&gt;1. 编写驱动程序的框架&lt;/h2&gt;&lt;h3 id=&quot;1-1-APP-打开的文件在内核中如何表示&quot;&gt;&lt;a href=&quot;#1-1-APP-打开的文件在内核中如何表示&quot; class=&quot;headerlink&quot; title=&quot;1.1 APP 打开的文件在内核中如何表示&quot;&gt;&lt;/a&gt;1.1 APP 打开的文件在内核中如何表示&lt;/h3&gt;&lt;p&gt;APP 打开文件时，可以得到一个整数，这个整数被称为文件句柄。对于 APP 的每一个文件句柄，在内核里面都有一个&lt;code&gt;struct file&lt;/code&gt;结构体与之对应:&lt;/p&gt;
+&lt;figure class=&quot;highlight c&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;3&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;4&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;5&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;6&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;7&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;8&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;9&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;10&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;11&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;12&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;13&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;14&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;15&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;16&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;17&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;18&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;19&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;20&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;21&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;class&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;file&lt;/span&gt; &amp;#123;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;	&lt;span class=&quot;class&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;union&lt;/span&gt; &amp;#123;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;		&lt;span class=&quot;class&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;llist_node&lt;/span&gt;	&lt;span class=&quot;title&quot;&gt;fu_llist&lt;/span&gt;;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;		&lt;span class=&quot;class&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;rcu_head&lt;/span&gt; 	&lt;span class=&quot;title&quot;&gt;fu_rcuhead&lt;/span&gt;;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;	&amp;#125; f_u;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;	&lt;span class=&quot;class&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;path&lt;/span&gt;		&lt;span class=&quot;title&quot;&gt;f_path&lt;/span&gt;;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;	&lt;span class=&quot;class&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;inode&lt;/span&gt;		*&lt;span class=&quot;title&quot;&gt;f_inode&lt;/span&gt;;&lt;/span&gt;	&lt;span class=&quot;comment&quot;&gt;/* cached value */&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;	&lt;span class=&quot;type&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;class&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;file_operations&lt;/span&gt;	*&lt;span class=&quot;title&quot;&gt;f_op&lt;/span&gt;;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;	&lt;span class=&quot;comment&quot;&gt;/*&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;comment&quot;&gt;	 * Protects f_ep_links, f_flags.&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;comment&quot;&gt;	 * Must not be taken from IRQ context.&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;comment&quot;&gt;	 */&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;	&lt;span class=&quot;type&quot;&gt;spinlock_t&lt;/span&gt;		f_lock;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;	&lt;span class=&quot;type&quot;&gt;atomic_long_t&lt;/span&gt;		f_count;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;	&lt;span class=&quot;type&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;type&quot;&gt;int&lt;/span&gt; 		f_flags;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;	&lt;span class=&quot;type&quot;&gt;fmode_t&lt;/span&gt;			f_mode;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;	&lt;span class=&quot;class&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;mutex&lt;/span&gt;		&lt;span class=&quot;title&quot;&gt;f_pos_lock&lt;/span&gt;;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;	&lt;span class=&quot;type&quot;&gt;loff_t&lt;/span&gt;			f_pos;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;	&lt;span class=&quot;class&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;fown_struct&lt;/span&gt;	&lt;span class=&quot;title&quot;&gt;f_owner&lt;/span&gt;;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;	&lt;span class=&quot;type&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;class&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;cred&lt;/span&gt;	*&lt;span class=&quot;title&quot;&gt;f_cred&lt;/span&gt;;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;	&lt;span class=&quot;class&quot;&gt;&lt;span class=&quot;keyword&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;title&quot;&gt;file_ra_state&lt;/span&gt;	&lt;span class=&quot;title&quot;&gt;f_ra&lt;/span&gt;;&lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+
+&lt;p&gt;在APP中调用open函数打开文件时，传入的flags、mode等参数会记录在内核相应的&lt;code&gt;struct file&lt;/code&gt;成员&lt;code&gt;f_flags&#92;f_mode&lt;/code&gt;中；读写文件的偏移地址也会保存在&lt;code&gt;struct file&lt;/code&gt;结构体的&lt;code&gt;f_pos&lt;/code&gt;成员中。&lt;/p&gt;</summary>
     
     
     
     <category term="Linux应用开发" scheme="http://example.com/categories/Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/"/>
     
     
+    <category term="C/C++" scheme="http://example.com/tags/C-C/"/>
+    
     <category term="嵌入式" scheme="http://example.com/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/"/>
     
     <category term="Linux" scheme="http://example.com/tags/Linux/"/>
-    
-    <category term="C/C++" scheme="http://example.com/tags/C-C/"/>
     
   </entry>
   
@@ -307,10 +370,10 @@
     <updated>2024-02-15T09:09:23.540Z</updated>
     
     
-      
-      
-    <summary type="html">&lt;h3 id=&quot;来自星辰大海的好奇之旅——在宇宙的尽头里烤棉花糖吧&quot;&gt;&lt;a href=&quot;#来自星辰大海的好奇之旅——在宇宙的尽头里烤棉花糖吧&quot; class=&quot;headerlink&quot; title=&quot;来自星辰大海的好奇之旅——在宇宙的尽头里烤棉花糖吧&quot;&gt;&lt;/a&gt;来自星辰大海的好奇之旅</summary>
-      
+    <summary type="html">&lt;h3 id=&quot;来自星辰大海的好奇之旅——在宇宙的尽头里烤棉花糖吧&quot;&gt;&lt;a href=&quot;#来自星辰大海的好奇之旅——在宇宙的尽头里烤棉花糖吧&quot; class=&quot;headerlink&quot; title=&quot;来自星辰大海的好奇之旅——在宇宙的尽头里烤棉花糖吧&quot;&gt;&lt;/a&gt;来自星辰大海的好奇之旅——在宇宙的尽头里烤棉花糖吧&lt;/h3&gt;&lt;p&gt;&lt;img src=&quot;/../images/%E6%98%9F%E9%99%85%E6%8B%93%E8%8D%92%E5%90%8E%E8%AE%B0/Snipaste_2024-02-15_10-27-30-17079659657219.png&quot; alt=&quot;Snipaste_2024-02-15_10-27-30&quot;&gt;&lt;/p&gt;
+&lt;p&gt;​		28万亿年之前，一个挪麦家族的宇宙飞船突然接收到了一个遥远而古老的信号，他们惊讶的发现这个信号比这个宇宙还要古老，怀着巨大的好奇心毫不犹豫地启动飞船，跃迁到了这个信号所在的星系。&lt;/p&gt;
+&lt;p&gt;​		在跃迁的终点，他们非常不幸的碰到了极小的概率；飞船跃迁的坐标处刚好是黑棘星的部分实体，这将宇宙飞船完全损坏，他们不得不选择发射紧急逃生舱离开不适宜生存的黑棘星。三艘逃生舱中的两艘幸运地穿过了黑棘星复杂的藤蔓结构和巨大安康鱼的追捕，分别在碎空星和灰烬双星成功降落。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/../images/%E6%98%9F%E9%99%85%E6%8B%93%E8%8D%92%E5%90%8E%E8%AE%B0/Snipaste_2024-02-15_10-48-06.png&quot; alt=&quot;Snipaste_2024-02-15_10-48-06&quot;&gt;&lt;/p&gt;</summary>
     
     
     
@@ -329,21 +392,25 @@
     <updated>2023-10-23T12:17:16.039Z</updated>
     
     
-      
-      
-    <summary type="html">&lt;h2 id=&quot;1-I2C协议&quot;&gt;&lt;a href=&quot;#1-I2C协议&quot; class=&quot;headerlink&quot; title=&quot;1. I2C协议&quot;&gt;&lt;/a&gt;1. I2C协议&lt;/h2&gt;&lt;p&gt;&lt;img src=&quot;/../images/IIC%E5%BA%94%E7%94%A8%E7%BC</summary>
-      
+    <summary type="html">&lt;h2 id=&quot;1-I2C协议&quot;&gt;&lt;a href=&quot;#1-I2C协议&quot; class=&quot;headerlink&quot; title=&quot;1. I2C协议&quot;&gt;&lt;/a&gt;1. I2C协议&lt;/h2&gt;&lt;p&gt;&lt;img src=&quot;/../images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231013195434388.png&quot; alt=&quot;image-20231013195434388&quot;&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;起始信号&lt;/li&gt;
+&lt;li&gt;停止信号&lt;/li&gt;
+&lt;li&gt;传输1Bit数据时的信号&lt;/li&gt;
+&lt;li&gt;应答信号（&lt;strong&gt;0：应答，1：非应答&lt;/strong&gt;）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&quot;1-1-I2C写操作&quot;&gt;&lt;a href=&quot;#1-1-I2C写操作&quot; class=&quot;headerlink&quot; title=&quot;1.1 I2C写操作&quot;&gt;&lt;/a&gt;1.1 I2C写操作&lt;/h3&gt;&lt;p&gt;&lt;img src=&quot;/../images/IIC%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231013200107130.png&quot; alt=&quot;image-20231013200107130&quot;&gt;&lt;/p&gt;</summary>
     
     
     
     <category term="Linux应用开发" scheme="http://example.com/categories/Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/"/>
     
     
+    <category term="C/C++" scheme="http://example.com/tags/C-C/"/>
+    
     <category term="嵌入式" scheme="http://example.com/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/"/>
     
     <category term="Linux" scheme="http://example.com/tags/Linux/"/>
-    
-    <category term="C/C++" scheme="http://example.com/tags/C-C/"/>
     
   </entry>
   
@@ -352,26 +419,27 @@
     <link href="http://example.com/2023/10/06/UART%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/"/>
     <id>http://example.com/2023/10/06/UART%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/</id>
     <published>2023-10-06T02:54:31.000Z</published>
-    <updated>2023-10-11T14:34:56.073Z</updated>
+    <updated>2024-04-05T03:43:03.700Z</updated>
     
     
-      
-      
     <summary type="html">&lt;h2 id=&quot;1-TTY体系的发展&quot;&gt;&lt;a href=&quot;#1-TTY体系的发展&quot; class=&quot;headerlink&quot; title=&quot;1.TTY体系的发展&quot;&gt;&lt;/a&gt;1.TTY体系的发展&lt;/h2&gt;&lt;blockquote&gt;
 &lt;p&gt;参考：&lt;/p&gt;
-&lt;p&gt;&lt;a href=&quot;https</summary>
-      
+&lt;p&gt;&lt;a href=&quot;https://zhuanlan.zhihu.com/p/337366679&quot;&gt;Linux 终端(TTY)&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://taoshu.in/tty.html&quot;&gt;解密 TTY 设备&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3 id=&quot;1-1-终端机&quot;&gt;&lt;a href=&quot;#1-1-终端机&quot; class=&quot;headerlink&quot; title=&quot;1.1 终端机&quot;&gt;&lt;/a&gt;1.1 终端机&lt;/h3&gt;&lt;p&gt;从历史上看，终端刚开始就是终端机，配有打印机，键盘，带有一个串口，通过串口传送数据到主机端，然后主机处理完交给终端打印出来。电传打字机(teletype)可以被看作是这类设备的统称，因此终端也被简称为 TTY(teletype 的缩写)：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/../images/UART%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20231006145708741.png&quot; alt=&quot;image-20231006145708741&quot;&gt;&lt;/p&gt;</summary>
     
     
     
     <category term="Linux应用开发" scheme="http://example.com/categories/Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/"/>
     
     
+    <category term="C/C++" scheme="http://example.com/tags/C-C/"/>
+    
     <category term="嵌入式" scheme="http://example.com/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/"/>
     
     <category term="Linux" scheme="http://example.com/tags/Linux/"/>
-    
-    <category term="C/C++" scheme="http://example.com/tags/C-C/"/>
     
   </entry>
   
@@ -383,21 +451,24 @@
     <updated>2024-02-26T10:14:59.062Z</updated>
     
     
-      
-      
-    <summary type="html">&lt;h2 id=&quot;1-线程的标识-pthread-t&quot;&gt;&lt;a href=&quot;#1-线程的标识-pthread-t&quot; class=&quot;headerlink&quot; title=&quot;1. 线程的标识 pthread_t&quot;&gt;&lt;/a&gt;1. 线程的标识 pthread_t&lt;/h2&gt;&lt;p&gt;对于每一个进程都</summary>
-      
+    <summary type="html">&lt;h2 id=&quot;1-线程的标识-pthread-t&quot;&gt;&lt;a href=&quot;#1-线程的标识-pthread-t&quot; class=&quot;headerlink&quot; title=&quot;1. 线程的标识 pthread_t&quot;&gt;&lt;/a&gt;1. 线程的标识 pthread_t&lt;/h2&gt;&lt;p&gt;对于每一个进程都有唯一PID号与之对应，而对于线程而言，也有类似的tid号，即一个pthread_t类型的变量。线程号是表示线程的唯一标识，&lt;strong&gt;但是对于线程号而言，其仅仅在其所属的进程上下文中才有意义。&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;获取当前线程的线程号：&lt;/p&gt;
+&lt;figure class=&quot;highlight c&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;2&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;td class=&quot;code&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;meta&quot;&gt;#&lt;span class=&quot;keyword&quot;&gt;include&lt;/span&gt; &lt;span class=&quot;string&quot;&gt;&amp;lt;pthread.h&amp;gt;&lt;/span&gt; &lt;/span&gt;&lt;/span&gt;&lt;br&gt;&lt;span class=&quot;line&quot;&gt;&lt;span class=&quot;type&quot;&gt;pthread_t&lt;/span&gt; &lt;span class=&quot;title function_&quot;&gt;pthread_self&lt;/span&gt;&lt;span class=&quot;params&quot;&gt;(&lt;span class=&quot;type&quot;&gt;void&lt;/span&gt;)&lt;/span&gt;;&lt;/span&gt;&lt;br&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/figure&gt;
+
+
+
+&lt;h2 id=&quot;2-线程的创建&quot;&gt;&lt;a href=&quot;#2-线程的创建&quot; class=&quot;headerlink&quot; title=&quot;2. 线程的创建&quot;&gt;&lt;/a&gt;2. 线程的创建&lt;/h2&gt;</summary>
     
     
     
     <category term="Linux应用开发" scheme="http://example.com/categories/Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/"/>
     
     
+    <category term="C/C++" scheme="http://example.com/tags/C-C/"/>
+    
     <category term="嵌入式" scheme="http://example.com/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/"/>
     
     <category term="Linux" scheme="http://example.com/tags/Linux/"/>
-    
-    <category term="C/C++" scheme="http://example.com/tags/C-C/"/>
     
   </entry>
   
@@ -409,21 +480,19 @@
     <updated>2023-10-03T11:08:41.131Z</updated>
     
     
-      
-      
-    <summary type="html">&lt;h2 id=&quot;1-TCP-UDP网络通信流程图&quot;&gt;&lt;a href=&quot;#1-TCP-UDP网络通信流程图&quot; class=&quot;headerlink&quot; title=&quot;1. TCP&amp;#x2F;UDP网络通信流程图&quot;&gt;&lt;/a&gt;1. TCP&amp;#x2F;UDP网络通信流程图&lt;/h2&gt;&lt;h3 i</summary>
-      
+    <summary type="html">&lt;h2 id=&quot;1-TCP-UDP网络通信流程图&quot;&gt;&lt;a href=&quot;#1-TCP-UDP网络通信流程图&quot; class=&quot;headerlink&quot; title=&quot;1. TCP&amp;#x2F;UDP网络通信流程图&quot;&gt;&lt;/a&gt;1. TCP&amp;#x2F;UDP网络通信流程图&lt;/h2&gt;&lt;h3 id=&quot;1-1-TCP&quot;&gt;&lt;a href=&quot;#1-1-TCP&quot; class=&quot;headerlink&quot; title=&quot;1.1 TCP&quot;&gt;&lt;/a&gt;1.1 TCP&lt;/h3&gt;&lt;p&gt;&lt;img src=&quot;/../images/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B/image-20230926192207003.png&quot; alt=&quot;image-20230926192207003&quot;&gt;&lt;/p&gt;
+&lt;h4 id=&quot;1-1-1-代码&quot;&gt;&lt;a href=&quot;#1-1-1-代码&quot; class=&quot;headerlink&quot; title=&quot;1.1.1 代码&quot;&gt;&lt;/a&gt;1.1.1 代码&lt;/h4&gt;&lt;h5 id=&quot;server-c&quot;&gt;&lt;a href=&quot;#server-c&quot; class=&quot;headerlink&quot; title=&quot;server.c&quot;&gt;&lt;/a&gt;server.c&lt;/h5&gt;</summary>
     
     
     
     <category term="Linux应用开发" scheme="http://example.com/categories/Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/"/>
     
     
+    <category term="C/C++" scheme="http://example.com/tags/C-C/"/>
+    
     <category term="嵌入式" scheme="http://example.com/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/"/>
     
     <category term="Linux" scheme="http://example.com/tags/Linux/"/>
-    
-    <category term="C/C++" scheme="http://example.com/tags/C-C/"/>
     
   </entry>
   
@@ -435,21 +504,24 @@
     <updated>2023-09-24T09:57:44.127Z</updated>
     
     
-      
-      
-    <summary type="html">&lt;h2 id=&quot;1-电阻屏和电容屏定位原理&quot;&gt;&lt;a href=&quot;#1-电阻屏和电容屏定位原理&quot; class=&quot;headerlink&quot; title=&quot;1. 电阻屏和电容屏定位原理&quot;&gt;&lt;/a&gt;1. 电阻屏和电容屏定位原理&lt;/h2&gt;&lt;h3 id=&quot;1-1-电阻屏&quot;&gt;&lt;a href=&quot;#</summary>
-      
+    <summary type="html">&lt;h2 id=&quot;1-电阻屏和电容屏定位原理&quot;&gt;&lt;a href=&quot;#1-电阻屏和电容屏定位原理&quot; class=&quot;headerlink&quot; title=&quot;1. 电阻屏和电容屏定位原理&quot;&gt;&lt;/a&gt;1. 电阻屏和电容屏定位原理&lt;/h2&gt;&lt;h3 id=&quot;1-1-电阻屏&quot;&gt;&lt;a href=&quot;#1-1-电阻屏&quot; class=&quot;headerlink&quot; title=&quot;1.1 电阻屏&quot;&gt;&lt;/a&gt;1.1 电阻屏&lt;/h3&gt;&lt;p&gt;&lt;img src=&quot;/../images/%E4%BD%BF%E7%94%A8%E7%94%B5%E9%98%BB%E5%B1%8F%E5%92%8C%E7%94%B5%E5%AE%B9%E5%B1%8F/image-20230922200403814.png&quot; alt=&quot;image-20230922200403814&quot;&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;根据分压原理，计算电阻值。假设材料长度和电阻成线性关系，则可以计算出相对距离&lt;/li&gt;
+&lt;li&gt;电阻屏分为上下两层薄膜，一层通电时，另一层在按压时作为探针获取分压值，从而进行计算&lt;/li&gt;
+&lt;li&gt;电阻屏和LCD使用之前，需要进行五点校准二者的相对位置&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&quot;1-1-1-电阻屏数据&quot;&gt;&lt;a href=&quot;#1-1-1-电阻屏数据&quot; class=&quot;headerlink&quot; title=&quot;1.1.1 电阻屏数据&quot;&gt;&lt;/a&gt;1.1.1 电阻屏数据&lt;/h4&gt;</summary>
     
     
     
     <category term="Linux应用开发" scheme="http://example.com/categories/Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/"/>
     
     
+    <category term="C/C++" scheme="http://example.com/tags/C-C/"/>
+    
     <category term="嵌入式" scheme="http://example.com/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/"/>
     
     <category term="Linux" scheme="http://example.com/tags/Linux/"/>
-    
-    <category term="C/C++" scheme="http://example.com/tags/C-C/"/>
     
   </entry>
   
@@ -461,78 +533,42 @@
     <updated>2023-09-20T13:55:54.948Z</updated>
     
     
-      
-      
-    <summary type="html">&lt;h2 id=&quot;1-输入系统框架及调试&quot;&gt;&lt;a href=&quot;#1-输入系统框架及调试&quot; class=&quot;headerlink&quot; title=&quot;1. 输入系统框架及调试&quot;&gt;&lt;/a&gt;1. 输入系统框架及调试&lt;/h2&gt;&lt;h3 id=&quot;1-1-框架概述&quot;&gt;&lt;a href=&quot;#1-1-框架概</summary>
-      
-    
-    
-    
-    <category term="Linux应用开发" scheme="http://example.com/categories/Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/"/>
-    
-    
-    <category term="嵌入式" scheme="http://example.com/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/"/>
-    
-    <category term="Linux" scheme="http://example.com/tags/Linux/"/>
-    
-    <category term="C/C++" scheme="http://example.com/tags/C-C/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>使用LCD屏幕</title>
-    <link href="http://example.com/2023/09/12/%E4%BD%BF%E7%94%A8LCD%E5%B1%8F%E5%B9%95/"/>
-    <id>http://example.com/2023/09/12/%E4%BD%BF%E7%94%A8LCD%E5%B1%8F%E5%B9%95/</id>
-    <published>2023-09-12T12:41:58.000Z</published>
-    <updated>2023-09-17T09:13:45.399Z</updated>
-    
-    
-      
-      
-    <summary type="html">&lt;h2 id=&quot;1-LCD操作原理&quot;&gt;&lt;a href=&quot;#1-LCD操作原理&quot; class=&quot;headerlink&quot; title=&quot;1. LCD操作原理&quot;&gt;&lt;/a&gt;1. LCD操作原理&lt;/h2&gt;&lt;ol&gt;
-&lt;li&gt;驱动程序：Farmebuffer驱动程序设置好LCD控制器：&lt;ol&gt;</summary>
-      
-    
-    
-    
-    <category term="Linux应用开发" scheme="http://example.com/categories/Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/"/>
-    
-    
-    <category term="嵌入式" scheme="http://example.com/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/"/>
-    
-    <category term="Linux" scheme="http://example.com/tags/Linux/"/>
-    
-    <category term="C/C++" scheme="http://example.com/tags/C-C/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>Unix-Linux编程实践教程-章节3笔记</title>
-    <link href="http://example.com/2023/09/12/Unix-Linux%E7%BC%96%E7%A8%8B%E5%AE%9E%E8%B7%B5%E6%95%99%E7%A8%8B-%E7%AB%A0%E8%8A%823%E7%AC%94%E8%AE%B0/"/>
-    <id>http://example.com/2023/09/12/Unix-Linux%E7%BC%96%E7%A8%8B%E5%AE%9E%E8%B7%B5%E6%95%99%E7%A8%8B-%E7%AB%A0%E8%8A%823%E7%AC%94%E8%AE%B0/</id>
-    <published>2023-09-12T07:19:10.000Z</published>
-    <updated>2023-09-17T03:28:16.787Z</updated>
-    
-    
-      
-      
-    <summary type="html">&lt;h2 id=&quot;ls&quot;&gt;&lt;a href=&quot;#ls&quot; class=&quot;headerlink&quot; title=&quot;ls&quot;&gt;&lt;/a&gt;ls&lt;/h2&gt;&lt;p&gt;编写ls命令&lt;/p&gt;
+    <summary type="html">&lt;h2 id=&quot;1-输入系统框架及调试&quot;&gt;&lt;a href=&quot;#1-输入系统框架及调试&quot; class=&quot;headerlink&quot; title=&quot;1. 输入系统框架及调试&quot;&gt;&lt;/a&gt;1. 输入系统框架及调试&lt;/h2&gt;&lt;h3 id=&quot;1-1-框架概述&quot;&gt;&lt;a href=&quot;#1-1-框架概述&quot; class=&quot;headerlink&quot; title=&quot;1.1 框架概述&quot;&gt;&lt;/a&gt;1.1 框架概述&lt;/h3&gt;&lt;p&gt;&lt;img src=&quot;/../images/%E8%BE%93%E5%85%A5%E7%B3%BB%E7%BB%9F%E5%BA%94%E7%94%A8%E7%BC%96%E7%A8%8B/image-20230917174044630.png&quot; alt=&quot;image-20230917174044630&quot;&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;APP 发起读操作，若无数据则休眠； &lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;用户操作设备，硬件上产生中断； &lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;输入系统驱动层对应的驱动程序处理中断： &lt;/p&gt;
+&lt;p&gt;读取到数据，转换为标准的输入事件，向核心层汇报。 所谓输入事件就是一个&lt;code&gt;input_event&lt;/code&gt;结构体。 &lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;核心层可以决定把输入事件转发给上面哪个 handler 来处理： &lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;列出目录的内容&lt;/li&gt;
-&lt;li&gt;读取并显示文件的属性&lt;/li&gt;
-&lt;li&gt;给出名字，判断它是目录还是</summary>
-      
+&lt;li&gt;&lt;p&gt;从 handler 的名字来看，它就是用来处输入操作的。有多种 handler，比 如：evdev_handler、kbd_handler、joydev_handler 等等。 &lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;最常用的是 evdev_handler：它只是把 input_event 结构体保存在内核buffer 等，APP 来读取时就原原本本地返回。它支持多个 APP 同时访问输入设备，每个 APP 都可以获得同一份输入事件。 &lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;当 APP 正在等待数据时，evdev_handler 会把它唤醒，这样 APP 就可以返回数据。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;APP 对输入事件的处理：&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;APP获得数据的方法有2种：直接访问设备节点( 比如&lt;code&gt;/dev/input/event0,1,2,...&lt;/code&gt;)，或者通过&lt;code&gt;tslib、libinput&lt;/code&gt;这类库来间接访问设备节点。这些库简化了对数据的处理。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&quot;1-2-编写APP需要掌握的知识&quot;&gt;&lt;a href=&quot;#1-2-编写APP需要掌握的知识&quot; class=&quot;headerlink&quot; title=&quot;1.2 编写APP需要掌握的知识&quot;&gt;&lt;/a&gt;1.2 编写APP需要掌握的知识&lt;/h3&gt;</summary>
     
     
     
-    <category term="读书笔记" scheme="http://example.com/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/"/>
+    <category term="Linux应用开发" scheme="http://example.com/categories/Linux%E5%BA%94%E7%94%A8%E5%BC%80%E5%8F%91/"/>
     
-    <category term="《Unix-Linux编程实践教程》" scheme="http://example.com/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E3%80%8AUnix-Linux%E7%BC%96%E7%A8%8B%E5%AE%9E%E8%B7%B5%E6%95%99%E7%A8%8B%E3%80%8B/"/>
-    
-    
-    <category term="Linux" scheme="http://example.com/tags/Linux/"/>
     
     <category term="C/C++" scheme="http://example.com/tags/C-C/"/>
+    
+    <category term="嵌入式" scheme="http://example.com/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/"/>
+    
+    <category term="Linux" scheme="http://example.com/tags/Linux/"/>
     
   </entry>
   

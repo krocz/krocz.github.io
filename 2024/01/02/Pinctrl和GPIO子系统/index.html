@@ -36,11 +36,11 @@
 <meta property="og:image" content="http://example.com/images/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/image-20240103104344564.png">
 <meta property="og:image" content="http://example.com/images/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/image-20240103202925506.png">
 <meta property="article:published_time" content="2024-01-02T11:43:44.000Z">
-<meta property="article:modified_time" content="2024-01-07T06:53:35.028Z">
+<meta property="article:modified_time" content="2024-03-22T02:31:31.325Z">
 <meta property="article:author" content="Krocz">
+<meta property="article:tag" content="C&#x2F;C++">
 <meta property="article:tag" content="嵌入式">
 <meta property="article:tag" content="Linux">
-<meta property="article:tag" content="C&#x2F;C++">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://example.com/images/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/image-20240102204442724.png">
 
@@ -242,7 +242,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2024-01-07 14:53:35" itemprop="dateModified" datetime="2024-01-07T14:53:35+08:00">2024-01-07</time>
+                <time title="修改时间：2024-03-22 10:31:31" itemprop="dateModified" datetime="2024-03-22T10:31:31+08:00">2024-03-22</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -290,7 +290,7 @@
 </ul>
 <h4 id="1-1-1-pin-controller"><a href="#1-1-1-pin-controller" class="headerlink" title="1.1.1 pin controller"></a>1.1.1 pin controller</h4><p>pin controller 是一个软件上的概念，用来复用引脚，还可以配置引脚(比如上下拉电阻等)。</p>
 <blockquote>
-<p>pin controller 和后面讲到的 GPIO Controller 不是一回事，前者控制的引脚可用于 GPIO 功能、I2C 功能；后者只是把引脚配置为输入、输出等简单的功能。</p>
+<p>pin controller 和后面讲到的 GPIO Controller 不是一回事，GPIO Controller 只是把引脚配置为输入、输出等简单的功能。</p>
 </blockquote>
 <h4 id="1-1-2-client-device"><a href="#1-1-2-client-device" class="headerlink" title="1.1.2 client device"></a>1.1.2 client device</h4><p>Pinctrl 系统的客户，就是使用引脚的设备，<strong>它在设备树里会被定义为一个节点，在节点里声明要用哪些引脚</strong>。例如：</p>
 <p><img src="/../images/Pinctrl%E5%92%8CGPIO%E5%AD%90%E7%B3%BB%E7%BB%9F/image-20240102204442724.png" alt="image-20240102204442724"></p>
@@ -299,7 +299,7 @@
 <h5 id="2-groups-和-function"><a href="#2-groups-和-function" class="headerlink" title="(2) groups 和 function"></a>(2) groups 和 function</h5><p>一个设备会用到一个或多个引脚，这些引脚就可以归为一组(group)；</p>
 <p>这些引脚可以复用为某个功能：function。</p>
 <p>当然：一个设备可以用到多组引脚，比如 A1、A2 两组引脚，A1 组复用为 F1 功能，A2 组复用为 F2 功能。</p>
-<h5 id="3-Generic-pin-multiplexing-node-和-Generic-pin-configuration-node"><a href="#3-Generic-pin-multiplexing-node-和-Generic-pin-configuration-node" class="headerlink" title="(3) Generic pin multiplexing node 和 Generic pin configuration node"></a>(3) Generic pin multiplexing node 和 Generic pin configuration node</h5><p>在上图左边的 pin controller 节点中，一些其他属性可以描述不同的引脚信息，例如，哪组 (group) 引脚配置为哪 个设置功能 (setting)，比如上拉、下拉等。</p>
+<h5 id="3-Generic-pin-multiplexing-node-和-Generic-pin-configuration-node"><a href="#3-Generic-pin-multiplexing-node-和-Generic-pin-configuration-node" class="headerlink" title="(3) Generic pin multiplexing node 和 Generic pin configuration node"></a>(3) Generic pin multiplexing node 和 Generic pin configuration node</h5><p>在上图左边的 pin controller 节点中，一些其他属性可以描述不同的引脚信息，例如，哪组 (group) 引脚配置为哪个设置功能 (setting)，比如上拉、下拉等。</p>
 <blockquote>
 <p>pin controller 节点的格式，没有统一的标准。每家芯片都不一样。 甚至上面的 group、function 关键字也不一定有，但是概念是有的。</p>
 </blockquote>
@@ -417,9 +417,9 @@
 
       <footer class="post-footer">
           <div class="post-tags">
+              <a href="/tags/C-C/" rel="tag"># C/C++</a>
               <a href="/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/" rel="tag"># 嵌入式</a>
               <a href="/tags/Linux/" rel="tag"># Linux</a>
-              <a href="/tags/C-C/" rel="tag"># C/C++</a>
           </div>
 
         
@@ -508,18 +508,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">27</span>
+          <span class="site-state-item-count">29</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
-        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-count">8</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
-        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-count">9</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>

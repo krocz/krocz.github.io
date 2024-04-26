@@ -40,11 +40,11 @@
 <meta property="og:image" content="http://example.com/images/%E4%BD%BF%E7%94%A8%E8%AE%BE%E5%A4%87%E6%A0%91%E7%9A%84LED%E9%A9%B1%E5%8A%A8%E6%A1%86%E6%9E%B6/image-20240102114920931.png">
 <meta property="og:image" content="http://example.com/images/%E4%BD%BF%E7%94%A8%E8%AE%BE%E5%A4%87%E6%A0%91%E7%9A%84LED%E9%A9%B1%E5%8A%A8%E6%A1%86%E6%9E%B6/image-20240102115755062.png">
 <meta property="article:published_time" content="2024-01-02T03:02:49.000Z">
-<meta property="article:modified_time" content="2024-01-06T04:29:11.167Z">
+<meta property="article:modified_time" content="2024-03-21T13:43:48.896Z">
 <meta property="article:author" content="Krocz">
+<meta property="article:tag" content="C&#x2F;C++">
 <meta property="article:tag" content="嵌入式">
 <meta property="article:tag" content="Linux">
-<meta property="article:tag" content="C&#x2F;C++">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://example.com/images/%E4%BD%BF%E7%94%A8%E8%AE%BE%E5%A4%87%E6%A0%91%E7%9A%84LED%E9%A9%B1%E5%8A%A8%E6%A1%86%E6%9E%B6/image-20231218155959125.png">
 
@@ -246,7 +246,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2024-01-06 12:29:11" itemprop="dateModified" datetime="2024-01-06T12:29:11+08:00">2024-01-06</time>
+                <time title="修改时间：2024-03-21 21:43:48" itemprop="dateModified" datetime="2024-03-21T21:43:48+08:00">2024-03-21</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -264,14 +264,14 @@
                 <i class="far fa-file-word"></i>
               </span>
                 <span class="post-meta-item-text">本文字数：</span>
-              <span>13k</span>
+              <span>14k</span>
             </span>
             <span class="post-meta-item" title="阅读时长">
               <span class="post-meta-item-icon">
                 <i class="far fa-clock"></i>
               </span>
                 <span class="post-meta-item-text">阅读时长 &asymp;</span>
-              <span>24 分钟</span>
+              <span>26 分钟</span>
             </span>
 
         </div>
@@ -338,6 +338,23 @@
 <h4 id="1-2-3-常用属性"><a href="#1-2-3-常用属性" class="headerlink" title="1.2.3 常用属性"></a>1.2.3 常用属性</h4><ol>
 <li><p>#address-cells、#size-cells</p>
 <p>#address-cells指示硬件的address要用多少个32位数表示；#size-cells表示硬件所占用的内存size要用多少个32位数来表示。</p>
+<p>例如：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">aips1: aips-bus@<span class="number">02000000</span> &#123;</span><br><span class="line">    compatible = <span class="string">&quot;fsl,aips-bus&quot;</span>, <span class="string">&quot;simple-bus&quot;</span>;</span><br><span class="line">    <span class="meta">#address-cells = <span class="string">&lt;1&gt;</span>;</span></span><br><span class="line">    <span class="meta">#size-cells = <span class="string">&lt;1&gt;</span>;</span></span><br><span class="line">    reg = &lt;<span class="number">0x02000000</span> <span class="number">0x100000</span>&gt;;</span><br><span class="line">    ranges;</span><br></pre></td></tr></table></figure>
+
+<p>对于需要指定大小资源的设备是有用的，比如 RAM 块或者其他可配置大小的硬件资源，需要设置 <code>#address-cells = &lt;1&gt;;</code> 以便描述该设备所使用的内存空间大小。</p>
+<blockquote>
+<p> AIPS 是 ARM IP Bus 的缩写，它一边与内核 AHB 总线连接，另一边与片上的各种外设连接，AIPS1~4 连接了各种各样的外设。</p>
+</blockquote>
+<p>对于一些固定大小的外设，如I2C控制器：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">i2c1: i2c@021a0000 &#123;</span><br><span class="line">    #address-cells = &lt;1&gt;;</span><br><span class="line">    #size-cells = &lt;0&gt;;</span><br><span class="line">    compatible = &quot;fsl,imx6ul-i2c&quot;, &quot;fsl,imx21-i2c&quot;;</span><br><span class="line">    reg = &lt;0x021a0000 0x4000&gt;;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>它们占用的内存映射空间通常是固定的，因此不需要在设备树中指定大小。在这种情况下，<code>#size-cells</code>可以被设置为<code>&lt;0&gt;</code>。</p>
+<p>其他 <code>#size-cells = &lt;0&gt;</code> 的情况：</p>
+<ul>
+<li>该节点代表的硬件资源的大小是固定的，不需要通过设备树来指定。</li>
+<li>驱动程序将不期望从设备树获取大小信息，因为它已经知道资源的大小或者有其他机制来确定它。</li>
+<li>在设备树中，该节点可能仍然包含其他重要信息，比如中断、时钟或状态，但不包括大小信息。</li>
+</ul>
 </li>
 <li><p>compatible</p>
 <p>“compatible”表示“兼容”，对于某个 LED，内核中可能有 A、B、C 三个驱动都支持它，那可以这样写：</p>
@@ -474,7 +491,7 @@
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">    A</span><br><span class="line">   / \</span><br><span class="line">  B   C</span><br><span class="line"> / \</span><br><span class="line">D   E</span><br></pre></td></tr></table></figure>
 
 <p>在这个例子中，节点 A 的 <code>child</code> 指向 B，节点 B 的 <code>sibling</code> 指向 C，节点 B 的 <code>child</code> 指向 D，节点 D 的 <code>sibling</code> 指向 E。这样，就可以通过 <code>child</code> 和 <code>sibling</code> 字段在设备树中表示节点之间的关系，包括一个节点有多个孩子的情况。</p>
-<p><strong>根节点被保存在全局变量 of_root 中，从 of_root 开始可以访问到任意节 点。</strong></p>
+<p><strong>根节点被保存在全局变量 of_root 中，从 of_root 开始可以访问到任意节点。</strong></p>
 <p>节点中属性成员：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span>	<span class="title">property</span> *<span class="title">properties</span>;</span></span><br><span class="line"><span class="class"><span class="keyword">struct</span>	<span class="title">property</span> *<span class="title">deadprops</span>;</span>	<span class="comment">/* removed properties */</span></span><br></pre></td></tr></table></figure>
 
@@ -501,8 +518,17 @@
 
 
 <h4 id="1-4-3-device-node-怎么转为-platform-device"><a href="#1-4-3-device-node-怎么转为-platform-device" class="headerlink" title="1.4.3 device_node 怎么转为 platform_device"></a>1.4.3 device_node 怎么转为 platform_device</h4><ul>
-<li><code>platform_device</code> 中含有 <code>resource</code> 数组，它来自 <code>device_node</code> 的 <code>reg\interrupts</code> 属性；</li>
-<li><code>platform_device.dev.of_node</code> 指向 <code>struct device_node</code>，可以通过该指针来获取<code>of_node-&gt;property</code> 从而获取设备节点中自定义的其他属性。</li>
+<li><p><code>platform_device</code> 中含有 <code>resource</code> 数组，设备树节点中的 reg、interrupts 属性会被转化为 resource；</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">struct</span> resource *<span class="title function_">platform_get_resource</span><span class="params">(<span class="keyword">struct</span> platform_device *dev, <span class="type">unsigned</span> <span class="type">int</span> type, <span class="type">unsigned</span> <span class="type">int</span> num)</span></span><br></pre></td></tr></table></figure>
+
+<p>使用该函数可以取出这些资源：</p>
+<ul>
+<li>对于设备树节点中的 reg 属性，它对应 IORESOURCE_MEM 类型的资源； </li>
+<li>对于设备树节点中的 interrupts 属性，它对应 IORESOURCE_IRQ 类型的资源。</li>
+</ul>
+</li>
+<li><p><code>platform_device.dev.of_node</code> 指向 <code>struct device_node</code>，可以通过该指针来获取<code>of_node-&gt;property</code> 从而获取设备节点中自定义的其他属性。</p>
+</li>
 </ul>
 <h3 id="1-5-完善-platform-device-与-platform-driver-匹配过程"><a href="#1-5-完善-platform-device-与-platform-driver-匹配过程" class="headerlink" title="1.5 完善 platform_device 与 platform_driver 匹配过程"></a>1.5 完善 platform_device 与 platform_driver 匹配过程</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">static</span> <span class="type">int</span> <span class="title function_">platform_match</span><span class="params">(<span class="keyword">struct</span> device *dev, <span class="keyword">struct</span> device_driver *drv)</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">platform_device</span> *<span class="title">pdev</span> =</span> to_platform_device(dev);</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">platform_driver</span> *<span class="title">pdrv</span> =</span> to_platform_driver(drv);</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* When driver_override is set, only bind to the matching driver */</span></span><br><span class="line">	<span class="keyword">if</span> (pdev-&gt;driver_override)</span><br><span class="line">		<span class="keyword">return</span> !<span class="built_in">strcmp</span>(pdev-&gt;driver_override, drv-&gt;name);</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* Attempt an OF style match first */</span></span><br><span class="line">	<span class="keyword">if</span> (of_driver_match_device(dev, drv))</span><br><span class="line">		<span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* Then try ACPI style match */</span></span><br><span class="line">	<span class="keyword">if</span> (acpi_driver_match_device(dev, drv))</span><br><span class="line">		<span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* Then try to match against the id table */</span></span><br><span class="line">	<span class="keyword">if</span> (pdrv-&gt;id_table)</span><br><span class="line">		<span class="keyword">return</span> platform_match_id(pdrv-&gt;id_table, pdev) != <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">/* fall-back to driver name match */</span></span><br><span class="line">	<span class="keyword">return</span> (<span class="built_in">strcmp</span>(pdev-&gt;name, drv-&gt;name) == <span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -511,8 +537,8 @@
 <p><img src="/../images/%E4%BD%BF%E7%94%A8%E8%AE%BE%E5%A4%87%E6%A0%91%E7%9A%84LED%E9%A9%B1%E5%8A%A8%E6%A1%86%E6%9E%B6/image-20231223160427435.png" alt="image-20231223160427435"></p>
 <ol>
 <li>如果 of_match_table 中含有 compatible 值，就跟 dev 的 compatile 属性比较，若一致则成功，否则返回失败；</li>
-<li>如果 of_match_table 中含有 type 值，就跟 dev 的 device_type 属性 比较，若一致则成功，否则返回失败；</li>
-<li>如果 of_match_table 中含有 name 值，就跟 dev 的 name 属性比 较，若一致则成功，否则返回失败。</li>
+<li>如果 of_match_table 中含有 type 值，就跟 dev 的 device_type 属性比较，若一致则成功，否则返回失败；</li>
+<li>如果 of_match_table 中含有 name 值，就跟 dev 的 name 属性比较，若一致则成功，否则返回失败。</li>
 </ol>
 <p><strong>而设备树中建议不再使用 devcie_type 和 name 属性</strong>，所以基本上只使用设备节点的 compatible 属性来寻找匹配的 platform_driver。</p>
 <h4 id="1-5-3-接下来比较：-platform-device-id"><a href="#1-5-3-接下来比较：-platform-device-id" class="headerlink" title="1.5.3 接下来比较： platform_device_id"></a>1.5.3 接下来比较： platform_device_id</h4><p>比较 platform_device.name 和 platform_driver.id_table[i].name， id_table 中可能有多项。</p>
@@ -574,9 +600,9 @@
 
       <footer class="post-footer">
           <div class="post-tags">
+              <a href="/tags/C-C/" rel="tag"># C/C++</a>
               <a href="/tags/%E5%B5%8C%E5%85%A5%E5%BC%8F/" rel="tag"># 嵌入式</a>
               <a href="/tags/Linux/" rel="tag"># Linux</a>
-              <a href="/tags/C-C/" rel="tag"># C/C++</a>
           </div>
 
         
@@ -665,18 +691,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
           <a href="/archives">
-          <span class="site-state-item-count">27</span>
+          <span class="site-state-item-count">29</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
-        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-count">8</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
-        <span class="site-state-item-count">8</span>
+        <span class="site-state-item-count">9</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
